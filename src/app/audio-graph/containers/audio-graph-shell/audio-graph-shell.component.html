@@ -1,1 +1,5 @@
-<app-audio-node-list [nodes]="audioNodes$ | async"></app-audio-node-list>
+<app-audio-node-list
+  [nodes]="audioNodes$ | async"
+  (createOscillator)="addOscillator()"
+  (connectNodes)="connectNodes($event)"
+></app-audio-node-list>

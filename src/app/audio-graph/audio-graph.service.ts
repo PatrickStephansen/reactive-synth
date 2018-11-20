@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import * as model from './audio-node';
+import { AudioNode as NodeModel } from './audio-node';
+import { Parameter as ParameterModel } from './parameter';
 
 let incrementingId = 0;
 
@@ -30,34 +31,55 @@ export class AudioGraphService {
     });
   }
 
-  createOscillator(): model.AudioNode {
+  createOscillator(): [NodeModel, ParameterModel[]] {
     const nodeType = 'oscillator';
     const id = this.createId(nodeType);
-    this.graph.set(id, this.context.createOscillator());
-    return { id, nodeType, numberInputs: 0, numberOutputs: 1, sourceIds: [] };
+    const oscillator = this.context.createOscillator();
+    this.graph.set(id, oscillator);
+    return [
+      { id, nodeType, numberInputs: 0, numberOutputs: 1, sourceIds: [] },
+      [
+        {
+          name: 'frequency',
+          nodeId: id,
+          sourceIds: [],
+          maxValue: oscillator.frequency.maxValue,
+          minValue: oscillator.frequency.minValue,
+          value: oscillator.frequency.defaultValue
+        },
+        {
+          name: 'detune',
+          nodeId: id,
+          sourceIds: [],
+          maxValue: oscillator.detune.maxValue,
+          minValue: oscillator.detune.minValue,
+          value: oscillator.detune.defaultValue
+        },
+      ]
+    ];
   }
 
   connectNodes(sourceId: string, destinationId: string): void {
     if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
-      this.graph[sourceId].connect(this.graph[destinationId]);
+      this.graph.get(sourceId).connect(this.graph.get(destinationId));
     }
   }
 
   disconnectNodes(sourceId: string, destinationId: string): void {
     if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
-      this.graph[sourceId].disconnect(this.graph[destinationId]);
+      this.graph.get(sourceId).disconnect(this.graph.get(destinationId));
     }
   }
 
   changeParameterValue(nodeId: string, parameterName: string, value): void {
     if (this.graph.has(nodeId)) {
-      const param = this.graph[nodeId][parameterName];
+      const param = this.graph.get(nodeId)[parameterName];
       if (param && param.setTargetAtTime) {
         // don't change immediately as an anti-pop precaution
         param.setTargetAtTime(value, this.context.currentTime, 0.0001);
       } else {
         // for cases like oscillator type, where the param is not numeric
-        this.graph[nodeId][parameterName] = value;
+        this.graph.get(nodeId)[parameterName] = value;
       }
     }
   }

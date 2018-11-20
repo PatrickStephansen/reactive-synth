@@ -3,7 +3,10 @@
     [nodeId]="node.id"
     [nodeType]="node.nodeType"
     [connectedSourceNodes]="node.sourceIds"
+    [numberInputs]="node.numberInputs"
+    [numberOutputs]="node.numberOutputs"
     [availableSourceNodes]="sourceNodes"
     (connectSourceNode)="connectNodes.emit($event)"
   ></app-audio-node>
 </ng-container>
+<button (click)="createOscillator.emit()">Add Oscillator Node</button>

@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Parameter } from '../../parameter';
+import { ChangeParameterEvent } from '../../change-parameter-event';
 
 @Component({
   selector: 'app-parameter',
@@ -11,10 +12,7 @@ import { Parameter } from '../../parameter';
 export class ParameterComponent implements OnInit {
   @Input() parameter: Parameter;
 
-  @Output() parameterValueChanged = new EventEmitter<{
-    parameterName: string;
-    value: number;
-  }>();
+  @Output() parameterValueChanged = new EventEmitter<ChangeParameterEvent>();
 
   parameterForm: FormGroup;
 
@@ -24,5 +22,7 @@ export class ParameterComponent implements OnInit {
     this.parameterForm = this.fb.group({
       value: ['' + this.parameter.value]
     });
+
+
   }
 }

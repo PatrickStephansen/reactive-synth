@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 import { ConnectNodesEvent } from '../connect-nodes-event';
 import { AudioNode } from '../audio-node';
 import { ChangeParameterEvent } from '../change-parameter-event';
+import { Parameter } from '../parameter';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
@@ -11,7 +12,8 @@ export enum AudioGraphActionTypes {
   ConnectNodes = '[Audio Graph] Connect Nodes',
   ConnectNodesSuccess = '[Audio Graph] Connect Nodes Success',
   CreateOscillator = '[Audio Graph] Create Oscillator',
-  CreateOscillatorSuccess = '[Audio Graph] Create OscillatorSuccess'
+  CreateNodeSuccess = '[Audio Graph] Create Node Success',
+  CreateParameterSuccess = '[Audio Graph Create Parameter Success]'
 }
 
 export class ResetGraph implements Action {
@@ -25,16 +27,12 @@ export class ResetGraphSuccess implements Action {
 
 export class ChangeParameter implements Action {
   readonly type = AudioGraphActionTypes.ChangeParameter;
-  constructor(
-    public payload: ChangeParameterEvent
-  ) {}
+  constructor(public payload: ChangeParameterEvent) {}
 }
 
 export class ChangeParameterSuccess implements Action {
   readonly type = AudioGraphActionTypes.ChangeParameterSuccess;
-  constructor(
-    public payload: ChangeParameterEvent
-  ) {}
+  constructor(public payload: ChangeParameterEvent) {}
 }
 
 export class ConnectNodes implements Action {
@@ -55,9 +53,15 @@ export class CreateOscillator implements Action {
 }
 
 export class CreateOscillatorSuccess implements Action {
-  readonly type = AudioGraphActionTypes.CreateOscillatorSuccess;
+  readonly type = AudioGraphActionTypes.CreateNodeSuccess;
 
   constructor(public payload: AudioNode) {}
+}
+
+export class CreateParameterSuccess implements Action {
+  readonly type = AudioGraphActionTypes.CreateParameterSuccess;
+
+  constructor(public payload: Parameter) {}
 }
 
 export type AudioGraphAction =
@@ -68,4 +72,5 @@ export type AudioGraphAction =
   | ConnectNodes
   | ConnectNodesSuccess
   | CreateOscillator
-  | CreateOscillatorSuccess;
+  | CreateOscillatorSuccess
+  | CreateParameterSuccess;

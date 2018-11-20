@@ -40,8 +40,11 @@ export function reducer(
       );
       return { ...state, nodes: updatedNodes };
     }
-    case AudioGraphActionTypes.CreateOscillatorSuccess: {
+    case AudioGraphActionTypes.CreateNodeSuccess: {
       return { ...state, nodes: [...state.nodes, action.payload] };
+    }
+    case AudioGraphActionTypes.CreateParameterSuccess: {
+      return { ...state, parameters: [...state.parameters, action.payload] };
     }
     default:
       return state;

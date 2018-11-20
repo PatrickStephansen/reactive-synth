@@ -10,7 +10,8 @@ import {
   ConnectNodesSuccess,
   ConnectNodes,
   ChangeParameterSuccess,
-  ChangeParameter
+  ChangeParameter,
+  CreateParameterSuccess
 } from './audio-graph.actions';
 import { from, Observable } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
@@ -36,7 +37,13 @@ export class AudioGraphEffects {
   @Effect()
   createOscillator$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateOscillator),
-    map(() => new CreateOscillatorSuccess(this.graphService.createOscillator()))
+    mergeMap(() => {
+      const [node, parameters] = this.graphService.createOscillator();
+      return from([
+        new CreateOscillatorSuccess(node),
+        ...parameters.map(p => new CreateParameterSuccess(p))
+      ]);
+    })
   );
 
   @Effect()

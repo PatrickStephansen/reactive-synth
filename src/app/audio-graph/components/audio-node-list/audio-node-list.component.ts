@@ -13,6 +13,7 @@ export class AudioNodeListComponent implements OnInit {
   @Input() sourceNodes: AudioNode[];
 
   @Output() connectNodes = new EventEmitter<ConnectNodesEvent>();
+  @Output() createOscillator = new EventEmitter<void>();
 
   constructor() {}
 
