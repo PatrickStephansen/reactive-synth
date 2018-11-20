@@ -21,7 +21,10 @@ export class AudioNodeListComponent implements OnInit {
 
   ngOnInit() {}
 
-  filterSourceNodes(nodeId: string) {
-    return this.sourceNodes.filter(n => n.id !== nodeId && n.numberOutputs).map(n => n.id);
+  filterSourceNodes({ id, sourceIds }: AudioNode) {
+    const excludeIds = [id, ...sourceIds];
+    return this.sourceNodes
+      .filter(n => !excludeIds.includes(n.id) && n.numberOutputs)
+      .map(n => n.id);
   }
 }

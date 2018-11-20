@@ -13,7 +13,7 @@ const initialState = {
     }
   ],
   parameters: [],
-  muted: true
+  muted: false
 };
 
 export function reducer(

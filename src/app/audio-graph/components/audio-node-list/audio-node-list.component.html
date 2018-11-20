@@ -8,7 +8,7 @@
     [connectedSourceNodes]="node.sourceIds"
     [numberInputs]="node.numberInputs"
     [numberOutputs]="node.numberOutputs"
-    [availableSourceNodes]="filterSourceNodes(node.id)"
+    [availableSourceNodes]="filterSourceNodes(node)"
     (connectSourceNode)="connectNodes.emit($event)"
   ></app-audio-node>
 </ng-container>
