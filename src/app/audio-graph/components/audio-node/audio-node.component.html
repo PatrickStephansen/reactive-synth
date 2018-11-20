@@ -1,4 +1,3 @@
-
 <label>
   ID
   <p>{{ nodeId }}</p>
@@ -20,20 +19,22 @@
   <ul>
     <li *ngFor="let sourceNode of connectedSourceNodes">{{ sourceNode }}</li>
   </ul>
-  <h3>Available Nodes</h3>
-  <select
-    name="new-input"
-    id="{{nodeId}}-new-input"
-    (change)="onConnectSourceNode($event.target.value)"
-  >
-    <option
-      *ngFor="let sourceNode of availableSourceNodes"
-      value="sourceNode"
+  <h3>Available Source Nodes</h3>
+  <form [formGroup]="nodeForm" (ngSubmit)="submitNodeChanges()">
+    <select
+      name="new-input"
+      id="{{nodeId}}-new-input"
+      formControlName="selectedSourceNode"
     >
-      {{ sourceNode }}
-    </option>
-  </select>
+      <option
+        *ngFor="let sourceNode of availableSourceNodes"
+        value="{{sourceNode}}"
+      >
+        {{ sourceNode }}
+      </option>
+    </select>
+    <button type="submit" [disabled]="!nodeForm.valid">Connect</button>
+  </form>
 </ng-container>
 
 <app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
-

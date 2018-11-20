@@ -24,10 +24,18 @@ export class AudioGraphService {
     return `${nodeType}-${incrementingId++}`;
   }
 
+  unmute(): Promise<void> {
+    return this.context.resume();
+  }
+
+  mute(): Promise<void> {
+    return this.context.suspend();
+  }
+
   resetGraph(): Promise<void> {
     return this.destroyContext().then(() => {
       this.context = new AudioContext();
-      this.graph = new Map([['spreakers-output', this.context.destination]]);
+      this.graph = new Map([['speakers-output', this.context.destination]]);
     });
   }
 
@@ -35,6 +43,7 @@ export class AudioGraphService {
     const nodeType = 'oscillator';
     const id = this.createId(nodeType);
     const oscillator = this.context.createOscillator();
+    oscillator.start();
     this.graph.set(id, oscillator);
     return [
       { id, nodeType, numberInputs: 0, numberOutputs: 1, sourceIds: [] },
@@ -54,7 +63,7 @@ export class AudioGraphService {
           maxValue: oscillator.detune.maxValue,
           minValue: oscillator.detune.minValue,
           value: oscillator.detune.defaultValue
-        },
+        }
       ]
     ];
   }

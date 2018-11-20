@@ -11,9 +11,11 @@ import {
   ConnectNodes,
   ChangeParameterSuccess,
   ChangeParameter,
-  CreateParameterSuccess
+  CreateParameterSuccess,
+  ToggleGraphActive,
+  ToggleGraphActiveSuccess
 } from './audio-graph.actions';
-import { from, Observable } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 import { ConnectNodesEvent } from '../connect-nodes-event';
 
@@ -65,6 +67,20 @@ export class AudioGraphEffects {
         event.value
       );
       return new ChangeParameterSuccess(event);
+    })
+  );
+
+  @Effect()
+  toggleGraphActive$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.ToggleGraphActive),
+    mergeMap(({ payload: activate }: ToggleGraphActive) => {
+      const servicePromise = activate
+        ? this.graphService.unmute()
+        : this.graphService.mute();
+
+      return of(servicePromise).pipe(
+        map(() => new ToggleGraphActiveSuccess(activate))
+      );
     })
   );
 }

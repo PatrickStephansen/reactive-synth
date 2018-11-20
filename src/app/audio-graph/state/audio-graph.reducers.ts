@@ -5,14 +5,15 @@ const initialState = {
   id: 'default-graph',
   nodes: [
     {
-      id: 'default-output',
+      id: 'speakers-output',
       nodeType: 'graph output',
       numberInputs: 1,
       numberOutputs: 0,
       sourceIds: []
     }
   ],
-  parameters: []
+  parameters: [],
+  muted: true
 };
 
 export function reducer(
@@ -45,6 +46,9 @@ export function reducer(
     }
     case AudioGraphActionTypes.CreateParameterSuccess: {
       return { ...state, parameters: [...state.parameters, action.payload] };
+    }
+    case AudioGraphActionTypes.ToggleGraphActiveSuccess: {
+      return { ...state, muted: !action.payload };
     }
     default:
       return state;

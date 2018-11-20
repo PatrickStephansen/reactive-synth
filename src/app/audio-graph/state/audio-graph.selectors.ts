@@ -2,6 +2,10 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AudioGraphState } from './audio-graph.state';
 
 const getGraphsFeatureState = createFeatureSelector<AudioGraphState>('graph');
+export const getGraphOutputActiveState = createSelector(
+  getGraphsFeatureState,
+  graph => !graph.muted
+);
 export const getNodesState = createSelector(
   getGraphsFeatureState,
   graph => graph.nodes

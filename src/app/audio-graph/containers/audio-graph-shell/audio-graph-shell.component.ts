@@ -4,11 +4,15 @@ import { Store, select } from '@ngrx/store';
 import { AudioGraphState } from '../../state/audio-graph.state';
 import { AudioNode } from '../../audio-node';
 import { Observable } from 'rxjs';
-import { getNodesState } from '../../state/audio-graph.selectors';
+import {
+  getNodesState,
+  getGraphOutputActiveState
+} from '../../state/audio-graph.selectors';
 import {
   ResetGraph,
   CreateOscillator,
-  ConnectNodes
+  ConnectNodes,
+  ToggleGraphActive
 } from '../../state/audio-graph.actions';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
@@ -19,10 +23,12 @@ import { ConnectNodesEvent } from '../../connect-nodes-event';
 })
 export class AudioGraphShellComponent implements OnInit {
   audioNodes$: Observable<AudioNode[]>;
+  graphOutputEnabled$: Observable<boolean>;
 
   constructor(private store: Store<AudioGraphState>) {
     store.dispatch(new ResetGraph());
     this.audioNodes$ = store.pipe(select(getNodesState));
+    this.graphOutputEnabled$ = store.pipe(select(getGraphOutputActiveState));
   }
 
   ngOnInit() {}
@@ -33,5 +39,9 @@ export class AudioGraphShellComponent implements OnInit {
 
   connectNodes(event: ConnectNodesEvent) {
     this.store.dispatch(new ConnectNodes(event));
+  }
+
+  toggleGraphOutputEnabled(enabled: boolean) {
+    this.store.dispatch(new ToggleGraphActive(enabled));
   }
 }

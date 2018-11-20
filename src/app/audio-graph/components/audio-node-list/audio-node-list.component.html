@@ -1,3 +1,6 @@
+<button (click)="toggleGraphOutputEnabled.emit(!graphOutputEnabled)">
+  {{ graphOutputEnabled ? 'Mute' : 'Unmute' }}
+</button>
 <ng-container *ngFor="let node of nodes">
   <app-audio-node
     [nodeId]="node.id"
@@ -5,7 +8,7 @@
     [connectedSourceNodes]="node.sourceIds"
     [numberInputs]="node.numberInputs"
     [numberOutputs]="node.numberOutputs"
-    [availableSourceNodes]="sourceNodes"
+    [availableSourceNodes]="filterSourceNodes(node.id)"
     (connectSourceNode)="connectNodes.emit($event)"
   ></app-audio-node>
 </ng-container>

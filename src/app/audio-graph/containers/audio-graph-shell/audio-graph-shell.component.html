@@ -1,5 +1,10 @@
-<app-audio-node-list
-  [nodes]="audioNodes$ | async"
-  (createOscillator)="addOscillator()"
-  (connectNodes)="connectNodes($event)"
-></app-audio-node-list>
+<ng-container *ngIf="(audioNodes$ | async) as audioNodes">
+  <app-audio-node-list
+    [nodes]="audioNodes"
+    [sourceNodes]="audioNodes"
+    [graphOutputEnabled]="graphOutputEnabled$ | async"
+    (createOscillator)="addOscillator()"
+    (connectNodes)="connectNodes($event)"
+    (toggleGraphOutputEnabled)="toggleGraphOutputEnabled($event)"
+  ></app-audio-node-list>
+</ng-container>

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, RequiredValidator } from '@angular/forms';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
 @Component({
@@ -17,14 +17,24 @@ export class AudioNodeComponent implements OnInit {
 
   @Output() connectSourceNode = new EventEmitter<ConnectNodesEvent>();
 
-  constructor() {}
+  nodeForm: FormGroup;
 
-  ngOnInit() {}
+  constructor(private formBuilder: FormBuilder) {}
 
-  onConnectSourceNode(sourceId: string) {
-    this.connectSourceNode.emit({
-      sourceId: sourceId,
-      destinationId: this.nodeId
+  ngOnInit() {
+    this.nodeForm = this.formBuilder.group({
+      selectedSourceNode: ['', RequiredValidator]
     });
+  }
+
+  submitNodeChanges() {
+    if (this.nodeForm.valid) {
+      const formValue = this.nodeForm.value;
+
+      this.connectSourceNode.emit({
+        sourceId: formValue.selectedSourceNode,
+        destinationId: this.nodeId
+      });
+    }
   }
 }

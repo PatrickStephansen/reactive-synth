@@ -5,4 +5,5 @@ export interface AudioGraphState {
   id: string;
   nodes: AudioNode[];
   parameters: Parameter[];
+  muted: boolean;
 }
