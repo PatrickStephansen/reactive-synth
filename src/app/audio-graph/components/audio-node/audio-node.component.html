@@ -1,39 +1,39 @@
-<div class="audio-node">
-  <label>
-    ID
-    <p>{{ nodeId }}</p>
-  </label>
-  <label>
-    Node Type
-    <p>{{ nodeType }}</p>
-  </label>
-  <label>
-    Inputs
-    <p>{{ numberInputs }}</p>
-  </label>
-  <label>
-    Outputs
-    <p>{{ numberOutputs }}</p>
-  </label>
-  <ng-container *ngIf="numberInputs">
-    <h3>Connected inputs</h3>
-    <ul>
-      <li *ngFor="let sourceNode of connectedSourceNodes">{{ sourceNode }}</li>
-    </ul>
-    <h3>Available Nodes</h3>
-    <select
-      name="new-input"
-      id="{{nodeId}}-new-input"
-      (change)="onConnectSourceNode($event.target.value)"
-    >
-      <option
-        *ngFor="let sourceNode of availableSourceNodes"
-        value="sourceNode"
-      >
-        {{ sourceNode }}
-      </option>
-    </select>
-  </ng-container>
 
-  <app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
-</div>
+<label>
+  ID
+  <p>{{ nodeId }}</p>
+</label>
+<label>
+  Node Type
+  <p>{{ nodeType }}</p>
+</label>
+<label>
+  Inputs
+  <p>{{ numberInputs }}</p>
+</label>
+<label>
+  Outputs
+  <p>{{ numberOutputs }}</p>
+</label>
+<ng-container *ngIf="numberInputs">
+  <h3>Connected inputs</h3>
+  <ul>
+    <li *ngFor="let sourceNode of connectedSourceNodes">{{ sourceNode }}</li>
+  </ul>
+  <h3>Available Nodes</h3>
+  <select
+    name="new-input"
+    id="{{nodeId}}-new-input"
+    (change)="onConnectSourceNode($event.target.value)"
+  >
+    <option
+      *ngFor="let sourceNode of availableSourceNodes"
+      value="sourceNode"
+    >
+      {{ sourceNode }}
+    </option>
+  </select>
+</ng-container>
+
+<app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
+
