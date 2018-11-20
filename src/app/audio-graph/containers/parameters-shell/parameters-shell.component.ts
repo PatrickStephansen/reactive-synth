@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { AudioGraphState } from '../../state/audio-graph.state';
 import { getParametersForNodeState } from '../../state/audio-graph.selectors';
 import { Parameter } from '../../parameter';
-import { ParameterChanged } from '../../state/audio-graph.actions';
+import { ChangeParameter } from '../../state/audio-graph.actions';
 
 @Component({
   selector: 'app-parameters-shell',
@@ -28,7 +28,7 @@ export class ParametersShellComponent implements OnInit {
 
   onParameterChanged(parameterName, value) {
     this.store.dispatch(
-      new ParameterChanged({ nodeId: this.nodeId, parameterName, value })
+      new ChangeParameter({ nodeId: this.nodeId, parameterName, value })
     );
   }
 }

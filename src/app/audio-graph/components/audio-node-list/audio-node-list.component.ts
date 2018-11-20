@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+import { AudioNode } from '../../audio-node';
+import { ConnectNodesEvent } from '../../connect-nodes-event';
 
 @Component({
   selector: 'app-audio-node-list',
@@ -6,10 +9,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./audio-node-list.component.scss']
 })
 export class AudioNodeListComponent implements OnInit {
+  @Input() nodes: AudioNode[];
+  @Input() sourceNodes: AudioNode[];
 
-  constructor() { }
+  @Output() connectNodes = new EventEmitter<ConnectNodesEvent>();
 
-  ngOnInit() {
-  }
+  constructor() {}
 
+  ngOnInit() {}
 }

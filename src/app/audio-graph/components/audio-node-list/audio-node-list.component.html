@@ -1,3 +1,9 @@
-<p>
-  audio-node-list works!
-</p>
+<ng-container *ngFor="let node of nodes">
+  <app-audio-node
+    [nodeId]="node.id"
+    [nodeType]="node.nodeType"
+    [connectedSourceNodes]="node.sourceIds"
+    [availableSourceNodes]="sourceNodes"
+    (connectSourceNode)="connectNodes.emit($event)"
+  ></app-audio-node>
+</ng-container>
