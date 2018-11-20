@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, RequiredValidator } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
 @Component({
@@ -23,7 +23,7 @@ export class AudioNodeComponent implements OnInit {
 
   ngOnInit() {
     this.nodeForm = this.formBuilder.group({
-      selectedSourceNode: ['', RequiredValidator]
+      selectedSourceNode: ['', Validators.required]
     });
   }
 
