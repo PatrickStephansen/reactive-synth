@@ -1,4 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
@@ -7,7 +15,7 @@ import { ConnectNodesEvent } from '../../connect-nodes-event';
   templateUrl: './audio-node.component.html',
   styleUrls: ['./audio-node.component.scss']
 })
-export class AudioNodeComponent implements OnInit {
+export class AudioNodeComponent implements OnInit, OnChanges {
   @Input() nodeId: string;
   @Input() nodeType: string;
   @Input() numberInputs: number;
@@ -28,6 +36,20 @@ export class AudioNodeComponent implements OnInit {
     this.connectNodeForm = this.formBuilder.group({
       selectedSourceNode: ['', Validators.required]
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const selectedSourceNoLongerAvailable =
+      changes.availableSourceNodes &&
+      !changes.availableSourceNodes.isFirstChange() &&
+      this.connectNodeForm.value.selectedSourceNode &&
+      !this.availableSourceNodes.includes(
+        this.connectNodeForm.value.selectedSourceNode
+      );
+
+    if (selectedSourceNoLongerAvailable) {
+      this.connectNodeForm.patchValue({ selectedSourceNode: '' });
+    }
   }
 
   submitNodeConnectionForm() {
