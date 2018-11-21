@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Parameter } from '../../parameter';
 import { ChangeParameterEvent } from '../../change-parameter-event';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-parameter',
@@ -12,7 +13,7 @@ import { ChangeParameterEvent } from '../../change-parameter-event';
 export class ParameterComponent implements OnInit {
   @Input() parameter: Parameter;
 
-  @Output() parameterValueChanged = new EventEmitter<ChangeParameterEvent>();
+  @Output() updateParameterValue = new EventEmitter<ChangeParameterEvent>();
 
   parameterForm: FormGroup;
 
@@ -20,9 +21,24 @@ export class ParameterComponent implements OnInit {
 
   ngOnInit() {
     this.parameterForm = this.fb.group({
-      value: ['' + this.parameter.value]
+      value: [this.parameter.value + '', Validators.required]
     });
 
-
+    this.parameterForm.valueChanges
+      // this sucks - find out why it double-triggers
+      .pipe(
+        distinctUntilChanged(
+          (oldForm, newForm) => oldForm.value === newForm.value
+        )
+      )
+      .subscribe(({ value }) => {
+        if (this.parameterForm.valid && this.parameterForm.dirty) {
+          this.updateParameterValue.emit({
+            nodeId: this.parameter.nodeId,
+            parameterName: this.parameter.name,
+            value
+          });
+        }
+      });
   }
 }

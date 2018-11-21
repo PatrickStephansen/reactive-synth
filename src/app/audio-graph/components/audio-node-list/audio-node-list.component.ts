@@ -28,4 +28,8 @@ export class AudioNodeListComponent implements OnInit {
       .filter(n => !excludeIds.includes(n.id) && n.numberOutputs)
       .map(n => n.id);
   }
+
+  getNodeId(index: number, node: AudioNode) {
+    return (node && node.id) || null;
+  }
 }

@@ -2,7 +2,7 @@
   {{ graphOutputEnabled ? 'Mute' : 'Unmute' }}
 </button>
 <div class="audio-graph">
-  <div class="audio-node" *ngFor="let node of nodes">
+  <div class="audio-node" *ngFor="let node of nodes; trackBy: getNodeId">
     <app-audio-node
       [nodeId]="node.id"
       [nodeType]="node.nodeType"

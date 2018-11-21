@@ -6,6 +6,7 @@ import { AudioGraphState } from '../../state/audio-graph.state';
 import { getParametersForNodeState } from '../../state/audio-graph.selectors';
 import { Parameter } from '../../parameter';
 import { ChangeParameter } from '../../state/audio-graph.actions';
+import { ChangeParameterEvent } from '../../change-parameter-event';
 
 @Component({
   selector: 'app-parameters-shell',
@@ -26,9 +27,7 @@ export class ParametersShellComponent implements OnInit {
     );
   }
 
-  onParameterChanged(parameterName, value) {
-    this.store.dispatch(
-      new ChangeParameter({ nodeId: this.nodeId, parameterName, value })
-    );
+  onParameterChanged(event: ChangeParameterEvent) {
+    this.store.dispatch(new ChangeParameter(event));
   }
 }

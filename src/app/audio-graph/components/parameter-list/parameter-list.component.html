@@ -1,3 +1,6 @@
-<ng-container *ngFor="let parameter of parameters">
-  <app-parameter [parameter]="parameter"></app-parameter>
+<ng-container *ngFor="let parameter of parameters; trackBy: getParameterId">
+  <app-parameter
+    [parameter]="parameter"
+    (updateParameterValue)="updateParameterValue.emit($event)"
+  ></app-parameter>
 </ng-container>
