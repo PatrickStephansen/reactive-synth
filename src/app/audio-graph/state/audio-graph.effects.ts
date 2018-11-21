@@ -14,7 +14,9 @@ import {
   CreateParameterSuccess,
   ToggleGraphActive,
   ToggleGraphActiveSuccess,
-  DisconnectNodesSuccess
+  DisconnectNodesSuccess,
+  DestroyNode,
+  DestroyNodeSuccess
 } from './audio-graph.actions';
 import { from, Observable, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
@@ -103,6 +105,15 @@ export class AudioGraphEffects {
       return of(servicePromise).pipe(
         map(() => new ToggleGraphActiveSuccess(activate))
       );
+    })
+  );
+
+  @Effect()
+  destroyNode$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.DestroyNode),
+    map(({ nodeId }: DestroyNode) => {
+      this.graphService.destroyNode(nodeId);
+      return new DestroyNodeSuccess(nodeId);
     })
   );
 }

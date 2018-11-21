@@ -14,7 +14,8 @@ import {
   ConnectNodes,
   ToggleGraphActive,
   DisconnectNodes,
-  CreateGainNode
+  CreateGainNode,
+  DestroyNode
 } from '../../state/audio-graph.actions';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
@@ -53,5 +54,9 @@ export class AudioGraphShellComponent implements OnInit {
 
   toggleGraphOutputEnabled(enabled: boolean) {
     this.store.dispatch(new ToggleGraphActive(enabled));
+  }
+
+  deleteNode(nodeId: string) {
+    this.store.dispatch(new DestroyNode(nodeId));
   }
 }

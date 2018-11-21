@@ -46,7 +46,14 @@ export class AudioGraphService {
     oscillator.start();
     this.graph.set(id, oscillator);
     return [
-      { id, nodeType, numberInputs: 0, numberOutputs: 1, sourceIds: [] },
+      {
+        id,
+        nodeType,
+        numberInputs: 0,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true
+      },
       [
         {
           name: 'frequency',
@@ -74,7 +81,14 @@ export class AudioGraphService {
     const gain = this.context.createGain();
     this.graph.set(id, gain);
     return [
-      { id, nodeType, numberInputs: 1, numberOutputs: 1, sourceIds: [] },
+      {
+        id,
+        nodeType,
+        numberInputs: 1,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true
+      },
       [
         {
           name: 'gain',
@@ -110,6 +124,13 @@ export class AudioGraphService {
         // for cases like oscillator type, where the param is not numeric
         this.graph.get(nodeId)[parameterName] = value;
       }
+    }
+  }
+
+  destroyNode(nodeId: string): void {
+    if (this.graph.has(nodeId)) {
+      this.graph.get(nodeId).disconnect();
+      this.graph.delete(nodeId);
     }
   }
 }

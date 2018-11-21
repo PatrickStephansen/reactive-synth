@@ -12,11 +12,13 @@ export class AudioNodeComponent implements OnInit {
   @Input() nodeType: string;
   @Input() numberInputs: number;
   @Input() numberOutputs: number;
+  @Input() canDelete: boolean;
   @Input() connectedSourceNodes: string[];
   @Input() availableSourceNodes: string[];
 
   @Output() connectSourceNode = new EventEmitter<ConnectNodesEvent>();
   @Output() disconnectSourceNode = new EventEmitter<ConnectNodesEvent>();
+  @Output() deleteNode = new EventEmitter<string>();
 
   connectNodeForm: FormGroup;
 

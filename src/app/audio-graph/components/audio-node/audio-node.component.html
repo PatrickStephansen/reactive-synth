@@ -1,3 +1,5 @@
+<button *ngIf="canDelete" type="button" class="delete-node" (click)="deleteNode.emit(nodeId)">Delete Node</button>
+
 <dl>
   <div class="node-property">
     <dt>ID</dt>
@@ -40,3 +42,4 @@
 </ng-container>
 
 <app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
+

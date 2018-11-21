@@ -9,9 +9,11 @@
       [connectedSourceNodes]="node.sourceIds"
       [numberInputs]="node.numberInputs"
       [numberOutputs]="node.numberOutputs"
+      [canDelete]="node.canDelete"
       [availableSourceNodes]="filterSourceNodes(node)"
       (connectSourceNode)="connectNodes.emit($event)"
       (disconnectSourceNode)="disconnectNodes.emit($event)"
+      (deleteNode)="deleteNode.emit($event)"
     ></app-audio-node>
   </div>
 </div>

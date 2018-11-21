@@ -4,4 +4,5 @@ export interface AudioNode {
   numberInputs: number;
   numberOutputs: number;
   sourceIds: string[];
+  canDelete: boolean;
 }

@@ -1,5 +1,10 @@
 import { AudioGraphState } from './audio-graph.state';
-import { AudioGraphActionTypes, AudioGraphAction } from './audio-graph.actions';
+import {
+  AudioGraphActionTypes,
+  AudioGraphAction,
+  DestroyNodeSuccess
+} from './audio-graph.actions';
+import { filter } from 'rxjs/operators';
 
 const initialState = {
   id: 'default-graph',
@@ -9,7 +14,8 @@ const initialState = {
       nodeType: 'graph output',
       numberInputs: 1,
       numberOutputs: 0,
-      sourceIds: []
+      sourceIds: [],
+      canDelete: false
     }
   ],
   parameters: [],
@@ -46,9 +52,7 @@ export function reducer(
         n.id === action.payload.destinationId
           ? {
               ...n,
-              sourceIds: n.sourceIds.filter(
-                s => s !== action.payload.sourceId
-              )
+              sourceIds: n.sourceIds.filter(s => s !== action.payload.sourceId)
             }
           : n
       );
@@ -62,6 +66,22 @@ export function reducer(
     }
     case AudioGraphActionTypes.ToggleGraphActiveSuccess: {
       return { ...state, muted: !action.payload };
+    }
+    case AudioGraphActionTypes.DestroyNodeSuccess: {
+      const remainingNodes = state.nodes
+        .filter(n => n.id !== action.nodeId)
+        .map(n => ({
+          ...n,
+          sourceIds: n.sourceIds.filter(s => s !== action.nodeId)
+        }));
+      const remainingParameters = state.parameters.filter(
+        p => p.nodeId !== action.nodeId
+      );
+      return {
+        ...state,
+        nodes: remainingNodes,
+        parameters: remainingParameters
+      };
     }
     default:
       return state;
