@@ -5,6 +5,7 @@
     [graphOutputEnabled]="graphOutputEnabled$ | async"
     (createOscillator)="addOscillator()"
     (createGainNode)="addGainNode()"
+    (createDistortionNode)="addDistortionNode()"
     (connectNodes)="connectNodes($event)"
     (disconnectNodes)="disconnectNodes($event)"
     (toggleGraphOutputEnabled)="toggleGraphOutputEnabled($event)"

@@ -64,6 +64,18 @@ export class AudioGraphEffects {
   );
 
   @Effect()
+  createDistortionNode$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.CreateDistortionNode),
+    mergeMap(() => {
+      const [node, parameters] = this.graphService.createDistortionNode();
+      return from([
+        new CreateOscillatorSuccess(node),
+        ...parameters.map(p => new CreateParameterSuccess(p))
+      ]);
+    })
+  );
+
+  @Effect()
   connectNodes$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ConnectNodes),
     map(({ payload: event }: ConnectNodes) => {

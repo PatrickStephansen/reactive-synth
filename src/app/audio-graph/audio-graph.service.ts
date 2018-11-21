@@ -4,6 +4,18 @@ import { Parameter as ParameterModel } from './parameter';
 
 let incrementingId = 0;
 
+// based on https://developer.mozilla.org/en-US/docs/Web/API/WaveShaperNode
+function makeDistortionCurve(amount = 50) {
+  const n_samples = 44100,
+    curve = new Float32Array(n_samples),
+    deg = Math.PI / 180;
+  for (let i = 0; i < n_samples; ++i) {
+    const x = (i * 2) / n_samples - 1;
+    curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+  }
+  return curve;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -99,6 +111,26 @@ export class AudioGraphService {
           value: gain.gain.defaultValue
         }
       ]
+    ];
+  }
+
+  createDistortionNode(): [NodeModel, ParameterModel[]] {
+    const nodeType = 'distortion';
+    const id = this.createId(nodeType);
+    const distortion = this.context.createWaveShaper();
+    distortion.curve = makeDistortionCurve(400);
+    distortion.oversample = '4x';
+    this.graph.set(id, distortion);
+    return [
+      {
+        id,
+        nodeType,
+        numberInputs: 1,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true
+      },
+      []
     ];
   }
 
