@@ -50,6 +50,18 @@ export class AudioGraphEffects {
   );
 
   @Effect()
+  createGainNode$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.CreateGainNode),
+    mergeMap(() => {
+      const [node, parameters] = this.graphService.createGainNode();
+      return from([
+        new CreateOscillatorSuccess(node),
+        ...parameters.map(p => new CreateParameterSuccess(p))
+      ]);
+    })
+  );
+
+  @Effect()
   connectNodes$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ConnectNodes),
     map(({ payload: event }: ConnectNodes) => {

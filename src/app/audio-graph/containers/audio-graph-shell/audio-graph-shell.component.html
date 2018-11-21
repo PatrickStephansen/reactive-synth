@@ -4,6 +4,7 @@
     [sourceNodes]="audioNodes"
     [graphOutputEnabled]="graphOutputEnabled$ | async"
     (createOscillator)="addOscillator()"
+    (createGainNode)="addGainNode()"
     (connectNodes)="connectNodes($event)"
     (disconnectNodes)="disconnectNodes($event)"
     (toggleGraphOutputEnabled)="toggleGraphOutputEnabled($event)"

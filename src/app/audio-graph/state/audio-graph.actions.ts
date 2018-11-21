@@ -14,6 +14,7 @@ export enum AudioGraphActionTypes {
   DisconnectNodes = '[Audio Graph] Disconnect Nodes',
   DisconnectNodesSuccess = '[Audio Graph] Disconnect Nodes Success',
   CreateOscillator = '[Audio Graph] Create Oscillator',
+  CreateGainNode = '[Audio Graph] Create Gain Node',
   CreateNodeSuccess = '[Audio Graph] Create Node Success',
   CreateParameterSuccess = '[Audio Graph] Create Parameter Success',
   ToggleGraphActive = '[Audio Graph] Toggle Graph Output Active',
@@ -67,6 +68,11 @@ export class CreateOscillator implements Action {
 
   constructor() {}
 }
+export class CreateGainNode implements Action {
+  readonly type = AudioGraphActionTypes.CreateGainNode;
+
+  constructor() {}
+}
 
 export class CreateOscillatorSuccess implements Action {
   readonly type = AudioGraphActionTypes.CreateNodeSuccess;
@@ -104,4 +110,5 @@ export type AudioGraphAction =
   | CreateOscillatorSuccess
   | CreateParameterSuccess
   | ToggleGraphActive
-  | ToggleGraphActiveSuccess;
+  | ToggleGraphActiveSuccess
+  | CreateGainNode;

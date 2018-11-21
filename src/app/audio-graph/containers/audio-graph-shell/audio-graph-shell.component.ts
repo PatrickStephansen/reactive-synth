@@ -13,7 +13,8 @@ import {
   CreateOscillator,
   ConnectNodes,
   ToggleGraphActive,
-  DisconnectNodes
+  DisconnectNodes,
+  CreateGainNode
 } from '../../state/audio-graph.actions';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
@@ -36,6 +37,10 @@ export class AudioGraphShellComponent implements OnInit {
 
   addOscillator() {
     this.store.dispatch(new CreateOscillator());
+  }
+
+  addGainNode() {
+    this.store.dispatch(new CreateGainNode());
   }
 
   connectNodes(event: ConnectNodesEvent) {

@@ -68,6 +68,26 @@ export class AudioGraphService {
     ];
   }
 
+  createGainNode(): [NodeModel, ParameterModel[]] {
+    const nodeType = 'volume';
+    const id = this.createId(nodeType);
+    const gain = this.context.createGain();
+    this.graph.set(id, gain);
+    return [
+      { id, nodeType, numberInputs: 1, numberOutputs: 1, sourceIds: [] },
+      [
+        {
+          name: 'gain',
+          nodeId: id,
+          sourceIds: [],
+          maxValue: gain.gain.maxValue,
+          minValue: gain.gain.minValue,
+          value: gain.gain.defaultValue
+        }
+      ]
+    ];
+  }
+
   connectNodes(sourceId: string, destinationId: string): void {
     if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
       this.graph.get(sourceId).connect(this.graph.get(destinationId));

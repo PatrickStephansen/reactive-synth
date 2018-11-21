@@ -16,6 +16,7 @@ export class AudioNodeListComponent implements OnInit {
   @Output() connectNodes = new EventEmitter<ConnectNodesEvent>();
   @Output() disconnectNodes = new EventEmitter<ConnectNodesEvent>();
   @Output() createOscillator = new EventEmitter<void>();
+  @Output() createGainNode = new EventEmitter<void>();
   @Output() toggleGraphOutputEnabled = new EventEmitter<boolean>();
 
   constructor() {}
