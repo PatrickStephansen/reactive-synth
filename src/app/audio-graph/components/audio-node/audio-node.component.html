@@ -1,19 +1,21 @@
-<label>
-  ID
-  <p>{{ nodeId }}</p>
-</label>
-<label>
-  Node Type
-  <p>{{ nodeType }}</p>
-</label>
-<label>
-  Inputs
-  <p>{{ numberInputs }}</p>
-</label>
-<label>
-  Outputs
-  <p>{{ numberOutputs }}</p>
-</label>
+<dl>
+  <div class="node-property">
+    <dt>ID</dt>
+    <dd>{{ nodeId }}</dd>
+  </div>
+  <div class="node-property">
+    <dt>Node Type</dt>
+    <dd>{{ nodeType }}</dd>
+  </div>
+  <div class="node-property">
+    <dt>Inputs</dt>
+    <dd>{{ numberInputs }}</dd>
+  </div>
+  <div class="node-property">
+    <dt>Outputs</dt>
+    <dd>{{ numberOutputs }}</dd>
+  </div>
+</dl>
 <ng-container *ngIf="numberInputs">
   <h3>Connected inputs</h3>
   <ul>
