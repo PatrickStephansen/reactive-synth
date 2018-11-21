@@ -41,6 +41,19 @@ export function reducer(
       );
       return { ...state, nodes: updatedNodes };
     }
+    case AudioGraphActionTypes.DisconnectNodesSuccess: {
+      const updatedNodes = state.nodes.map(n =>
+        n.id === action.payload.destinationId
+          ? {
+              ...n,
+              sourceIds: n.sourceIds.filter(
+                s => s !== action.payload.sourceId
+              )
+            }
+          : n
+      );
+      return { ...state, nodes: updatedNodes };
+    }
     case AudioGraphActionTypes.CreateNodeSuccess: {
       return { ...state, nodes: [...state.nodes, action.payload] };
     }

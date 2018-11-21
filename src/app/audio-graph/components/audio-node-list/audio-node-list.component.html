@@ -11,6 +11,7 @@
       [numberOutputs]="node.numberOutputs"
       [availableSourceNodes]="filterSourceNodes(node)"
       (connectSourceNode)="connectNodes.emit($event)"
+      (disconnectSourceNode)="disconnectNodes.emit($event)"
     ></app-audio-node>
   </div>
 </div>

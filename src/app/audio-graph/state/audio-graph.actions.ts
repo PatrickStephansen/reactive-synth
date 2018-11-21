@@ -11,6 +11,8 @@ export enum AudioGraphActionTypes {
   ChangeParameterSuccess = '[Audio Graph] Change Parameter Success',
   ConnectNodes = '[Audio Graph] Connect Nodes',
   ConnectNodesSuccess = '[Audio Graph] Connect Nodes Success',
+  DisconnectNodes = '[Audio Graph] Disconnect Nodes',
+  DisconnectNodesSuccess = '[Audio Graph] Disconnect Nodes Success',
   CreateOscillator = '[Audio Graph] Create Oscillator',
   CreateNodeSuccess = '[Audio Graph] Create Node Success',
   CreateParameterSuccess = '[Audio Graph] Create Parameter Success',
@@ -48,6 +50,18 @@ export class ConnectNodesSuccess implements Action {
 
   constructor(public payload: ConnectNodesEvent) {}
 }
+export class DisconnectNodes implements Action {
+  readonly type = AudioGraphActionTypes.DisconnectNodes;
+
+  constructor(public payload: ConnectNodesEvent) {}
+}
+
+export class DisconnectNodesSuccess implements Action {
+  readonly type = AudioGraphActionTypes.DisconnectNodesSuccess;
+
+  constructor(public payload: ConnectNodesEvent) {}
+}
+
 export class CreateOscillator implements Action {
   readonly type = AudioGraphActionTypes.CreateOscillator;
 
@@ -84,6 +98,8 @@ export type AudioGraphAction =
   | ChangeParameterSuccess
   | ConnectNodes
   | ConnectNodesSuccess
+  | DisconnectNodes
+  | DisconnectNodesSuccess
   | CreateOscillator
   | CreateOscillatorSuccess
   | CreateParameterSuccess

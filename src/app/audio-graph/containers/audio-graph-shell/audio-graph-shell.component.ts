@@ -12,7 +12,8 @@ import {
   ResetGraph,
   CreateOscillator,
   ConnectNodes,
-  ToggleGraphActive
+  ToggleGraphActive,
+  DisconnectNodes
 } from '../../state/audio-graph.actions';
 import { ConnectNodesEvent } from '../../connect-nodes-event';
 
@@ -39,6 +40,10 @@ export class AudioGraphShellComponent implements OnInit {
 
   connectNodes(event: ConnectNodesEvent) {
     this.store.dispatch(new ConnectNodes(event));
+  }
+
+  disconnectNodes(event: ConnectNodesEvent) {
+    this.store.dispatch(new DisconnectNodes(event));
   }
 
   toggleGraphOutputEnabled(enabled: boolean) {

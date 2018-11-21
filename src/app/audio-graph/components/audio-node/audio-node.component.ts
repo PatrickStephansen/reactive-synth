@@ -16,25 +16,33 @@ export class AudioNodeComponent implements OnInit {
   @Input() availableSourceNodes: string[];
 
   @Output() connectSourceNode = new EventEmitter<ConnectNodesEvent>();
+  @Output() disconnectSourceNode = new EventEmitter<ConnectNodesEvent>();
 
-  nodeForm: FormGroup;
+  connectNodeForm: FormGroup;
 
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
-    this.nodeForm = this.formBuilder.group({
+    this.connectNodeForm = this.formBuilder.group({
       selectedSourceNode: ['', Validators.required]
     });
   }
 
-  submitNodeChanges() {
-    if (this.nodeForm.valid) {
-      const formValue = this.nodeForm.value;
+  submitNodeConnectionForm() {
+    if (this.connectNodeForm.valid) {
+      const formValue = this.connectNodeForm.value;
 
       this.connectSourceNode.emit({
         sourceId: formValue.selectedSourceNode,
         destinationId: this.nodeId
       });
     }
+  }
+
+  disconnectNode(sourceId) {
+    this.disconnectSourceNode.emit({
+      sourceId,
+      destinationId: this.nodeId
+    });
   }
 }

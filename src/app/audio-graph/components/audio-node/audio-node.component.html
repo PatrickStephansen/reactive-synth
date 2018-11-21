@@ -19,10 +19,10 @@
 <ng-container *ngIf="numberInputs">
   <h3>Connected inputs</h3>
   <ul>
-    <li *ngFor="let sourceNode of connectedSourceNodes">{{ sourceNode }}</li>
+    <li *ngFor="let sourceNode of connectedSourceNodes">{{ sourceNode }} <button type="button" (click)="disconnectNode(sourceNode)">Disconnect</button> </li>
   </ul>
   <h3>Available Source Nodes</h3>
-  <form [formGroup]="nodeForm" (ngSubmit)="submitNodeChanges()">
+  <form [formGroup]="connectNodeForm" (ngSubmit)="submitNodeConnectionForm()">
     <select
       name="new-input"
       id="{{nodeId}}-new-input"
@@ -35,7 +35,7 @@
         {{ sourceNode }}
       </option>
     </select>
-    <button type="submit" [disabled]="!nodeForm.valid">Connect</button>
+    <button type="submit" [disabled]="!connectNodeForm.valid">Connect</button>
   </form>
 </ng-container>
 
