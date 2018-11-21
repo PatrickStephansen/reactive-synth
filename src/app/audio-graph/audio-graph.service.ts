@@ -118,7 +118,7 @@ export class AudioGraphService {
     const nodeType = 'distortion';
     const id = this.createId(nodeType);
     const distortion = this.context.createWaveShaper();
-    distortion.curve = makeDistortionCurve(400);
+    distortion.curve = makeDistortionCurve();
     distortion.oversample = '4x';
     this.graph.set(id, distortion);
     return [
