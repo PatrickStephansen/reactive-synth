@@ -34,7 +34,7 @@ export class AudioGraphEffects {
     ofType(AudioGraphActionTypes.ResetGraph),
     mergeMap(() =>
       from(this.graphService.resetGraph()).pipe(
-        map(() => new ResetGraphSuccess())
+        map(graph => new ResetGraphSuccess(graph))
       )
     )
   );

@@ -3,6 +3,8 @@ import { ConnectNodesEvent } from '../connect-nodes-event';
 import { AudioNode } from '../audio-node';
 import { ChangeParameterEvent } from '../change-parameter-event';
 import { Parameter } from '../parameter';
+import { Visualization } from '../visualization';
+import { AudioGraphState } from './audio-graph.state';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
@@ -30,7 +32,7 @@ export class ResetGraph implements Action {
 }
 export class ResetGraphSuccess implements Action {
   readonly type = AudioGraphActionTypes.ResetGraphSuccess;
-  constructor() {}
+  constructor(public graph: AudioGraphState) {}
 }
 
 export class ChangeParameter implements Action {

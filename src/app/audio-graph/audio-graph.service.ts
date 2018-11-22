@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AudioNode as NodeModel } from './audio-node';
 import { Parameter as ParameterModel } from './parameter';
+import { Visualization as VisualizationModel } from './visualization';
+import { AudioGraphState } from './state/audio-graph.state';
 
 let incrementingId = 0;
 
@@ -44,10 +46,25 @@ export class AudioGraphService {
     return this.context.suspend();
   }
 
-  resetGraph(): Promise<void> {
+  resetGraph(): Promise<AudioGraphState> {
     return this.destroyContext().then(() => {
       this.context = new AudioContext();
       this.graph = new Map([['speakers-output', this.context.destination]]);
+      return this.context.resume().then(() => ({
+        nodes: [
+          {
+            id: 'speakers-output',
+            nodeType: 'graph output',
+            numberInputs: 1,
+            numberOutputs: 0,
+            sourceIds: [],
+            canDelete: false
+          }
+        ],
+        parameters: [],
+        visualizations: [],
+        muted: false
+      }));
     });
   }
 
