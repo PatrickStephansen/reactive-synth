@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Parameter } from '../../parameter';
-import { ChangeParameterEvent } from '../../change-parameter-event';
+import { Parameter } from '../../model/parameter';
+import { ChangeParameterEvent } from '../../model/change-parameter-event';
 
 @Component({
   selector: 'app-parameter-list',

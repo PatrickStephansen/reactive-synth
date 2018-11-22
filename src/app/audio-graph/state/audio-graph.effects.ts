@@ -20,7 +20,7 @@ import {
 } from './audio-graph.actions';
 import { from, Observable, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
-import { ConnectNodesEvent } from '../connect-nodes-event';
+import { ConnectNodesEvent } from '../model/connect-nodes-event';
 
 @Injectable()
 export class AudioGraphEffects {

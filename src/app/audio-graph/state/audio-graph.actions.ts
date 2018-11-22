@@ -1,9 +1,9 @@
 import { Action } from '@ngrx/store';
-import { ConnectNodesEvent } from '../connect-nodes-event';
-import { AudioNode } from '../audio-node';
-import { ChangeParameterEvent } from '../change-parameter-event';
-import { Parameter } from '../parameter';
-import { Visualization } from '../visualization';
+import { ConnectNodesEvent } from '../model/connect-nodes-event';
+import { AudioNode } from '../model/audio-node';
+import { ChangeParameterEvent } from '../model/change-parameter-event';
+import { Parameter } from '../model/parameter';
+import { Visualization } from '../model/visualization';
 import { AudioGraphState } from './audio-graph.state';
 
 export enum AudioGraphActionTypes {

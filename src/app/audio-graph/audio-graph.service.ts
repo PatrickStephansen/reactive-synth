@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { AudioNode as NodeModel } from './audio-node';
-import { Parameter as ParameterModel } from './parameter';
-import { Visualization as VisualizationModel } from './visualization';
+import { AudioNode as NodeModel } from './model/audio-node';
+import { Parameter as ParameterModel } from './model/parameter';
+import { Visualization as VisualizationModel } from './model/visualization';
 import { AudioGraphState } from './state/audio-graph.state';
 
 let incrementingId = 0;

@@ -8,7 +8,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ConnectNodesEvent } from '../../connect-nodes-event';
+import { ConnectNodesEvent } from '../../model/connect-nodes-event';
 
 @Component({
   selector: 'app-audio-node',

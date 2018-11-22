@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Parameter } from '../../parameter';
-import { ChangeParameterEvent } from '../../change-parameter-event';
+import { Parameter } from '../../model/parameter';
+import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({

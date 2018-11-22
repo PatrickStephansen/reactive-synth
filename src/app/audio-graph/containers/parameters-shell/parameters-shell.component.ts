@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 
 import { AudioGraphState } from '../../state/audio-graph.state';
 import { getParametersForNodeState } from '../../state/audio-graph.selectors';
-import { Parameter } from '../../parameter';
+import { Parameter } from '../../model/parameter';
 import { ChangeParameter } from '../../state/audio-graph.actions';
-import { ChangeParameterEvent } from '../../change-parameter-event';
+import { ChangeParameterEvent } from '../../model/change-parameter-event';
 
 @Component({
   selector: 'app-parameters-shell',

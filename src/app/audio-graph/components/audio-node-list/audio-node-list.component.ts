@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { AudioNode } from '../../audio-node';
-import { ConnectNodesEvent } from '../../connect-nodes-event';
+import { AudioNode } from '../../model/audio-node';
+import { ConnectNodesEvent } from '../../model/connect-nodes-event';
 
 @Component({
   selector: 'app-audio-node-list',

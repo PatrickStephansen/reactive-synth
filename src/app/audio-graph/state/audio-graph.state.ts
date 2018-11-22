@@ -1,6 +1,6 @@
-import { Parameter } from '../parameter';
-import { AudioNode } from '../audio-node';
-import { Visualization } from '../visualization';
+import { Parameter } from '../model/parameter';
+import { AudioNode } from '../model/audio-node';
+import { Visualization } from '../model/visualization';
 
 export interface AudioGraphState {
   nodes: AudioNode[];

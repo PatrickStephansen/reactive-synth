@@ -2,7 +2,7 @@ import { Component, OnInit, EventEmitter } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
 import { AudioGraphState } from '../../state/audio-graph.state';
-import { AudioNode } from '../../audio-node';
+import { AudioNode } from '../../model/audio-node';
 import { Observable } from 'rxjs';
 import {
   getNodesState,
@@ -18,7 +18,7 @@ import {
   DestroyNode,
   CreateDistortionNode
 } from '../../state/audio-graph.actions';
-import { ConnectNodesEvent } from '../../connect-nodes-event';
+import { ConnectNodesEvent } from '../../model/connect-nodes-event';
 
 @Component({
   selector: 'app-audio-graph-shell',
