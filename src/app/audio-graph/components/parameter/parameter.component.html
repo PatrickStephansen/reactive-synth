@@ -1,7 +1,10 @@
 <form [formGroup]="parameterForm">
-  <label>
-    Parameter name
-    <div>{{ parameter.name }}</div>
-  </label>
-  <label>Value <input type="number" formControlName="value"/></label>
+  <div class="field">
+    <label class="label">
+      {{ parameter.name }}
+      <div class="control">
+        <input type="number" class="input" formControlName="value" />
+      </div>
+    </label>
+  </div>
 </form>

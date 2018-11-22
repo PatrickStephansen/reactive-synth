@@ -1,9 +1,5 @@
 .audio-graph {
-  display: flex;
-  flex-flow: row wrap;
-
   .audio-node {
-    flex: 1 1 300px;
-    border: 1px solid black;
+    border: 1px solid white;
   }
 }

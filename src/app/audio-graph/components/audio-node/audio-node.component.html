@@ -1,45 +1,75 @@
-<button *ngIf="canDelete" type="button" class="delete-node" (click)="deleteNode.emit(nodeId)">Delete Node</button>
+<div class="box is-fullheight">
+  <button
+    *ngIf="canDelete"
+    type="button"
+    class="delete is-pulled-right"
+    (click)="deleteNode.emit(nodeId)"
+  ></button>
 
-<dl>
-  <div class="node-property">
-    <dt>ID</dt>
-    <dd>{{ nodeId }}</dd>
-  </div>
-  <div class="node-property">
-    <dt>Node Type</dt>
-    <dd>{{ nodeType }}</dd>
-  </div>
-  <div class="node-property">
-    <dt>Inputs</dt>
-    <dd>{{ numberInputs }}</dd>
-  </div>
-  <div class="node-property">
-    <dt>Outputs</dt>
-    <dd>{{ numberOutputs }}</dd>
-  </div>
-</dl>
-<ng-container *ngIf="numberInputs">
-  <h3>Connected inputs</h3>
-  <ul>
-    <li *ngFor="let sourceNode of connectedSourceNodes">{{ sourceNode }} <button type="button" (click)="disconnectNode(sourceNode)">Disconnect</button> </li>
-  </ul>
-  <h3>Available Source Nodes</h3>
-  <form [formGroup]="connectNodeForm" (ngSubmit)="submitNodeConnectionForm()">
-    <select
-      name="new-input"
-      id="{{nodeId}}-new-input"
-      formControlName="selectedSourceNode"
-    >
-      <option
-        *ngFor="let sourceNode of availableSourceNodes"
-        value="{{sourceNode}}"
-      >
-        {{ sourceNode }}
-      </option>
-    </select>
-    <button type="submit" [disabled]="!connectNodeForm.valid">Connect</button>
-  </form>
-</ng-container>
+  <dl class="content">
+    <h3 class="title is-5">{{ nodeId }}</h3>
+    <div class="node-property">
+      <dt>Node Type</dt>
+      <dd>{{ nodeType }}</dd>
+    </div>
+    <div class="node-property">
+      <dt>Inputs</dt>
+      <dd>{{ numberInputs }}</dd>
+    </div>
+    <div class="node-property">
+      <dt>Outputs</dt>
+      <dd>{{ numberOutputs }}</dd>
+    </div>
+  </dl>
+  <ng-container *ngIf="numberInputs">
+    <div class="content" *ngIf="connectedSourceNodes?.length">
+      <div class="label">Connected inputs</div>
+      <ul>
+        <li *ngFor="let sourceNode of connectedSourceNodes">
+          <span class="tag"
+            >{{ sourceNode }}
+            <button
+              class="delete is-small"
+              type="button"
+              (click)="disconnectNode(sourceNode)"
+            ></button
+          ></span>
+        </li>
+      </ul>
+    </div>
+    <form [formGroup]="connectNodeForm" (ngSubmit)="submitNodeConnectionForm()">
+      <label class="label">
+        Available Source Nodes
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <div class="select is-fullwidth">
+              <select
+                name="new-input"
+                id="{{nodeId}}-new-input"
+                formControlName="selectedSourceNode"
+              >
+                <option
+                  *ngFor="let sourceNode of availableSourceNodes"
+                  value="{{sourceNode}}"
+                >
+                  {{ sourceNode }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="control">
+            <button
+              type="submit"
+              class="button"
+              [disabled]="!connectNodeForm.valid"
+            >
+              Connect
+            </button>
+          </div>
+        </div>
+      </label>
+    </form>
+  </ng-container>
 
-<app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
-
+  <app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
+</div>
