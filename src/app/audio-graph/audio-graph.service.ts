@@ -168,7 +168,7 @@ export class AudioGraphService {
       const param = this.graph.get(nodeId)[parameterName];
       if (param && param.setTargetAtTime) {
         // don't change immediately as an anti-pop precaution
-        param.setTargetAtTime(value, this.context.currentTime, 0.0001);
+        param.setTargetAtTime(value, this.context.currentTime, 0.005);
       } else {
         // for cases like oscillator type, where the param is not numeric
         this.graph.get(nodeId)[parameterName] = value;
