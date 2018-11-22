@@ -90,7 +90,8 @@ export class AudioGraphService {
           sourceIds: [],
           maxValue: oscillator.frequency.maxValue,
           minValue: oscillator.frequency.minValue,
-          value: oscillator.frequency.defaultValue
+          value: oscillator.frequency.defaultValue,
+          stepSize: 1
         },
         {
           name: 'detune',
@@ -98,7 +99,8 @@ export class AudioGraphService {
           sourceIds: [],
           maxValue: oscillator.detune.maxValue,
           minValue: oscillator.detune.minValue,
-          value: oscillator.detune.defaultValue
+          value: oscillator.detune.defaultValue,
+          stepSize: 1
         }
       ]
     ];
@@ -108,6 +110,8 @@ export class AudioGraphService {
     const nodeType = 'volume';
     const id = this.createId(nodeType);
     const gain = this.context.createGain();
+    const defaultValue = 0.1;
+    gain.gain.setValueAtTime(defaultValue, this.context.currentTime);
     this.graph.set(id, gain);
     return [
       {
@@ -125,7 +129,8 @@ export class AudioGraphService {
           sourceIds: [],
           maxValue: gain.gain.maxValue,
           minValue: gain.gain.minValue,
-          value: gain.gain.defaultValue
+          stepSize: 0.01,
+          value: defaultValue
         }
       ]
     ];

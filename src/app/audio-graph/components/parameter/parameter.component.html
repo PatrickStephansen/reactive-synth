@@ -3,7 +3,7 @@
     <label class="label">
       {{ parameter.name }}
       <div class="control">
-        <input type="number" class="input" formControlName="value" />
+        <input [step]="parameter.stepSize" type="number" class="input" formControlName="value" />
       </div>
     </label>
   </div>
