@@ -1,4 +1,4 @@
-import { AudioNode } from './model/audio-node';
+import { AudioNode } from './audio-node';
 
 export interface AnalysisNode extends AudioNode {
   analysisDataLength: number;
