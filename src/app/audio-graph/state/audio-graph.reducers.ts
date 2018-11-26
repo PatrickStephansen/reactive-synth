@@ -4,6 +4,7 @@ import { AudioGraphActionTypes, AudioGraphAction } from './audio-graph.actions';
 const initialState = {
   nodes: [],
   parameters: [],
+  choiceParameters: [],
   visualizations: [],
   muted: false
 };
@@ -14,7 +15,7 @@ export function reducer(
 ) {
   switch (action.type) {
     case AudioGraphActionTypes.ResetGraphSuccess: {
-      return {...action.graph};
+      return { ...action.graph };
     }
     case AudioGraphActionTypes.ChangeParameterSuccess: {
       const updatedParameters = state.parameters.map(p =>
@@ -50,6 +51,12 @@ export function reducer(
     case AudioGraphActionTypes.CreateParameterSuccess: {
       return { ...state, parameters: [...state.parameters, action.payload] };
     }
+    case AudioGraphActionTypes.CreateChoiceParameterSuccess: {
+      return {
+        ...state,
+        choiceParameters: [...state.choiceParameters, action.payload]
+      };
+    }
     case AudioGraphActionTypes.ToggleGraphActiveSuccess: {
       return { ...state, muted: !action.payload };
     }
@@ -63,10 +70,15 @@ export function reducer(
       const remainingParameters = state.parameters.filter(
         p => p.nodeId !== action.nodeId
       );
+      const remainingChoiceParameters = state.choiceParameters.filter(
+        p => p.nodeId !== action.nodeId
+      );
+
       return {
         ...state,
         nodes: remainingNodes,
-        parameters: remainingParameters
+        parameters: remainingParameters,
+        choiceParameters: remainingChoiceParameters
       };
     }
     default:

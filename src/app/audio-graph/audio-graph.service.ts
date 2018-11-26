@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AudioNode as NodeModel } from './model/audio-node';
 import { Parameter as ParameterModel } from './model/parameter';
-import { Visualization as VisualizationModel } from './model/visualization';
+import { ChoiceParameter as ChoiceParameterModel } from './model/choice-parameter';
 import { AudioGraphState } from './state/audio-graph.state';
 
 let incrementingId = 0;
@@ -62,13 +62,14 @@ export class AudioGraphService {
           }
         ],
         parameters: [],
+        choiceParameters: [],
         visualizations: [],
         muted: false
       }));
     });
   }
 
-  createOscillator(): [NodeModel, ParameterModel[]] {
+  createOscillator(): [NodeModel, ParameterModel[], ChoiceParameterModel[]] {
     const nodeType = 'oscillator';
     const id = this.createId(nodeType);
     const oscillator = this.context.createOscillator();
@@ -101,6 +102,14 @@ export class AudioGraphService {
           minValue: oscillator.detune.minValue,
           value: oscillator.detune.defaultValue,
           stepSize: 1
+        }
+      ],
+      [
+        {
+          name: 'type',
+          nodeId: id,
+          choices: ['sine', 'triangle', 'sawtooth', 'square'],
+          selection: 'sine'
         }
       ]
     ];

@@ -16,11 +16,12 @@ import {
   ToggleGraphActiveSuccess,
   DisconnectNodesSuccess,
   DestroyNode,
-  DestroyNodeSuccess
+  DestroyNodeSuccess,
+  CreateChoiceParameterSuccess,
+  ChangeChoiceParameter
 } from './audio-graph.actions';
 import { from, Observable, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
-import { ConnectNodesEvent } from '../model/connect-nodes-event';
 
 @Injectable()
 export class AudioGraphEffects {
@@ -43,10 +44,15 @@ export class AudioGraphEffects {
   createOscillator$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateOscillator),
     mergeMap(() => {
-      const [node, parameters] = this.graphService.createOscillator();
+      const [
+        node,
+        parameters,
+        choiceParameters
+      ] = this.graphService.createOscillator();
       return from([
         new CreateOscillatorSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p))
+        ...parameters.map(p => new CreateParameterSuccess(p)),
+        ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
       ]);
     })
   );
@@ -97,6 +103,19 @@ export class AudioGraphEffects {
   changeParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ChangeParameter),
     map(({ payload: event }: ChangeParameter) => {
+      this.graphService.changeParameterValue(
+        event.nodeId,
+        event.parameterName,
+        event.value
+      );
+      return new ChangeParameterSuccess(event);
+    })
+  );
+
+  @Effect()
+  changeChoiceParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.ChangeChoiceParameter),
+    map(({ payload: event }: ChangeChoiceParameter) => {
       this.graphService.changeParameterValue(
         event.nodeId,
         event.parameterName,

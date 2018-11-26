@@ -16,9 +16,20 @@ const getParametersState = createSelector(
   graph => graph.parameters
 );
 
+const getChoiceParametersState = createSelector(
+  getGraphsFeatureState,
+  graph => graph.choiceParameters
+);
+
 // This will crash if given bad arguments
 export const getParametersForNodeState = createSelector(
   getParametersState,
+  (parameters, { nodeId }: { nodeId: string }) =>
+    parameters.filter(parameter => parameter.nodeId === nodeId)
+);
+
+export const getChoiceParametersForNodeState = createSelector(
+  getChoiceParametersState,
   (parameters, { nodeId }: { nodeId: string }) =>
     parameters.filter(parameter => parameter.nodeId === nodeId)
 );

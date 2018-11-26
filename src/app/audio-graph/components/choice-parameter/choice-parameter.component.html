@@ -1,0 +1,13 @@
+<div class="field">
+  <label class="label">
+    <div class="control">
+      <div class="select">
+        <select (change)="changeSelection($event.target.value)">
+          <option *ngFor="let option of parameter.choices" value="{{option}}" [selected]="parameter.selection===option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </label>
+</div>

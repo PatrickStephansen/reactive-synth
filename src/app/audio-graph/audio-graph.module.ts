@@ -12,6 +12,7 @@ import { ParameterListComponent } from './components/parameter-list/parameter-li
 import { SharedModule } from '../shared/shared.module';
 import { AudioGraphEffects } from './state/audio-graph.effects';
 import { reducer } from './state/audio-graph.reducers';
+import { ChoiceParameterComponent } from './components/choice-parameter/choice-parameter.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { reducer } from './state/audio-graph.reducers';
     AudioNodeListComponent,
     ParameterComponent,
     ParametersShellComponent,
-    ParameterListComponent
+    ParameterListComponent,
+    ChoiceParameterComponent
   ],
   imports: [
     StoreModule.forFeature('graph', reducer),

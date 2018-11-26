@@ -1,1 +1,5 @@
-<app-parameter-list [parameters]="parameters$ | async" (updateParameterValue)="onParameterChanged($event)"></app-parameter-list>
+<app-parameter-list
+  [parameters]="parameters$ | async"
+  [choiceParameters]="choiceParameters$ | async"
+  (updateParameterValue)="onParameterChanged($event)"
+  (updateChoiceParameterValue)="onChoiceParameterChanged($event)"></app-parameter-list>

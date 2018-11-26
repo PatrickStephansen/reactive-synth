@@ -5,12 +5,15 @@ import { ChangeParameterEvent } from '../model/change-parameter-event';
 import { Parameter } from '../model/parameter';
 import { Visualization } from '../model/visualization';
 import { AudioGraphState } from './audio-graph.state';
+import { ChoiceParameter } from '../model/choice-parameter';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
   ResetGraphSuccess = '[Audio Graph] Reset Graph Success',
   ChangeParameter = '[Audio Graph] Change Parameter',
   ChangeParameterSuccess = '[Audio Graph] Change Parameter Success',
+  ChangeChoiceParameter = '[Audio Graph] Change Choice Parameter',
+  ChangeChoiceParameterSuccess = '[Audio Graph] Change Choice Parameter Success',
   ConnectNodes = '[Audio Graph] Connect Nodes',
   ConnectNodesSuccess = '[Audio Graph] Connect Nodes Success',
   DisconnectNodes = '[Audio Graph] Disconnect Nodes',
@@ -22,6 +25,7 @@ export enum AudioGraphActionTypes {
   DestroyNode = '[Audio Graph] Destroy Node',
   DestroyNodeSuccess = '[Audio Graph] Destroy NodeSuccess',
   CreateParameterSuccess = '[Audio Graph] Create Parameter Success',
+  CreateChoiceParameterSuccess = '[Audio Graph] Create Choice Parameter Success',
   ToggleGraphActive = '[Audio Graph] Toggle Graph Output Active',
   ToggleGraphActiveSuccess = '[Audio Graph] Toggle Graph Output Active Success'
 }
@@ -42,6 +46,16 @@ export class ChangeParameter implements Action {
 
 export class ChangeParameterSuccess implements Action {
   readonly type = AudioGraphActionTypes.ChangeParameterSuccess;
+  constructor(public payload: ChangeParameterEvent) {}
+}
+
+export class ChangeChoiceParameter implements Action {
+  readonly type = AudioGraphActionTypes.ChangeChoiceParameter;
+  constructor(public payload: ChangeParameterEvent) {}
+}
+
+export class ChangeChoiceParameterSuccess implements Action {
+  readonly type = AudioGraphActionTypes.ChangeChoiceParameterSuccess;
   constructor(public payload: ChangeParameterEvent) {}
 }
 
@@ -96,6 +110,12 @@ export class CreateParameterSuccess implements Action {
   readonly type = AudioGraphActionTypes.CreateParameterSuccess;
 
   constructor(public payload: Parameter) {}
+
+}
+export class CreateChoiceParameterSuccess implements Action {
+  readonly type = AudioGraphActionTypes.CreateChoiceParameterSuccess;
+
+  constructor(public payload: ChoiceParameter) {}
 }
 
 export class ToggleGraphActive implements Action {
@@ -126,6 +146,8 @@ export type AudioGraphAction =
   | ResetGraphSuccess
   | ChangeParameter
   | ChangeParameterSuccess
+  | ChangeChoiceParameter
+  | ChangeChoiceParameterSuccess
   | ConnectNodes
   | ConnectNodesSuccess
   | DisconnectNodes
@@ -133,6 +155,7 @@ export type AudioGraphAction =
   | CreateOscillator
   | CreateOscillatorSuccess
   | CreateParameterSuccess
+  | CreateChoiceParameterSuccess
   | ToggleGraphActive
   | ToggleGraphActiveSuccess
   | CreateGainNode

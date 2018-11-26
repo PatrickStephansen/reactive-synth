@@ -3,10 +3,17 @@ import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { AudioGraphState } from '../../state/audio-graph.state';
-import { getParametersForNodeState } from '../../state/audio-graph.selectors';
+import {
+  getParametersForNodeState,
+  getChoiceParametersForNodeState
+} from '../../state/audio-graph.selectors';
 import { Parameter } from '../../model/parameter';
-import { ChangeParameter } from '../../state/audio-graph.actions';
+import {
+  ChangeParameter,
+  ChangeChoiceParameter
+} from '../../state/audio-graph.actions';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
+import { ChoiceParameter } from '../../model/choice-parameter';
 
 @Component({
   selector: 'app-parameters-shell',
@@ -18,6 +25,7 @@ export class ParametersShellComponent implements OnInit {
   @Input() nodeId: string;
 
   parameters$: Observable<Parameter[]>;
+  choiceParameters$: Observable<ChoiceParameter[]>;
 
   constructor(private store: Store<AudioGraphState>) {}
 
@@ -25,9 +33,17 @@ export class ParametersShellComponent implements OnInit {
     this.parameters$ = this.store.pipe(
       select(getParametersForNodeState, { nodeId: this.nodeId })
     );
+
+    this.choiceParameters$ = this.store.pipe(
+      select(getChoiceParametersForNodeState, { nodeId: this.nodeId })
+    );
   }
 
   onParameterChanged(event: ChangeParameterEvent) {
     this.store.dispatch(new ChangeParameter(event));
+  }
+
+  onChoiceParameterChanged(event: ChangeParameterEvent) {
+    this.store.dispatch(new ChangeChoiceParameter(event));
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
+import { ChoiceParameter } from '../../model/choice-parameter';
 
 @Component({
   selector: 'app-parameter-list',
@@ -9,8 +10,10 @@ import { ChangeParameterEvent } from '../../model/change-parameter-event';
 })
 export class ParameterListComponent implements OnInit {
   @Input() parameters: Parameter[];
+  @Input() choiceParameters: ChoiceParameter[];
 
   @Output() updateParameterValue = new EventEmitter<ChangeParameterEvent>();
+  @Output() updateChoiceParameterValue = new EventEmitter<ChangeParameterEvent>();
 
   constructor() {}
 
