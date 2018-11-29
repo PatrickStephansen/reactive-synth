@@ -197,6 +197,38 @@ export class AudioGraphService {
     ];
   }
 
+  createConstantSource(): [NodeModel, ParameterModel[]] {
+    const nodeType = 'constant';
+    const id = this.createId(nodeType);
+    const constant = this.context.createConstantSource();
+    constant.start();
+    this.graph.set(id, {
+      internalNodes: [constant],
+      parameterMap: new Map([['output value', constant.offset]])
+    });
+    return [
+      {
+        id,
+        nodeType,
+        numberInputs: 0,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true
+      },
+      [
+        {
+          nodeId: id,
+          sourceIds: [],
+          name: 'output value',
+          maxValue: constant.offset.maxValue,
+          minValue: constant.offset.minValue,
+          value: constant.offset.value,
+          stepSize: 0.01
+        }
+      ]
+    ];
+  }
+
   connectNodes(sourceId: string, destinationId: string): void {
     if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
       last(this.graph.get(sourceId).internalNodes).connect(

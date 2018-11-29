@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { AudioNode } from '../../model/audio-node';
 import { ConnectNodesEvent } from '../../model/connect-nodes-event';
+import { CreateConstantSource } from '../../state/audio-graph.actions';
 
 @Component({
   selector: 'app-audio-node-list',
@@ -18,6 +19,7 @@ export class AudioNodeListComponent implements OnInit {
   @Output() createOscillator = new EventEmitter<void>();
   @Output() createGainNode = new EventEmitter<void>();
   @Output() createDistortionNode = new EventEmitter<void>();
+  @Output() createConstantSource = new EventEmitter<void>();
   @Output() toggleGraphOutputEnabled = new EventEmitter<boolean>();
   @Output() deleteNode = new EventEmitter<string>();
 

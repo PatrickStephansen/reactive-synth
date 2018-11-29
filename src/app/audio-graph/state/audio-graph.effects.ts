@@ -4,7 +4,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { AudioGraphService } from '../audio-graph.service';
 import {
   AudioGraphActionTypes,
-  CreateOscillatorSuccess,
+  CreateNodeSuccess,
   AudioGraphAction,
   ResetGraphSuccess,
   ConnectNodesSuccess,
@@ -51,7 +51,7 @@ export class AudioGraphEffects {
         choiceParameters
       ] = this.graphService.createOscillator();
       return from([
-        new CreateOscillatorSuccess(node),
+        new CreateNodeSuccess(node),
         ...parameters.map(p => new CreateParameterSuccess(p)),
         ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
       ]);
@@ -64,7 +64,7 @@ export class AudioGraphEffects {
     mergeMap(() => {
       const [node, parameters] = this.graphService.createGainNode();
       return from([
-        new CreateOscillatorSuccess(node),
+        new CreateNodeSuccess(node),
         ...parameters.map(p => new CreateParameterSuccess(p))
       ]);
     })
@@ -76,7 +76,19 @@ export class AudioGraphEffects {
     mergeMap(() => {
       const [node, parameters] = this.graphService.createDistortionNode();
       return from([
-        new CreateOscillatorSuccess(node),
+        new CreateNodeSuccess(node),
+        ...parameters.map(p => new CreateParameterSuccess(p))
+      ]);
+    })
+  );
+
+  @Effect()
+  createConstantSource$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.CreateConstantSource),
+    mergeMap(() => {
+      const [node, parameters] = this.graphService.createConstantSource();
+      return from([
+        new CreateNodeSuccess(node),
         ...parameters.map(p => new CreateParameterSuccess(p))
       ]);
     })
