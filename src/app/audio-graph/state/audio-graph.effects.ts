@@ -18,7 +18,8 @@ import {
   DestroyNode,
   DestroyNodeSuccess,
   CreateChoiceParameterSuccess,
-  ChangeChoiceParameter
+  ChangeChoiceParameter,
+  ChangeChoiceParameterSuccess
 } from './audio-graph.actions';
 import { from, Observable, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
@@ -116,12 +117,12 @@ export class AudioGraphEffects {
   changeChoiceParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ChangeChoiceParameter),
     map(({ payload: event }: ChangeChoiceParameter) => {
-      this.graphService.changeParameterValue(
+      this.graphService.makeChoice(
         event.nodeId,
         event.parameterName,
         event.value
       );
-      return new ChangeParameterSuccess(event);
+      return new ChangeChoiceParameterSuccess(event);
     })
   );
 

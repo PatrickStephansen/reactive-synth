@@ -1,29 +1,29 @@
 import { Injectable } from '@angular/core';
+import { head, last } from 'ramda';
+
 import { AudioNode as NodeModel } from './model/audio-node';
 import { Parameter as ParameterModel } from './model/parameter';
 import { ChoiceParameter as ChoiceParameterModel } from './model/choice-parameter';
 import { AudioGraphState } from './state/audio-graph.state';
+import { makeDistortionCurve } from './distortion-curve';
 
 let incrementingId = 0;
 
-// based on https://developer.mozilla.org/en-US/docs/Web/API/WaveShaperNode
-function makeDistortionCurve(amount = 50) {
-  const n_samples = 44100,
-    curve = new Float32Array(n_samples),
-    deg = Math.PI / 180;
-  for (let i = 0; i < n_samples; ++i) {
-    const x = (i * 2) / n_samples - 1;
-    curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
-  }
-  return curve;
+interface CompoundNode {
+  internalNodes: AudioNode[];
+  parameterMap?: Map<string, AudioParam>;
+  choiceMap?: Map<string, [AudioNode, string]>;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AudioGraphService {
-  private graph: Map<string, AudioNode>;
+  // let the interface emerge
+  private graph: Map<string, CompoundNode>;
   private context: AudioContext;
+
+  private defaultGain = 0.1;
 
   constructor() {}
 
@@ -49,7 +49,9 @@ export class AudioGraphService {
   resetGraph(): Promise<AudioGraphState> {
     return this.destroyContext().then(() => {
       this.context = new AudioContext();
-      this.graph = new Map([['speakers-output', this.context.destination]]);
+      this.graph = new Map([
+        ['speakers-output', { internalNodes: [this.context.destination] }]
+      ]);
       return this.context.resume().then(() => ({
         nodes: [
           {
@@ -73,8 +75,22 @@ export class AudioGraphService {
     const nodeType = 'oscillator';
     const id = this.createId(nodeType);
     const oscillator = this.context.createOscillator();
+    const volumeControl = this.context.createGain();
+    volumeControl.gain.value = this.defaultGain;
+    oscillator.connect(volumeControl);
     oscillator.start();
-    this.graph.set(id, oscillator);
+    const compoundNode = {
+      internalNodes: [oscillator, volumeControl],
+      parameterMap: new Map([
+        ['frequency', oscillator.frequency],
+        ['detune', oscillator.detune],
+        ['output gain', volumeControl.gain]
+      ]),
+      choiceMap: new Map([
+        ['waveform', [oscillator, 'type'] as [AudioNode, string]]
+      ])
+    };
+    this.graph.set(id, compoundNode);
     return [
       {
         id,
@@ -102,11 +118,20 @@ export class AudioGraphService {
           minValue: oscillator.detune.minValue,
           value: oscillator.detune.defaultValue,
           stepSize: 1
+        },
+        {
+          name: 'output gain',
+          nodeId: id,
+          sourceIds: [],
+          maxValue: volumeControl.gain.maxValue,
+          minValue: volumeControl.gain.minValue,
+          stepSize: 0.01,
+          value: this.defaultGain
         }
       ],
       [
         {
-          name: 'type',
+          name: 'waveform',
           nodeId: id,
           choices: ['sine', 'triangle', 'sawtooth', 'square'],
           selection: 'sine'
@@ -116,12 +141,17 @@ export class AudioGraphService {
   }
 
   createGainNode(): [NodeModel, ParameterModel[]] {
-    const nodeType = 'volume';
+    const nodeType = 'gain';
     const id = this.createId(nodeType);
     const gain = this.context.createGain();
-    const defaultValue = 0.1;
-    gain.gain.setValueAtTime(defaultValue, this.context.currentTime);
-    this.graph.set(id, gain);
+    gain.gain.value = this.defaultGain;
+    const gainParameterKey = 'signal multiplier';
+    const compoundNode = {
+      internalNodes: [gain],
+      parameterMap: new Map([[gainParameterKey, gain.gain]])
+    };
+
+    this.graph.set(id, compoundNode);
     return [
       {
         id,
@@ -133,13 +163,13 @@ export class AudioGraphService {
       },
       [
         {
-          name: 'gain',
+          name: gainParameterKey,
           nodeId: id,
           sourceIds: [],
           maxValue: gain.gain.maxValue,
           minValue: gain.gain.minValue,
           stepSize: 0.01,
-          value: defaultValue
+          value: this.defaultGain
         }
       ]
     ];
@@ -151,7 +181,9 @@ export class AudioGraphService {
     const distortion = this.context.createWaveShaper();
     distortion.curve = makeDistortionCurve();
     distortion.oversample = '4x';
-    this.graph.set(id, distortion);
+    this.graph.set(id, {
+      internalNodes: [distortion]
+    });
     return [
       {
         id,
@@ -167,32 +199,52 @@ export class AudioGraphService {
 
   connectNodes(sourceId: string, destinationId: string): void {
     if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
-      this.graph.get(sourceId).connect(this.graph.get(destinationId));
+      last(this.graph.get(sourceId).internalNodes).connect(
+        head(this.graph.get(destinationId).internalNodes)
+      );
     }
   }
 
   disconnectNodes(sourceId: string, destinationId: string): void {
     if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
-      this.graph.get(sourceId).disconnect(this.graph.get(destinationId));
+      last(this.graph.get(sourceId).internalNodes).disconnect(
+        head(this.graph.get(destinationId).internalNodes)
+      );
     }
   }
 
-  changeParameterValue(nodeId: string, parameterName: string, value): void {
-    if (this.graph.has(nodeId)) {
-      const param = this.graph.get(nodeId)[parameterName];
+  changeParameterValue(
+    nodeId: string,
+    parameterName: string,
+    value: number
+  ): void {
+    if (this.graph.has(nodeId) && this.graph.get(nodeId).parameterMap) {
+      const param = this.graph.get(nodeId).parameterMap.get(parameterName);
       if (param && param.setTargetAtTime) {
         // don't change immediately as an anti-pop precaution
         param.setTargetAtTime(value, this.context.currentTime, 0.005);
-      } else {
-        // for cases like oscillator type, where the param is not numeric
-        this.graph.get(nodeId)[parameterName] = value;
+      }
+    }
+  }
+
+  makeChoice(nodeId: string, choiceName: string, value: string): void {
+    if (this.graph.has(nodeId) && this.graph.get(nodeId).choiceMap) {
+      const choice = this.graph.get(nodeId).choiceMap.get(choiceName);
+      if (choice) {
+        const [node, property] = choice;
+        node[property] = value;
       }
     }
   }
 
   destroyNode(nodeId: string): void {
     if (this.graph.has(nodeId)) {
-      this.graph.get(nodeId).disconnect();
+      this.graph.get(nodeId).internalNodes.forEach(node => {
+        node.disconnect();
+        if (node['stop']) {
+          node['stop']();
+        }
+      });
       this.graph.delete(nodeId);
     }
   }

@@ -14,6 +14,7 @@ import {
 } from '../../state/audio-graph.actions';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { ChoiceParameter } from '../../model/choice-parameter';
+import { ChangeChoiceEvent } from '../../model/change-choice-event';
 
 @Component({
   selector: 'app-parameters-shell',
@@ -43,7 +44,7 @@ export class ParametersShellComponent implements OnInit {
     this.store.dispatch(new ChangeParameter(event));
   }
 
-  onChoiceParameterChanged(event: ChangeParameterEvent) {
+  onChoiceParameterChanged(event: ChangeChoiceEvent) {
     this.store.dispatch(new ChangeChoiceParameter(event));
   }
 }

@@ -3,9 +3,9 @@ import { ConnectNodesEvent } from '../model/connect-nodes-event';
 import { AudioNode } from '../model/audio-node';
 import { ChangeParameterEvent } from '../model/change-parameter-event';
 import { Parameter } from '../model/parameter';
-import { Visualization } from '../model/visualization';
 import { AudioGraphState } from './audio-graph.state';
 import { ChoiceParameter } from '../model/choice-parameter';
+import { ChangeChoiceEvent } from '../model/change-choice-event';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
@@ -51,12 +51,12 @@ export class ChangeParameterSuccess implements Action {
 
 export class ChangeChoiceParameter implements Action {
   readonly type = AudioGraphActionTypes.ChangeChoiceParameter;
-  constructor(public payload: ChangeParameterEvent) {}
+  constructor(public payload: ChangeChoiceEvent) {}
 }
 
 export class ChangeChoiceParameterSuccess implements Action {
   readonly type = AudioGraphActionTypes.ChangeChoiceParameterSuccess;
-  constructor(public payload: ChangeParameterEvent) {}
+  constructor(public payload: ChangeChoiceEvent) {}
 }
 
 export class ConnectNodes implements Action {

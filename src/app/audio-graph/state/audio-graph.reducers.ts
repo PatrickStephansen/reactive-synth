@@ -26,6 +26,15 @@ export function reducer(
       );
       return { ...state, parameters: updatedParameters };
     }
+    case AudioGraphActionTypes.ChangeChoiceParameterSuccess: {
+      const updatedParameters = state.choiceParameters.map(c =>
+        c.nodeId === action.payload.nodeId &&
+        c.name === action.payload.parameterName
+          ? { ...c, value: action.payload.value }
+          : c
+      );
+      return { ...state, choiceParameters: updatedParameters };
+    }
     case AudioGraphActionTypes.ConnectNodesSuccess: {
       const updatedNodes = state.nodes.map(n =>
         n.id === action.payload.destinationId

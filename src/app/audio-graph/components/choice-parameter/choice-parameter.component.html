@@ -1,9 +1,14 @@
 <div class="field">
   <label class="label">
+    {{ parameter.name }}
     <div class="control">
       <div class="select is-fullwidth">
         <select (change)="changeSelection($event.target.value)">
-          <option *ngFor="let option of parameter.choices" value="{{option}}" [selected]="parameter.selection===option">
+          <option
+            *ngFor="let option of parameter.choices"
+            value="{{option}}"
+            [selected]="parameter.selection === option"
+          >
             {{ option }}
           </option>
         </select>

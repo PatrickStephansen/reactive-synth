@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { ChoiceParameter } from '../../model/choice-parameter';
-import { ChangeParameterEvent } from '../../model/change-parameter-event';
+import { ChangeChoiceEvent } from '../../model/change-choice-event';
 
 @Component({
   selector: 'app-choice-parameter',
@@ -10,7 +10,7 @@ import { ChangeParameterEvent } from '../../model/change-parameter-event';
 })
 export class ChoiceParameterComponent implements OnInit {
   @Input() parameter: ChoiceParameter;
-  @Output() updateParameterValue = new EventEmitter<ChangeParameterEvent>();
+  @Output() updateParameterValue = new EventEmitter<ChangeChoiceEvent>();
 
   constructor() {}
 
