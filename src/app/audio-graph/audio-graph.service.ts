@@ -175,6 +175,40 @@ export class AudioGraphService {
     ];
   }
 
+  createDelayNode(): [NodeModel, ParameterModel[]] {
+    const nodeType = 'delay';
+    const id = this.createId(nodeType);
+    const delay = this.context.createDelay();
+    const delayParameterKey = 'delay time';
+    const compoundNode = {
+      internalNodes: [delay],
+      parameterMap: new Map([[delayParameterKey, delay.delayTime]])
+    };
+
+    this.graph.set(id, compoundNode);
+    return [
+      {
+        id,
+        nodeType,
+        numberInputs: 1,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true
+      },
+      [
+        {
+          name: delayParameterKey,
+          nodeId: id,
+          sourceIds: [],
+          maxValue: delay.delayTime.maxValue,
+          minValue: delay.delayTime.minValue,
+          stepSize: 0.01,
+          value: delay.delayTime.value
+        }
+      ]
+    ];
+  }
+
   createDistortionNode(): [NodeModel, ParameterModel[]] {
     const nodeType = 'distortion';
     const id = this.createId(nodeType);

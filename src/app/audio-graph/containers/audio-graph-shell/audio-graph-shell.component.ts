@@ -16,6 +16,7 @@ import {
   DisconnectNodes,
   CreateGainNode,
   DestroyNode,
+  CreateDelayNode,
   CreateDistortionNode,
   CreateConstantSource
 } from '../../state/audio-graph.actions';
@@ -44,6 +45,10 @@ export class AudioGraphShellComponent implements OnInit {
 
   addGainNode() {
     this.store.dispatch(new CreateGainNode());
+  }
+
+  addDelayNode() {
+    this.store.dispatch(new CreateDelayNode());
   }
 
   addDistortionNode() {

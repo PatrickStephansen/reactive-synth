@@ -71,6 +71,18 @@ export class AudioGraphEffects {
   );
 
   @Effect()
+  createDelayNode$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.CreateDelayNode),
+    mergeMap(() => {
+      const [node, parameters] = this.graphService.createDelayNode();
+      return from([
+        new CreateNodeSuccess(node),
+        ...parameters.map(p => new CreateParameterSuccess(p))
+      ]);
+    })
+  );
+
+  @Effect()
   createDistortionNode$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateDistortionNode),
     mergeMap(() => {
