@@ -19,7 +19,10 @@ import {
   DestroyNodeSuccess,
   CreateChoiceParameterSuccess,
   ChangeChoiceParameter,
-  ChangeChoiceParameterSuccess
+  ChangeChoiceParameterSuccess,
+  ConnectParameter,
+  ConnectParameterSuccess,
+  DisconnectParameterSuccess
 } from './audio-graph.actions';
 import { from, Observable, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
@@ -121,6 +124,24 @@ export class AudioGraphEffects {
     map(({ payload: event }: ConnectNodes) => {
       this.graphService.disconnectNodes(event.sourceId, event.destinationId);
       return new DisconnectNodesSuccess(event);
+    })
+  );
+
+  @Effect()
+  connectParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.ConnectParameter),
+    map(({ payload: event }: ConnectParameter) => {
+      this.graphService.connectParameter(event);
+      return new ConnectParameterSuccess(event);
+    })
+  );
+
+  @Effect()
+  disconnectParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.DisconnectParameter),
+    map(({ payload: event }: ConnectParameter) => {
+      this.graphService.disconnectParameter(event);
+      return new DisconnectParameterSuccess(event);
     })
   );
 

@@ -54,6 +54,29 @@ export function reducer(
       );
       return { ...state, nodes: updatedNodes };
     }
+    case AudioGraphActionTypes.ConnectParameterSuccess: {
+      const updatedParameters = state.parameters.map(p =>
+        p.nodeId === action.payload.destinationNodeId &&
+        p.name === action.payload.destinationParameterName
+          ? { ...p, sourceIds: [...p.sourceIds, action.payload.sourceNodeId] }
+          : p
+      );
+      return { ...state, parameters: updatedParameters };
+    }
+    case AudioGraphActionTypes.DisconnectParameterSuccess: {
+      const updatedParameters = state.parameters.map(p =>
+        p.nodeId === action.payload.destinationNodeId &&
+        p.name === action.payload.destinationParameterName
+          ? {
+              ...p,
+              sourceIds: p.sourceIds.filter(
+                s => action.payload.sourceNodeId !== s
+              )
+            }
+          : p
+      );
+      return { ...state, parameters: updatedParameters };
+    }
     case AudioGraphActionTypes.CreateNodeSuccess: {
       return { ...state, nodes: [...state.nodes, action.payload] };
     }

@@ -10,6 +10,11 @@ export const getNodesState = createSelector(
   getGraphsFeatureState,
   graph => graph.nodes
 );
+export const getSourceNodeIds = createSelector(
+  getNodesState,
+  (nodes, { nodeId }: { nodeId: string }) =>
+    nodes.filter(n => n.id !== nodeId && n.numberOutputs).map(n => n.id)
+);
 
 const getParametersState = createSelector(
   getGraphsFeatureState,

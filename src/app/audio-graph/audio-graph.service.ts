@@ -6,6 +6,7 @@ import { Parameter as ParameterModel } from './model/parameter';
 import { ChoiceParameter as ChoiceParameterModel } from './model/choice-parameter';
 import { AudioGraphState } from './state/audio-graph.state';
 import { makeDistortionCurve } from './distortion-curve';
+import { ConnectParameterEvent } from './model/connect-parameter-event';
 
 let incrementingId = 0;
 
@@ -19,7 +20,6 @@ interface CompoundNode {
   providedIn: 'root'
 })
 export class AudioGraphService {
-  // let the interface emerge
   private graph: Map<string, CompoundNode>;
   private context: AudioContext;
 
@@ -276,6 +276,46 @@ export class AudioGraphService {
       last(this.graph.get(sourceId).internalNodes).disconnect(
         head(this.graph.get(destinationId).internalNodes)
       );
+    }
+  }
+
+  connectParameter(event: ConnectParameterEvent): void {
+    if (
+      this.graph.has(event.sourceNodeId) &&
+      this.graph.has(event.destinationNodeId) &&
+      this.graph.get(event.destinationNodeId).parameterMap
+    ) {
+      const destinationParameter = this.graph
+        .get(event.destinationNodeId)
+        .parameterMap.get(event.destinationParameterName);
+      if (
+        destinationParameter &&
+        destinationParameter.automationRate === 'a-rate'
+      ) {
+        last(this.graph.get(event.sourceNodeId).internalNodes).connect(
+          destinationParameter
+        );
+      }
+    }
+  }
+
+  disconnectParameter(event: ConnectParameterEvent): void {
+    if (
+      this.graph.has(event.sourceNodeId) &&
+      this.graph.has(event.destinationNodeId) &&
+      this.graph.get(event.destinationNodeId).parameterMap
+    ) {
+      const destinationParameter = this.graph
+        .get(event.destinationNodeId)
+        .parameterMap.get(event.destinationParameterName);
+      if (
+        destinationParameter &&
+        destinationParameter.automationRate === 'a-rate'
+      ) {
+        last(this.graph.get(event.sourceNodeId).internalNodes).disconnect(
+          destinationParameter
+        );
+      }
     }
   }
 

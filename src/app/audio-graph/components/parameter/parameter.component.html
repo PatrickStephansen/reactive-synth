@@ -1,10 +1,55 @@
 <form [formGroup]="parameterForm">
-  <div class="field">
-    <label class="label">
+  <label class="label">
+    <div class="field">
       {{ parameter.name }}
       <div class="control">
-        <input [step]="parameter.stepSize" type="number" class="input" formControlName="value" />
+        <input
+          [step]="parameter.stepSize"
+          type="number"
+          class="input"
+          formControlName="value"
+        />
       </div>
-    </label>
-  </div>
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <div class="select is-fullwidth">
+            <select
+              name="new-input"
+              id="{{parameter.nodeId}}-{{parameter.name}}-new-input"
+              formControlName="selectedSourceNode"
+            >
+              <option
+                *ngFor="let sourceNode of availableSourceNodes"
+                value="{{sourceNode}}"
+              >
+                {{ sourceNode }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="control">
+          <button
+            type="button"
+            class="button"
+            (click)="connectParameterToSource()"
+            [disabled]="!parameterForm.controls.selectedSourceNode.valid"
+          >
+            Connect
+          </button>
+        </div>
+      </div>
+    </div>
+  </label>
 </form>
+<div class="tags" *ngIf="parameter.sourceIds?.length">
+  <ng-container *ngFor="let sourceNode of parameter.sourceIds">
+    <span class="tag"
+      >{{ sourceNode }}
+      <button
+        class="delete is-small"
+        type="button"
+        (click)="disconnectParameterFromSource(sourceNode)"
+      ></button
+    ></span>
+  </ng-container>
+</div>

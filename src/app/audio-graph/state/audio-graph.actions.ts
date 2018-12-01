@@ -6,6 +6,7 @@ import { Parameter } from '../model/parameter';
 import { AudioGraphState } from './audio-graph.state';
 import { ChoiceParameter } from '../model/choice-parameter';
 import { ChangeChoiceEvent } from '../model/change-choice-event';
+import { ConnectParameterEvent } from '../model/connect-parameter-event';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
@@ -18,6 +19,10 @@ export enum AudioGraphActionTypes {
   ConnectNodesSuccess = '[Audio Graph] Connect Nodes Success',
   DisconnectNodes = '[Audio Graph] Disconnect Nodes',
   DisconnectNodesSuccess = '[Audio Graph] Disconnect Nodes Success',
+  ConnectParameter = '[Audio Graph] Connect Parameter',
+  ConnectParameterSuccess = '[Audio Graph] Connect Parameter Success',
+  DisconnectParameter = '[Audio Graph] Disconnect Parameter',
+  DisconnectParameterSuccess = '[Audio Graph] Disconnect Parameter Success',
   CreateOscillator = '[Audio Graph] Create Oscillator',
   CreateGainNode = '[Audio Graph] Create Gain Node',
   CreateDelayNode = '[Audio Graph] Create Delay Node',
@@ -82,6 +87,28 @@ export class DisconnectNodesSuccess implements Action {
   readonly type = AudioGraphActionTypes.DisconnectNodesSuccess;
 
   constructor(public payload: ConnectNodesEvent) {}
+}
+export class ConnectParameter implements Action {
+  readonly type = AudioGraphActionTypes.ConnectParameter;
+
+  constructor(public payload: ConnectParameterEvent) {}
+}
+
+export class ConnectParameterSuccess implements Action {
+  readonly type = AudioGraphActionTypes.ConnectParameterSuccess;
+
+  constructor(public payload: ConnectParameterEvent) {}
+}
+export class DisconnectParameter implements Action {
+  readonly type = AudioGraphActionTypes.DisconnectParameter;
+
+  constructor(public payload: ConnectParameterEvent) {}
+}
+
+export class DisconnectParameterSuccess implements Action {
+  readonly type = AudioGraphActionTypes.DisconnectParameterSuccess;
+
+  constructor(public payload: ConnectParameterEvent) {}
 }
 
 export class CreateOscillator implements Action {
@@ -166,6 +193,10 @@ export type AudioGraphAction =
   | ConnectNodesSuccess
   | DisconnectNodes
   | DisconnectNodesSuccess
+  | ConnectParameter
+  | ConnectParameterSuccess
+  | DisconnectParameter
+  | DisconnectParameterSuccess
   | CreateOscillator
   | CreateNodeSuccess
   | CreateParameterSuccess

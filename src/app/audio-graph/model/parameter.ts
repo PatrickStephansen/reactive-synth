@@ -5,5 +5,5 @@ export interface Parameter {
   minValue: number;
   maxValue: number;
   stepSize: number;
-  sourceIds: [];
+  sourceIds: string[];
 }
