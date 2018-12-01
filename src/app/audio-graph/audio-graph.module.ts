@@ -13,7 +13,6 @@ import { SharedModule } from '../shared/shared.module';
 import { AudioGraphEffects } from './state/audio-graph.effects';
 import { reducer } from './state/audio-graph.reducers';
 import { ChoiceParameterComponent } from './components/choice-parameter/choice-parameter.component';
-import { ConnectionListComponent } from './components/connection-list/connection-list.component';
 
 @NgModule({
   declarations: [
@@ -23,8 +22,7 @@ import { ConnectionListComponent } from './components/connection-list/connection
     ParameterComponent,
     ParametersShellComponent,
     ParameterListComponent,
-    ChoiceParameterComponent,
-    ConnectionListComponent
+    ChoiceParameterComponent
   ],
   imports: [
     StoreModule.forFeature('graph', reducer),
