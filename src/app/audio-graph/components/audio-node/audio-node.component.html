@@ -6,21 +6,9 @@
     (click)="deleteNode.emit(nodeId)"
   ></button>
 
-  <dl class="content">
+  <div class="content">
     <h3 class="title is-5">{{ nodeId }}</h3>
-    <div class="node-property">
-      <dt>Node Type</dt>
-      <dd>{{ nodeType }}</dd>
-    </div>
-    <div class="node-property">
-      <dt>Inputs</dt>
-      <dd>{{ numberInputs }}</dd>
-    </div>
-    <div class="node-property">
-      <dt>Outputs</dt>
-      <dd>{{ numberOutputs }}</dd>
-    </div>
-  </dl>
+  </div>
   <ng-container *ngIf="numberInputs">
     <div class="content" *ngIf="connectedSourceNodes?.length">
       <div class="label">Connected inputs</div>
@@ -39,7 +27,7 @@
     </div>
     <form [formGroup]="connectNodeForm" (ngSubmit)="submitNodeConnectionForm()">
       <label class="label">
-        Available Source Nodes
+        add node input
         <div class="field has-addons">
           <div class="control is-expanded">
             <div class="select is-fullwidth">

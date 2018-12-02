@@ -1,16 +1,10 @@
-<div
-  class="content"
-  *ngFor="let parameter of choiceParameters; trackBy: getParameterId"
->
+<div *ngFor="let parameter of choiceParameters; trackBy: getParameterId">
   <app-choice-parameter
     [parameter]="parameter"
     (updateParameterValue)="updateChoiceParameterValue.emit($event)"
   ></app-choice-parameter>
 </div>
-<div
-  class="content"
-  *ngFor="let parameter of parameters; trackBy: getParameterId"
->
+<div *ngFor="let parameter of parameters; trackBy: getParameterId">
   <app-parameter
     [parameter]="parameter"
     [availableSourceNodes]="filterSourceNodes(parameter)"
