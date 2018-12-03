@@ -204,6 +204,12 @@ Apache-2.0
  
 
 
+@ngrx/store-devtools
+MIT
+
+@angular/core
+MIT
+
 tslib
 Apache-2.0
 Apache License
@@ -263,10 +269,7 @@ If the Work includes a "NOTICE" text file as part of its distribution, then any 
 END OF TERMS AND CONDITIONS
 
 
-@angular/core
-MIT
-
-@ngrx/store-devtools
+@ngrx/store
 MIT
 
 @angular/common
@@ -305,9 +308,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-
-@ngrx/store
-MIT
 
 zone.js
 MIT
