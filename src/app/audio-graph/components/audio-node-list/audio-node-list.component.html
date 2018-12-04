@@ -1,20 +1,29 @@
 <h2 class="title is-3">Graph controls</h2>
 <div class="level">
-  <button
-    (click)="toggleGraphOutputEnabled.emit(!graphOutputEnabled)"
-    class="button"
-  >
-    {{ graphOutputEnabled ? 'Mute' : 'Unmute' }}
-  </button>
+  <div class="buttons">
+    <button
+      class="button"
+      (click)="toggleGraphOutputEnabled.emit(!graphOutputEnabled)"
+    >
+      {{ graphOutputEnabled ? 'Mute' : 'Unmute' }}
+    </button>
+
+  </div>
 </div>
 <div class="level">
   <div class="buttons">
     <button class="button" (click)="createOscillator.emit()">
       Add Oscillator Node
     </button>
-    <button class="button" (click)="createGainNode.emit()">Add Gain Node</button>
-    <button class="button" (click)="createConstantSource.emit()">Add Constant Source</button>
-    <button class="button" (click)="createDelayNode.emit()">Add Delay Node</button>
+    <button class="button" (click)="createGainNode.emit()">
+      Add Gain Node
+    </button>
+    <button class="button" (click)="createConstantSource.emit()">
+      Add Constant Source
+    </button>
+    <button class="button" (click)="createDelayNode.emit()">
+      Add Delay Node
+    </button>
     <button class="button" (click)="createDistortionNode.emit()">
       Add Distortion Node
     </button>
@@ -22,7 +31,10 @@
 </div>
 <h2 class="title is-3">Audio Nodes</h2>
 <div class="columns is-multiline">
-  <div class="column is-one-fifth-fullhd is-one-quarter-desktop is-half-tablet" *ngFor="let node of nodes; trackBy: getNodeId">
+  <div
+    class="column is-one-fifth-fullhd is-one-quarter-desktop is-half-tablet"
+    *ngFor="let node of nodes; trackBy: getNodeId"
+  >
     <app-audio-node
       [nodeId]="node.id"
       [nodeType]="node.nodeType"
