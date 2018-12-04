@@ -26,36 +26,28 @@
       </ul>
     </div>
     <form [formGroup]="connectNodeForm" (ngSubmit)="submitNodeConnectionForm()">
-      <label class="label">
-        add node input
-        <div class="field has-addons">
-          <div class="control is-expanded">
-            <div class="select is-fullwidth">
-              <select
-                name="new-input"
-                id="{{nodeId}}-new-input"
-                formControlName="selectedSourceNode"
-              >
-                <option
-                  *ngFor="let sourceNode of availableSourceNodes"
-                  value="{{sourceNode}}"
-                >
-                  {{ sourceNode }}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="control">
-            <button
-              type="submit"
-              class="button"
-              [disabled]="!connectNodeForm.valid"
+      <div class="field">
+        <div class="control is-expanded">
+          <div class="select is-fullwidth">
+            <select
+              name="new-input"
+              id="{{ nodeId }}-new-input"
+              formControlName="selectedSourceNode"
+              (change)="submitNodeConnectionForm()"
             >
-              Connect
-            </button>
+              <option value="" disabled selected hidden>Add Node Input</option>
+              <option *ngIf="!availableSourceNodes?.length && connectedSourceNodes?.length" value="" disabled>No more nodes available</option>
+              <option *ngIf="!availableSourceNodes?.length && !connectedSourceNodes?.length" value="" disabled>No other nodes in graph</option>
+              <option
+                *ngFor="let sourceNode of availableSourceNodes"
+                value="{{ sourceNode }}"
+              >
+                {{ sourceNode }}
+              </option>
+            </select>
           </div>
         </div>
-      </label>
+      </div>
     </form>
   </ng-container>
 

@@ -20,9 +20,9 @@
     </button>
   </div>
 </div>
-
+<h2 class="title is-3">Audio Nodes</h2>
 <div class="columns is-multiline">
-  <div class="column is-one-quarter" *ngFor="let node of nodes; trackBy: getNodeId">
+  <div class="column is-one-quarter-desktop is-half-tablet" *ngFor="let node of nodes; trackBy: getNodeId">
     <app-audio-node
       [nodeId]="node.id"
       [nodeType]="node.nodeType"

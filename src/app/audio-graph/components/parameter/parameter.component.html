@@ -10,14 +10,17 @@
           formControlName="value"
         />
       </div>
-      <div class="field has-addons">
+      <div class="field">
         <div class="control is-expanded">
           <div class="select is-fullwidth">
             <select
               name="new-input"
               id="{{parameter.nodeId}}-{{parameter.name}}-new-input"
               formControlName="selectedSourceNode"
+              (change)="connectParameterToSource()"
             >
+              <option value="" disabled selected hidden>Add Parameter Input</option>
+              <option *ngIf="!availableSourceNodes?.length" value="" disabled>No more nodes available</option>
               <option
                 *ngFor="let sourceNode of availableSourceNodes"
                 value="{{sourceNode}}"
@@ -26,16 +29,6 @@
               </option>
             </select>
           </div>
-        </div>
-        <div class="control">
-          <button
-            type="button"
-            class="button"
-            (click)="connectParameterToSource()"
-            [disabled]="!parameterForm.controls.selectedSourceNode.valid"
-          >
-            Connect
-          </button>
         </div>
       </div>
     </div>
