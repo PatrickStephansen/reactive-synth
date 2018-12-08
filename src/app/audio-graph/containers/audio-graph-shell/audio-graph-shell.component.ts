@@ -18,7 +18,8 @@ import {
   DestroyNode,
   CreateDelayNode,
   CreateDistortionNode,
-  CreateConstantSource
+  CreateConstantSource,
+  CreateFilterNode
 } from '../../state/audio-graph.actions';
 import { ConnectNodesEvent } from '../../model/connect-nodes-event';
 
@@ -49,6 +50,10 @@ export class AudioGraphShellComponent implements OnInit {
 
   addDelayNode() {
     this.store.dispatch(new CreateDelayNode());
+  }
+
+  addFilterNode() {
+    this.store.dispatch(new CreateFilterNode());
   }
 
   addDistortionNode() {

@@ -110,6 +110,23 @@ export class AudioGraphEffects {
   );
 
   @Effect()
+  createFilterNode$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.CreateFilterNode),
+    mergeMap(() => {
+      const [
+        node,
+        parameters,
+        choiceParameters
+      ] = this.graphService.createFilterNode();
+      return from([
+        new CreateNodeSuccess(node),
+        ...parameters.map(p => new CreateParameterSuccess(p)),
+        ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
+      ]);
+    })
+  );
+
+  @Effect()
   connectNodes$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ConnectNodes),
     map(({ payload: event }: ConnectNodes) => {

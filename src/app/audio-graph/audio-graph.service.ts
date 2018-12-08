@@ -212,6 +212,72 @@ export class AudioGraphService {
     ];
   }
 
+  createFilterNode(): [NodeModel, ParameterModel[], ChoiceParameterModel[]] {
+    const nodeType = 'filter';
+    const id = this.createId(nodeType);
+    const filter = this.context.createBiquadFilter();
+    this.graph.set(id, {
+      internalNodes: [filter],
+      parameterMap: new Map([
+        ['frequency', filter.frequency],
+        ['quality factor', filter.Q],
+        ['detune', filter.detune]
+      ]),
+      choiceMap: new Map([
+        ['filter type', [filter, 'type'] as [AudioNode, string]]
+      ])
+    });
+    return [
+      {
+        id,
+        nodeType,
+        numberInputs: 1,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true
+      },
+      [
+        {
+          name: 'frequency',
+          units: 'hertz',
+          nodeId: id,
+          maxValue: filter.frequency.maxValue,
+          minValue: filter.frequency.minValue,
+          stepSize: 1,
+          sourceIds: [],
+          value: filter.frequency.value
+        },
+        {
+          name: 'detune',
+          units: 'cents',
+          nodeId: id,
+          sourceIds: [],
+          maxValue: filter.detune.maxValue,
+          minValue: filter.detune.minValue,
+          value: filter.detune.defaultValue,
+          stepSize: 1
+        },
+        {
+          name: 'quality factor',
+          nodeId: id,
+          maxValue: filter.Q.maxValue,
+          minValue: filter.Q.minValue,
+          stepSize: 1,
+          sourceIds: [],
+          value: filter.Q.value
+        }
+      ],
+      [
+        {
+          name: 'filter type',
+          nodeId: id,
+          choices: ['lowpass', 'highpass', 'bandpass', 'notch', 'allpass'],
+          selection: filter.type
+        }
+      ]
+    ];
+  }
+
   createDistortionNode(): [NodeModel, ParameterModel[]] {
     const nodeType = 'distortion';
     const id = this.createId(nodeType);

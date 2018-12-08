@@ -26,6 +26,7 @@ export enum AudioGraphActionTypes {
   CreateOscillator = '[Audio Graph] Create Oscillator',
   CreateGainNode = '[Audio Graph] Create Gain Node',
   CreateDelayNode = '[Audio Graph] Create Delay Node',
+  CreateFilterNode = '[Audio Graph] Create Filter Node',
   CreateDistortionNode = '[Audio Graph] Create Distortion Node',
   CreateConstantSource = '[Audio Graph] Create Constant Source',
   CreateNodeSuccess = '[Audio Graph] Create Node Success',
@@ -141,6 +142,12 @@ export class CreateDelayNode implements Action {
   constructor() {}
 }
 
+export class CreateFilterNode implements Action {
+  readonly type = AudioGraphActionTypes.CreateFilterNode;
+
+  constructor() {}
+}
+
 export class CreateNodeSuccess implements Action {
   readonly type = AudioGraphActionTypes.CreateNodeSuccess;
 
@@ -206,6 +213,7 @@ export type AudioGraphAction =
   | CreateGainNode
   | CreateDistortionNode
   | CreateDelayNode
+  | CreateFilterNode
   | CreateConstantSource
   | DestroyNode
   | DestroyNodeSuccess;
