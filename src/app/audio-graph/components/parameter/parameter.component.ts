@@ -33,25 +33,33 @@ export class ParameterComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.parameterForm = this.fb.group({
-      value: [this.parameter.value + '', Validators.required],
+      parameterValue: [
+        this.parameter.value + '',
+        [
+          Validators.required,
+          Validators.max(this.parameter.maxValue),
+          Validators.min(this.parameter.minValue)
+        ]
+      ],
       selectedSourceNode: ['', Validators.required]
     });
 
     this.parameterForm.valueChanges
       .pipe(
         distinctUntilChanged(
-          (oldForm, newForm) => oldForm.value === newForm.value
+          (oldForm, newForm) =>
+            oldForm.parameterValue === newForm.parameterValue
         )
       )
-      .subscribe(({ value }) => {
+      .subscribe(({ parameterValue }) => {
         if (
-          this.parameterForm.controls.value.valid &&
+          this.parameterForm.controls.parameterValue.valid &&
           this.parameterForm.dirty
         ) {
           this.updateParameterValue.emit({
             nodeId: this.parameter.nodeId,
             parameterName: this.parameter.name,
-            value
+            value: parameterValue
           });
         }
       });
@@ -90,4 +98,6 @@ export class ParameterComponent implements OnInit, OnChanges {
       destinationParameterName: this.parameter.name
     });
   }
+
+  get parameterValue() { return this.parameterForm.get('parameterValue'); }
 }
