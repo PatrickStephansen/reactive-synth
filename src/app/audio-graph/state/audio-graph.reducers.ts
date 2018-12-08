@@ -99,9 +99,12 @@ export function reducer(
           ...n,
           sourceIds: n.sourceIds.filter(s => s !== action.nodeId)
         }));
-      const remainingParameters = state.parameters.filter(
-        p => p.nodeId !== action.nodeId
-      );
+      const remainingParameters = state.parameters
+        .filter(p => p.nodeId !== action.nodeId)
+        .map(p => ({
+          ...p,
+          sourceIds: p.sourceIds.filter(s => s !== action.nodeId)
+        }));
       const remainingChoiceParameters = state.choiceParameters.filter(
         p => p.nodeId !== action.nodeId
       );
