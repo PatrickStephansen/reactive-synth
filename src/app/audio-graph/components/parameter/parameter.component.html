@@ -2,6 +2,9 @@
   <label class="label">
     <div class="field">
       {{ parameter.name }}
+      <span class="units" *ngIf="parameter.units"
+        >({{ parameter.units }})</span
+      >
       <div class="control">
         <input
           [step]="parameter.stepSize"
@@ -15,15 +18,19 @@
           <div class="select is-fullwidth">
             <select
               name="new-input"
-              id="{{parameter.nodeId}}-{{parameter.name}}-new-input"
+              id="{{ parameter.nodeId }}-{{ parameter.name }}-new-input"
               formControlName="selectedSourceNode"
               (change)="connectParameterToSource()"
             >
-              <option value="" disabled selected hidden>Add Parameter Input</option>
-              <option *ngIf="!availableSourceNodes?.length" value="" disabled>No more nodes available</option>
+              <option value="" disabled selected hidden
+                >Add Parameter Input</option
+              >
+              <option *ngIf="!availableSourceNodes?.length" value="" disabled
+                >No more nodes available</option
+              >
               <option
                 *ngFor="let sourceNode of availableSourceNodes"
-                value="{{sourceNode}}"
+                value="{{ sourceNode }}"
               >
                 {{ sourceNode }}
               </option>

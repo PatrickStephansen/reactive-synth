@@ -103,6 +103,7 @@ export class AudioGraphService {
       [
         {
           name: 'frequency',
+          units: 'hertz',
           nodeId: id,
           sourceIds: [],
           maxValue: oscillator.frequency.maxValue,
@@ -112,6 +113,7 @@ export class AudioGraphService {
         },
         {
           name: 'detune',
+          units: 'cents',
           nodeId: id,
           sourceIds: [],
           maxValue: oscillator.detune.maxValue,
@@ -198,6 +200,7 @@ export class AudioGraphService {
       [
         {
           name: delayParameterKey,
+          units: 'seconds',
           nodeId: id,
           sourceIds: [],
           maxValue: delay.delayTime.maxValue,
