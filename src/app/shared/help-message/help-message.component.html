@@ -1,0 +1,6 @@
+<div *ngIf="isShowingHelp" class="level">
+  <article class="notification is-info content">
+    <button type="button" class="delete" (click)="hideHelp()" title="dismiss all help"></button>
+    <ng-content></ng-content>
+  </article>
+</div>

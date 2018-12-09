@@ -1,19 +1,20 @@
 <div class="box is-fullheight">
   <button
-    *ngIf="canDelete"
+    *ngIf="node.canDelete"
     type="button"
     class="delete is-pulled-right"
-    (click)="deleteNode.emit(nodeId)"
+    (click)="deleteNode.emit(node.id)"
   ></button>
 
   <div class="content">
-    <h3 class="title is-5">{{ nodeId }}</h3>
+    <h3 class="title is-5">{{ node.id }}</h3>
   </div>
-  <ng-container *ngIf="numberInputs">
-    <div class="content" *ngIf="connectedSourceNodes?.length">
+  <app-help-message *ngIf="node.helpText"> {{ node.helpText }} </app-help-message>
+  <ng-container *ngIf="node.numberInputs">
+    <div class="content" *ngIf="node.sourceIds?.length">
       <div class="label">Connected inputs</div>
       <ul>
-        <li *ngFor="let sourceNode of connectedSourceNodes">
+        <li *ngFor="let sourceNode of node.sourceIds">
           <span class="tag"
             >{{ sourceNode }}
             <button
@@ -31,13 +32,23 @@
           <div class="select is-fullwidth">
             <select
               name="new-input"
-              id="{{ nodeId }}-new-input"
+              id="{{ node.id }}-new-input"
               formControlName="selectedSourceNode"
               (change)="submitNodeConnectionForm()"
             >
               <option value="" disabled selected hidden>Add Node Input</option>
-              <option *ngIf="!availableSourceNodes?.length && connectedSourceNodes?.length" value="" disabled>No more nodes available</option>
-              <option *ngIf="!availableSourceNodes?.length && !connectedSourceNodes?.length" value="" disabled>No other nodes in graph</option>
+              <option
+                *ngIf="!availableSourceNodes?.length && node.sourceIds?.length"
+                value=""
+                disabled
+                >No more nodes available</option
+              >
+              <option
+                *ngIf="!availableSourceNodes?.length && !node.sourceIds?.length"
+                value=""
+                disabled
+                >No other nodes in graph</option
+              >
               <option
                 *ngFor="let sourceNode of availableSourceNodes"
                 value="{{ sourceNode }}"
@@ -51,5 +62,5 @@
     </form>
   </ng-container>
 
-  <app-parameters-shell [nodeId]="nodeId"></app-parameters-shell>
+  <app-parameters-shell [nodeId]="node.id"></app-parameters-shell>
 </div>

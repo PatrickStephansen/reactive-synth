@@ -7,9 +7,15 @@
     >
       {{ graphOutputEnabled ? 'Mute' : 'Unmute' }}
     </button>
-
+    <app-toggle-help></app-toggle-help>
   </div>
 </div>
+<app-help-message>
+  <p>
+    This is a modular synth that allows you to build up your own audio graph.
+  </p>
+  <p>Use the buttons below to add nodes to the graph.</p>
+</app-help-message>
 <div class="level">
   <div class="buttons">
     <button class="button" (click)="createOscillator.emit()">
@@ -33,18 +39,25 @@
   </div>
 </div>
 <h2 class="title is-3">Audio Nodes</h2>
+
+<app-help-message>
+  <p>
+    Nodes of the graph either produce or process signals based on some
+    parameters.
+  </p>
+  <p>
+    A node's input and parameters may be connected to the output from one or more other nodes.
+  </p>
+  <p>If multiple connections end at the same point, the signals are summed.</p>
+</app-help-message>
+
 <div class="columns is-multiline">
   <div
     class="column is-one-fifth-fullhd is-one-quarter-desktop is-half-tablet"
     *ngFor="let node of nodes; trackBy: getNodeId"
   >
     <app-audio-node
-      [nodeId]="node.id"
-      [nodeType]="node.nodeType"
-      [connectedSourceNodes]="node.sourceIds"
-      [numberInputs]="node.numberInputs"
-      [numberOutputs]="node.numberOutputs"
-      [canDelete]="node.canDelete"
+      [node]="node"
       [availableSourceNodes]="filterSourceNodes(node)"
       (connectSourceNode)="connectNodes.emit($event)"
       (disconnectSourceNode)="disconnectNodes.emit($event)"

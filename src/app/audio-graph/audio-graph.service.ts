@@ -50,17 +50,18 @@ export class AudioGraphService {
     return this.destroyContext().then(() => {
       this.context = new AudioContext();
       this.graph = new Map([
-        ['speakers-output', { internalNodes: [this.context.destination] }]
+        ['Output to Speakers', { internalNodes: [this.context.destination] }]
       ]);
       return this.context.resume().then(() => ({
         nodes: [
           {
-            id: 'speakers-output',
+            id: 'Output to Speakers',
             nodeType: 'graph output',
             numberInputs: 1,
             numberOutputs: 0,
             sourceIds: [],
-            canDelete: false
+            canDelete: false,
+            helpText: 'Signals must be connected to this node to be audible. Incoming signals are summed and clamped to the range [-1, 1].'
           }
         ],
         parameters: [],

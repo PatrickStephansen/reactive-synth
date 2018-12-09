@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ConnectNodesEvent } from '../../model/connect-nodes-event';
+import { AudioNode } from '../../model/audio-node';
 
 @Component({
   selector: 'app-audio-node',
@@ -16,14 +17,8 @@ import { ConnectNodesEvent } from '../../model/connect-nodes-event';
   styleUrls: ['./audio-node.component.scss']
 })
 export class AudioNodeComponent implements OnInit, OnChanges {
-  @Input() nodeId: string;
-  @Input() nodeType: string;
-  @Input() numberInputs: number;
-  @Input() numberOutputs: number;
-  @Input() canDelete: boolean;
-  @Input() connectedSourceNodes: string[];
+  @Input() node: AudioNode;
   @Input() availableSourceNodes: string[];
-
   @Output() connectSourceNode = new EventEmitter<ConnectNodesEvent>();
   @Output() disconnectSourceNode = new EventEmitter<ConnectNodesEvent>();
   @Output() deleteNode = new EventEmitter<string>();
@@ -58,7 +53,7 @@ export class AudioNodeComponent implements OnInit, OnChanges {
 
       this.connectSourceNode.emit({
         sourceId: formValue.selectedSourceNode,
-        destinationId: this.nodeId
+        destinationId: this.node.id
       });
     }
   }
@@ -66,7 +61,7 @@ export class AudioNodeComponent implements OnInit, OnChanges {
   disconnectNode(sourceId) {
     this.disconnectSourceNode.emit({
       sourceId,
-      destinationId: this.nodeId
+      destinationId: this.node.id
     });
   }
 }
