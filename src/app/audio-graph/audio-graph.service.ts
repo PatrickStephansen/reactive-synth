@@ -180,7 +180,7 @@ export class AudioGraphService {
   createDelayNode(): [NodeModel, ParameterModel[]] {
     const nodeType = 'delay';
     const id = this.createId(nodeType);
-    const delay = this.context.createDelay();
+    const delay = this.context.createDelay(60);
     const delayParameterKey = 'delay time';
     const compoundNode = {
       internalNodes: [delay],
