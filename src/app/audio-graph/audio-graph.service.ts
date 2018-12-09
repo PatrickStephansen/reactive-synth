@@ -357,10 +357,7 @@ export class AudioGraphService {
       const destinationParameter = this.graph
         .get(event.destinationNodeId)
         .parameterMap.get(event.destinationParameterName);
-      if (
-        destinationParameter &&
-        destinationParameter.automationRate === 'a-rate'
-      ) {
+      if (destinationParameter) {
         last(this.graph.get(event.sourceNodeId).internalNodes).connect(
           destinationParameter
         );
@@ -377,10 +374,7 @@ export class AudioGraphService {
       const destinationParameter = this.graph
         .get(event.destinationNodeId)
         .parameterMap.get(event.destinationParameterName);
-      if (
-        destinationParameter &&
-        destinationParameter.automationRate === 'a-rate'
-      ) {
+      if (destinationParameter) {
         last(this.graph.get(event.sourceNodeId).internalNodes).disconnect(
           destinationParameter
         );
