@@ -25,6 +25,14 @@ export class AudioGraphService {
 
   private defaultGain = 0.1;
 
+  private parameterMax(parameter: AudioParam) {
+    return Math.min(parameter.maxValue, 1000000);
+  }
+
+  private parameterMin(parameter: AudioParam) {
+    return Math.max(parameter.minValue, -1000000);
+  }
+
   constructor() {}
 
   private destroyContext() {
@@ -61,7 +69,8 @@ export class AudioGraphService {
             numberOutputs: 0,
             sourceIds: [],
             canDelete: false,
-            helpText: 'Signals must be connected to this node to be audible. Incoming signals are summed and clamped to the range [-1, 1].'
+            helpText:
+              'Signals must be connected to this node to be audible. Incoming signals are summed and clamped to the range [-1, 1].'
           }
         ],
         parameters: [],
@@ -107,8 +116,8 @@ export class AudioGraphService {
           units: 'hertz',
           nodeId: id,
           sourceIds: [],
-          maxValue: oscillator.frequency.maxValue,
-          minValue: oscillator.frequency.minValue,
+          maxValue: this.parameterMax(oscillator.frequency),
+          minValue: this.parameterMin(oscillator.frequency),
           value: oscillator.frequency.defaultValue,
           stepSize: 1
         },
@@ -117,8 +126,8 @@ export class AudioGraphService {
           units: 'cents',
           nodeId: id,
           sourceIds: [],
-          maxValue: oscillator.detune.maxValue,
-          minValue: oscillator.detune.minValue,
+          maxValue: this.parameterMax(oscillator.detune),
+          minValue: this.parameterMin(oscillator.detune),
           value: oscillator.detune.defaultValue,
           stepSize: 1
         },
@@ -126,8 +135,8 @@ export class AudioGraphService {
           name: 'output gain',
           nodeId: id,
           sourceIds: [],
-          maxValue: volumeControl.gain.maxValue,
-          minValue: volumeControl.gain.minValue,
+          maxValue: this.parameterMax(volumeControl.gain),
+          minValue: this.parameterMin(volumeControl.gain),
           stepSize: 0.01,
           value: this.defaultGain
         }
@@ -169,8 +178,8 @@ export class AudioGraphService {
           name: gainParameterKey,
           nodeId: id,
           sourceIds: [],
-          maxValue: gain.gain.maxValue,
-          minValue: gain.gain.minValue,
+          maxValue: this.parameterMax(gain.gain),
+          minValue: this.parameterMin(gain.gain),
           stepSize: 0.01,
           value: this.defaultGain
         }
@@ -204,8 +213,8 @@ export class AudioGraphService {
           units: 'seconds',
           nodeId: id,
           sourceIds: [],
-          maxValue: delay.delayTime.maxValue,
-          minValue: delay.delayTime.minValue,
+          maxValue: this.parameterMax(delay.delayTime),
+          minValue: this.parameterMin(delay.delayTime),
           stepSize: 0.01,
           value: delay.delayTime.value
         }
@@ -242,8 +251,8 @@ export class AudioGraphService {
           name: 'frequency',
           units: 'hertz',
           nodeId: id,
-          maxValue: filter.frequency.maxValue,
-          minValue: filter.frequency.minValue,
+          maxValue: this.parameterMax(filter.frequency),
+          minValue: this.parameterMin(filter.frequency),
           stepSize: 1,
           sourceIds: [],
           value: filter.frequency.value
@@ -253,16 +262,16 @@ export class AudioGraphService {
           units: 'cents',
           nodeId: id,
           sourceIds: [],
-          maxValue: filter.detune.maxValue,
-          minValue: filter.detune.minValue,
+          maxValue: this.parameterMax(filter.detune),
+          minValue: this.parameterMin(filter.detune),
           value: filter.detune.defaultValue,
           stepSize: 1
         },
         {
           name: 'quality factor',
           nodeId: id,
-          maxValue: filter.Q.maxValue,
-          minValue: filter.Q.minValue,
+          maxValue: this.parameterMax(filter.Q),
+          minValue: this.parameterMin(filter.Q),
           stepSize: 1,
           sourceIds: [],
           value: filter.Q.value
@@ -324,8 +333,8 @@ export class AudioGraphService {
           nodeId: id,
           sourceIds: [],
           name: 'output value',
-          maxValue: constant.offset.maxValue,
-          minValue: constant.offset.minValue,
+          maxValue: this.parameterMax(constant.offset),
+          minValue: this.parameterMin(constant.offset),
           value: constant.offset.value,
           stepSize: 0.01
         }
