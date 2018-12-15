@@ -7,6 +7,7 @@ import { ChoiceParameter as ChoiceParameterModel } from './model/choice-paramete
 import { AudioGraphState } from './state/audio-graph.state';
 import { makeDistortionCurve } from './distortion-curve';
 import { ConnectParameterEvent } from './model/connect-parameter-event';
+import { promise } from 'protractor';
 
 let incrementingId = 0;
 
@@ -47,15 +48,26 @@ export class AudioGraphService {
   }
 
   unmute(): Promise<void> {
-    return this.context.resume();
+    return this.context
+      ? this.context.resume()
+      : Promise.reject('No audio context to resume');
   }
 
   mute(): Promise<void> {
-    return this.context.suspend();
+    return this.context
+      ? this.context.suspend()
+      : Promise.reject('No audio context to suspend');
   }
 
   resetGraph(): Promise<AudioGraphState> {
     return this.destroyContext().then(() => {
+      if (typeof AudioContext !== 'function') {
+        throw new Error(
+          `Your browser is not supported because it does not implement the Web Audio API.
+          Try reloading the page in a newer browser.
+          If you're using iOS, none of them will work due to Apple store policy restrictions.`
+        );
+      }
       this.context = new AudioContext();
       this.graph = new Map([
         ['Output to Speakers', { internalNodes: [this.context.destination] }]
@@ -76,7 +88,8 @@ export class AudioGraphService {
         parameters: [],
         choiceParameters: [],
         visualizations: [],
-        muted: false
+        muted: false,
+        errors: []
       }));
     });
   }

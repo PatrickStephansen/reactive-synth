@@ -22,10 +22,13 @@ import {
   ChangeChoiceParameterSuccess,
   ConnectParameter,
   ConnectParameterSuccess,
-  DisconnectParameterSuccess
+  DisconnectParameterSuccess,
+  AddError
 } from './audio-graph.actions';
-import { from, Observable, of } from 'rxjs';
-import { mergeMap, map } from 'rxjs/operators';
+import { from, Observable, of, OperatorFunction } from 'rxjs';
+import { mergeMap, map, catchError } from 'rxjs/operators';
+
+let errorId = 0;
 
 @Injectable()
 export class AudioGraphEffects {
@@ -34,12 +37,25 @@ export class AudioGraphEffects {
     private actions$: Actions
   ) {}
 
+  private handleGraphChangeError: OperatorFunction<
+    any,
+    AudioGraphAction
+  > = catchError(error =>
+    of(
+      new AddError({
+        id: `graph-error-${errorId++}`,
+        errorMessage: error.message || error
+      })
+    )
+  );
+
   @Effect()
-  resetGraph$: Observable<ResetGraphSuccess> = this.actions$.pipe(
+  resetGraph$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ResetGraph),
     mergeMap(() =>
       from(this.graphService.resetGraph()).pipe(
-        map(graph => new ResetGraphSuccess(graph))
+        map(graph => new ResetGraphSuccess(graph)),
+        this.handleGraphChangeError
       )
     )
   );
@@ -47,145 +63,191 @@ export class AudioGraphEffects {
   @Effect()
   createOscillator$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateOscillator),
-    mergeMap(() => {
-      const [
-        node,
-        parameters,
-        choiceParameters
-      ] = this.graphService.createOscillator();
-      return from([
-        new CreateNodeSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p)),
-        ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
-      ]);
-    })
+    mergeMap(() =>
+      of(() => this.graphService.createOscillator()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters, choiceParameters]) =>
+          from([
+            new CreateNodeSuccess(node),
+            ...parameters.map(p => new CreateParameterSuccess(p)),
+            ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
+          ])
+        ),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   createGainNode$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateGainNode),
-    mergeMap(() => {
-      const [node, parameters] = this.graphService.createGainNode();
-      return from([
-        new CreateNodeSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p))
-      ]);
-    })
+    mergeMap(() =>
+      of(() => this.graphService.createGainNode()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters]) => [
+          new CreateNodeSuccess(node),
+          ...parameters.map(p => new CreateParameterSuccess(p))
+        ]),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   createDelayNode$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateDelayNode),
-    mergeMap(() => {
-      const [node, parameters] = this.graphService.createDelayNode();
-      return from([
-        new CreateNodeSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p))
-      ]);
-    })
+    mergeMap(() =>
+      of(() => this.graphService.createDelayNode()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters]) =>
+          from([
+            new CreateNodeSuccess(node),
+            ...parameters.map(p => new CreateParameterSuccess(p))
+          ])
+        ),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   createDistortionNode$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateDistortionNode),
-    mergeMap(() => {
-      const [node, parameters] = this.graphService.createDistortionNode();
-      return from([
-        new CreateNodeSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p))
-      ]);
-    })
+    mergeMap(() =>
+      of(() => this.graphService.createDistortionNode()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters]) =>
+          from([
+            new CreateNodeSuccess(node),
+            ...parameters.map(p => new CreateParameterSuccess(p))
+          ])
+        ),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   createConstantSource$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateConstantSource),
-    mergeMap(() => {
-      const [node, parameters] = this.graphService.createConstantSource();
-      return from([
-        new CreateNodeSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p))
-      ]);
-    })
+    mergeMap(() =>
+      of(() => this.graphService.createConstantSource()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters]) =>
+          from([
+            new CreateNodeSuccess(node),
+            ...parameters.map(p => new CreateParameterSuccess(p))
+          ])
+        ),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   createFilterNode$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateFilterNode),
-    mergeMap(() => {
-      const [
-        node,
-        parameters,
-        choiceParameters
-      ] = this.graphService.createFilterNode();
-      return from([
-        new CreateNodeSuccess(node),
-        ...parameters.map(p => new CreateParameterSuccess(p)),
-        ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
-      ]);
-    })
+    mergeMap(() =>
+      of(() => this.graphService.createFilterNode()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters, choiceParameters]) =>
+          from([
+            new CreateNodeSuccess(node),
+            ...parameters.map(p => new CreateParameterSuccess(p)),
+            ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
+          ])
+        ),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   connectNodes$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ConnectNodes),
-    map(({ payload: event }: ConnectNodes) => {
-      this.graphService.connectNodes(event.sourceId, event.destinationId);
-      return new ConnectNodesSuccess(event);
-    })
+    mergeMap(({ payload: event }: ConnectNodes) =>
+      of(() =>
+        this.graphService.connectNodes(event.sourceId, event.destinationId)
+      ).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new ConnectNodesSuccess(event)),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   disconnectNodes$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.DisconnectNodes),
-    map(({ payload: event }: ConnectNodes) => {
-      this.graphService.disconnectNodes(event.sourceId, event.destinationId);
-      return new DisconnectNodesSuccess(event);
-    })
+    mergeMap(({ payload: event }: ConnectNodes) =>
+      of(() =>
+        this.graphService.disconnectNodes(event.sourceId, event.destinationId)
+      ).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new DisconnectNodesSuccess(event)),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   connectParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ConnectParameter),
-    map(({ payload: event }: ConnectParameter) => {
-      this.graphService.connectParameter(event);
-      return new ConnectParameterSuccess(event);
-    })
+    mergeMap(({ payload: event }: ConnectParameter) =>
+      of(() => this.graphService.connectParameter(event)).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new ConnectParameterSuccess(event)),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   disconnectParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.DisconnectParameter),
-    map(({ payload: event }: ConnectParameter) => {
-      this.graphService.disconnectParameter(event);
-      return new DisconnectParameterSuccess(event);
-    })
+    mergeMap(({ payload: event }: ConnectParameter) =>
+      of(() => this.graphService.disconnectParameter(event)).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new DisconnectParameterSuccess(event)),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   changeParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ChangeParameter),
-    map(({ payload: event }: ChangeParameter) => {
-      this.graphService.changeParameterValue(
-        event.nodeId,
-        event.parameterName,
-        event.value
-      );
-      return new ChangeParameterSuccess(event);
-    })
+    mergeMap(({ payload: event }: ChangeParameter) =>
+      of(() =>
+        this.graphService.changeParameterValue(
+          event.nodeId,
+          event.parameterName,
+          event.value
+        )
+      ).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new ChangeParameterSuccess(event)),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
   changeChoiceParameter$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.ChangeChoiceParameter),
-    map(({ payload: event }: ChangeChoiceParameter) => {
-      this.graphService.makeChoice(
-        event.nodeId,
-        event.parameterName,
-        event.value
-      );
-      return new ChangeChoiceParameterSuccess(event);
-    })
+    mergeMap(({ payload: event }: ChangeChoiceParameter) =>
+      of(() =>
+        this.graphService.makeChoice(
+          event.nodeId,
+          event.parameterName,
+          event.value
+        )
+      ).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new ChangeChoiceParameterSuccess(event)),
+        this.handleGraphChangeError
+      )
+    )
   );
 
   @Effect()
@@ -196,8 +258,9 @@ export class AudioGraphEffects {
         ? this.graphService.unmute()
         : this.graphService.mute();
 
-      return of(servicePromise).pipe(
-        map(() => new ToggleGraphActiveSuccess(activate))
+      return from(servicePromise).pipe(
+        map(() => new ToggleGraphActiveSuccess(activate)),
+        this.handleGraphChangeError
       );
     })
   );
@@ -205,9 +268,12 @@ export class AudioGraphEffects {
   @Effect()
   destroyNode$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.DestroyNode),
-    map(({ nodeId }: DestroyNode) => {
-      this.graphService.destroyNode(nodeId);
-      return new DestroyNodeSuccess(nodeId);
-    })
+    mergeMap(({ nodeId }: DestroyNode) =>
+      of(() => this.graphService.destroyNode(nodeId)).pipe(
+        map(serviceMethod => serviceMethod()),
+        map(() => new DestroyNodeSuccess(nodeId)),
+        this.handleGraphChangeError
+      )
+    )
   );
 }

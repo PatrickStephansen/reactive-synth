@@ -1,0 +1,5 @@
+<app-error-list
+  [errors]="errors$ | async"
+  (dismissAllErrors)="clearErrors()"
+  (dismissError)="dismissError($event)"
+></app-error-list>

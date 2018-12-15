@@ -7,6 +7,7 @@ import { AudioGraphState } from './audio-graph.state';
 import { ChoiceParameter } from '../model/choice-parameter';
 import { ChangeChoiceEvent } from '../model/change-choice-event';
 import { ConnectParameterEvent } from '../model/connect-parameter-event';
+import { GraphError } from '../model/graph-error';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
@@ -35,7 +36,10 @@ export enum AudioGraphActionTypes {
   CreateParameterSuccess = '[Audio Graph] Create Parameter Success',
   CreateChoiceParameterSuccess = '[Audio Graph] Create Choice Parameter Success',
   ToggleGraphActive = '[Audio Graph] Toggle Graph Output Active',
-  ToggleGraphActiveSuccess = '[Audio Graph] Toggle Graph Output Active Success'
+  ToggleGraphActiveSuccess = '[Audio Graph] Toggle Graph Output Active Success',
+  AddError = '[Audio Graph] Add Graph Change Error',
+  DismissError = '[Audio Graph] Dismiss Graph Change Error',
+  ClearErrors = '[Audio Graph] Clear All Graph Change Errors'
 }
 
 export class ResetGraph implements Action {
@@ -158,7 +162,6 @@ export class CreateParameterSuccess implements Action {
   readonly type = AudioGraphActionTypes.CreateParameterSuccess;
 
   constructor(public payload: Parameter) {}
-
 }
 export class CreateChoiceParameterSuccess implements Action {
   readonly type = AudioGraphActionTypes.CreateChoiceParameterSuccess;
@@ -180,13 +183,31 @@ export class ToggleGraphActiveSuccess implements Action {
 export class DestroyNode implements Action {
   readonly type = AudioGraphActionTypes.DestroyNode;
 
-  constructor(public nodeId) {}
+  constructor(public nodeId: string) {}
 }
 
 export class DestroyNodeSuccess implements Action {
   readonly type = AudioGraphActionTypes.DestroyNodeSuccess;
 
-  constructor(public nodeId) {}
+  constructor(public nodeId: string) {}
+}
+
+export class AddError implements Action {
+  readonly type = AudioGraphActionTypes.AddError;
+
+  constructor(public error: GraphError) {}
+}
+
+export class DismissError implements Action {
+  readonly type = AudioGraphActionTypes.DismissError;
+
+  constructor(public id: string) {}
+}
+
+export class ClearErrors implements Action {
+  readonly type = AudioGraphActionTypes.ClearErrors;
+
+  constructor() {}
 }
 
 export type AudioGraphAction =
@@ -216,4 +237,7 @@ export type AudioGraphAction =
   | CreateFilterNode
   | CreateConstantSource
   | DestroyNode
-  | DestroyNodeSuccess;
+  | DestroyNodeSuccess
+  | AddError
+  | DismissError
+  | ClearErrors;

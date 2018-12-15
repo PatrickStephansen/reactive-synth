@@ -38,3 +38,8 @@ export const getChoiceParametersForNodeState = createSelector(
   (parameters, { nodeId }: { nodeId: string }) =>
     parameters.filter(parameter => parameter.nodeId === nodeId)
 );
+
+export const getGraphErrors = createSelector(
+  getGraphsFeatureState,
+  graph => graph.errors
+);

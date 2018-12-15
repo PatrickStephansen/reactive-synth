@@ -6,7 +6,8 @@ const initialState = {
   parameters: [],
   choiceParameters: [],
   visualizations: [],
-  muted: false
+  muted: false,
+  errors: []
 };
 
 export function reducer(
@@ -115,6 +116,16 @@ export function reducer(
         parameters: remainingParameters,
         choiceParameters: remainingChoiceParameters
       };
+    }
+    case AudioGraphActionTypes.ClearErrors: {
+      return { ...state, errors: [] };
+    }
+    case AudioGraphActionTypes.AddError: {
+      return { ...state, errors: [...state.errors, action.error] };
+    }
+    case AudioGraphActionTypes.DismissError: {
+      const remainingErrors = state.errors.filter(e => e.id !== action.id);
+      return { ...state, errors: remainingErrors };
     }
     default:
       return state;

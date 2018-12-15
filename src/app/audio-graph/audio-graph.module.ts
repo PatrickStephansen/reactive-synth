@@ -13,6 +13,8 @@ import { SharedModule } from '../shared/shared.module';
 import { AudioGraphEffects } from './state/audio-graph.effects';
 import { reducer } from './state/audio-graph.reducers';
 import { ChoiceParameterComponent } from './components/choice-parameter/choice-parameter.component';
+import { ErrorsShellComponent } from './containers/errors-shell/errors-shell.component';
+import { ErrorListComponent } from './components/error-list/error-list.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,9 @@ import { ChoiceParameterComponent } from './components/choice-parameter/choice-p
     ParameterComponent,
     ParametersShellComponent,
     ParameterListComponent,
-    ChoiceParameterComponent
+    ChoiceParameterComponent,
+    ErrorsShellComponent,
+    ErrorListComponent
   ],
   imports: [
     StoreModule.forFeature('graph', reducer),
