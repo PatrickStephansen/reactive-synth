@@ -27,11 +27,11 @@ export class AudioGraphService {
   private defaultGain = 0.1;
 
   private parameterMax(parameter: AudioParam) {
-    return Math.min(parameter.maxValue, 1000000);
+    return Math.min(parameter.maxValue, 1000000000);
   }
 
   private parameterMin(parameter: AudioParam) {
-    return Math.max(parameter.minValue, -1000000);
+    return Math.max(parameter.minValue, -1000000000);
   }
 
   constructor() {}
@@ -284,7 +284,7 @@ export class AudioGraphService {
           name: 'quality factor',
           nodeId: id,
           maxValue: this.parameterMax(filter.Q),
-          minValue: this.parameterMin(filter.Q),
+          minValue: 0,
           stepSize: 1,
           sourceIds: [],
           value: filter.Q.value
