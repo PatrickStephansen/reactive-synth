@@ -9,6 +9,7 @@ import { makeDistortionCurve } from './distortion-curve';
 import { ConnectParameterEvent } from './model/connect-parameter-event';
 import { promise } from 'protractor';
 import { makeRectifierCurve } from './rectifier-curve';
+import { NodeSignalStage } from './model/node-signal-stage';
 
 let incrementingId = 0;
 
@@ -70,8 +71,13 @@ export class AudioGraphService {
         );
       }
       this.context = new AudioContext();
+      const visualizer = this.context.createAnalyser();
+      visualizer.connect(this.context.destination);
       this.graph = new Map([
-        ['Output to Speakers', { internalNodes: [this.context.destination] }]
+        [
+          'Output to Speakers',
+          { internalNodes: [visualizer, this.context.destination] }
+        ]
       ]);
       return this.context.resume().then(() => ({
         nodes: [
@@ -88,7 +94,16 @@ export class AudioGraphService {
         ],
         parameters: [],
         choiceParameters: [],
-        visualizations: [],
+        visualizations: [
+          {
+            nodeId: 'Output to Speakers',
+            name: 'waveform',
+            dataLength: visualizer.fftSize,
+            visualizationType: 'line-graph',
+            visualizationStage: NodeSignalStage.input,
+            getVisualizationData: data => visualizer.getByteTimeDomainData(data)
+          }
+        ],
         muted: false,
         errors: []
       }));

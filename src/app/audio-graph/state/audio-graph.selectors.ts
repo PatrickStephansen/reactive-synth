@@ -1,5 +1,8 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AudioGraphState } from './audio-graph.state';
+import { ChoiceParameter } from '../model/choice-parameter';
+import { Parameter } from '../model/parameter';
+import { Visualization } from '../model/visualization';
 
 const getGraphsFeatureState = createFeatureSelector<AudioGraphState>('graph');
 export const getGraphOutputActiveState = createSelector(
@@ -26,17 +29,28 @@ const getChoiceParametersState = createSelector(
   graph => graph.choiceParameters
 );
 
+const getVisualizationsState = createSelector(
+  getGraphsFeatureState,
+  graph => graph.visualizations
+);
+
 // This will crash if given bad arguments
 export const getParametersForNodeState = createSelector(
   getParametersState,
-  (parameters, { nodeId }: { nodeId: string }) =>
+  (parameters: Parameter[], { nodeId }: { nodeId: string }) =>
     parameters.filter(parameter => parameter.nodeId === nodeId)
 );
 
 export const getChoiceParametersForNodeState = createSelector(
   getChoiceParametersState,
-  (parameters, { nodeId }: { nodeId: string }) =>
+  (parameters: ChoiceParameter[], { nodeId }: { nodeId: string }) =>
     parameters.filter(parameter => parameter.nodeId === nodeId)
+);
+
+export const getVisualizationsForNodeState = createSelector(
+  getVisualizationsState,
+  (visualizations: Visualization[], { nodeId }: { nodeId: string }) =>
+    visualizations.filter(v => v.nodeId === nodeId)
 );
 
 export const getGraphErrors = createSelector(

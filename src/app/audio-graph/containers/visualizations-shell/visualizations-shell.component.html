@@ -1,0 +1,7 @@
+<ng-container *ngIf="(visualizations$ | async) as visualizations">
+  <ng-container *ngIf="visualizations.length">
+    <app-visualization-list
+      [visualizations]="visualizations"
+    ></app-visualization-list>
+  </ng-container>
+</ng-container>

@@ -10,6 +10,7 @@
     <h3 class="title is-5">{{ node.id }}</h3>
   </div>
   <app-help-message *ngIf="node.helpText"> {{ node.helpText }} </app-help-message>
+  <app-visualizations-shell [nodeId]="node.id"></app-visualizations-shell>
   <ng-container *ngIf="node.numberInputs">
     <div class="content" *ngIf="node.sourceIds?.length">
       <div class="label">Connected inputs</div>

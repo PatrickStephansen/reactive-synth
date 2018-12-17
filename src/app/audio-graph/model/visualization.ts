@@ -2,7 +2,9 @@ import { NodeSignalStage } from './node-signal-stage';
 
 export interface Visualization {
   nodeId: string;
-  visualizationStage: NodeSignalStage;
+  name: string;
   dataLength: number;
-  getVisualizationData(data: Float32Array): Float32Array;
+  visualizationStage: NodeSignalStage;
+  visualizationType: string;
+  getVisualizationData(data: Uint8Array): void;
 }

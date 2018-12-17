@@ -1,4 +1,4 @@
 export enum NodeSignalStage {
-  input,
-  output
+  input = 'Input',
+  output = 'Output'
 }

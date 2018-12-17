@@ -15,6 +15,9 @@ import { reducer } from './state/audio-graph.reducers';
 import { ChoiceParameterComponent } from './components/choice-parameter/choice-parameter.component';
 import { ErrorsShellComponent } from './containers/errors-shell/errors-shell.component';
 import { ErrorListComponent } from './components/error-list/error-list.component';
+import { VisualizationListComponent } from './components/visualization-list/visualization-list.component';
+import { LineGraphVisualizationComponent } from './components/line-graph-visualization/line-graph-visualization.component';
+import { VisualizationsShellComponent } from './containers/visualizations-shell/visualizations-shell.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +29,10 @@ import { ErrorListComponent } from './components/error-list/error-list.component
     ParameterListComponent,
     ChoiceParameterComponent,
     ErrorsShellComponent,
-    ErrorListComponent
+    ErrorListComponent,
+    VisualizationListComponent,
+    LineGraphVisualizationComponent,
+    VisualizationsShellComponent
   ],
   imports: [
     StoreModule.forFeature('graph', reducer),
