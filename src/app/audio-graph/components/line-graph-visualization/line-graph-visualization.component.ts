@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
-import { Visualization } from '../../model/visualization';
+import { curry, flip } from 'ramda';
+
+import { Visualization } from '../../model/visualization/visualization';
 
 @Component({
   selector: 'app-line-graph-visualization',
@@ -28,14 +30,18 @@ export class LineGraphVisualizationComponent implements OnInit {
   private renderVisuals() {
     this.visualization.getVisualizationData(this.visualizationData);
     const { width: canvasWidth, height: canvasHeight } = this.canvas;
-    const pixelsPerSample = canvasWidth / this.visualization.dataLength;
-    const pixelsPerAmplitude = canvasHeight / 255;
+    const getPixelX = curry(
+      flip(this.visualization.renderingStrategyPerAxis[0])
+    )(this.visualization.dataLength, canvasWidth);
+    const getPixelY = curry(
+      flip(this.visualization.renderingStrategyPerAxis[1])
+    )(255, canvasHeight);
     this.drawingContext.clearRect(0, 0, canvasWidth, canvasHeight);
     this.drawingContext.beginPath();
 
     this.visualizationData.forEach((amplitude, index) => {
-      const x = pixelsPerSample * index;
-      const y = canvasHeight - amplitude * pixelsPerAmplitude;
+      const x = getPixelX(index);
+      const y = canvasHeight - getPixelY(amplitude);
       if (index) {
         this.drawingContext.lineTo(x, y);
       } else {

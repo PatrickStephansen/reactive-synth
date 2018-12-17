@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Visualization } from '../../model/visualization';
+import { Visualization } from '../../model/visualization/visualization';
 
 @Component({
   selector: 'app-visualization-list',

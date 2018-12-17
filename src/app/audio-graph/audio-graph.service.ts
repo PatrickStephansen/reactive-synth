@@ -7,9 +7,12 @@ import { ChoiceParameter as ChoiceParameterModel } from './model/choice-paramete
 import { AudioGraphState } from './state/audio-graph.state';
 import { makeDistortionCurve } from './distortion-curve';
 import { ConnectParameterEvent } from './model/connect-parameter-event';
-import { promise } from 'protractor';
 import { makeRectifierCurve } from './rectifier-curve';
 import { NodeSignalStage } from './model/node-signal-stage';
+import {
+  linearScalingStrategy,
+  logarithmicScalingStrategy
+} from './model/visualization/scaling-strategy';
 
 let incrementingId = 0;
 
@@ -101,7 +104,23 @@ export class AudioGraphService {
             dataLength: visualizer.fftSize,
             visualizationType: 'line-graph',
             visualizationStage: NodeSignalStage.input,
+            renderingStrategyPerAxis: [
+              linearScalingStrategy,
+              linearScalingStrategy
+            ],
             getVisualizationData: data => visualizer.getByteTimeDomainData(data)
+          },
+          {
+            nodeId: 'Output to Speakers',
+            name: 'spectrum',
+            dataLength: visualizer.frequencyBinCount,
+            visualizationType: 'line-graph',
+            visualizationStage: NodeSignalStage.input,
+            renderingStrategyPerAxis: [
+              logarithmicScalingStrategy,
+              linearScalingStrategy
+            ],
+            getVisualizationData: data => visualizer.getByteFrequencyData(data)
           }
         ],
         muted: false,

@@ -1,4 +1,5 @@
-import { NodeSignalStage } from './node-signal-stage';
+import { NodeSignalStage } from '../node-signal-stage';
+import { ScalingStrategy } from './scaling-strategy';
 
 export interface Visualization {
   nodeId: string;
@@ -6,5 +7,6 @@ export interface Visualization {
   dataLength: number;
   visualizationStage: NodeSignalStage;
   visualizationType: string;
+  renderingStrategyPerAxis: ScalingStrategy[];
   getVisualizationData(data: Uint8Array): void;
 }

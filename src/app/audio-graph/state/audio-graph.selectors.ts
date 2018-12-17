@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AudioGraphState } from './audio-graph.state';
 import { ChoiceParameter } from '../model/choice-parameter';
 import { Parameter } from '../model/parameter';
-import { Visualization } from '../model/visualization';
+import { Visualization } from '../model/visualization/visualization';
 
 const getGraphsFeatureState = createFeatureSelector<AudioGraphState>('graph');
 export const getGraphOutputActiveState = createSelector(

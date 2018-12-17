@@ -7,7 +7,7 @@ import {
 import { Store, select } from '@ngrx/store';
 import { AudioGraphState } from '../../state/audio-graph.state';
 import { Observable } from 'rxjs';
-import { Visualization } from '../../model/visualization';
+import { Visualization } from '../../model/visualization/visualization';
 import { getVisualizationsForNodeState } from '../../state/audio-graph.selectors';
 
 @Component({

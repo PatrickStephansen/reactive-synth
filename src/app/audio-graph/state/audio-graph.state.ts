@@ -1,6 +1,6 @@
 import { Parameter } from '../model/parameter';
 import { AudioNode } from '../model/audio-node';
-import { Visualization } from '../model/visualization';
+import { Visualization } from '../model/visualization/visualization';
 import { ChoiceParameter } from '../model/choice-parameter';
 import { GraphError } from '../model/graph-error';
 
