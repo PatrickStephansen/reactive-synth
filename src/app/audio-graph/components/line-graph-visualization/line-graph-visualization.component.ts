@@ -30,7 +30,7 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges {
   private canvasRef: ElementRef;
   private canvas: HTMLCanvasElement;
   private drawingContext: CanvasRenderingContext2D;
-  private hideCanvas: boolean;
+  hideCanvas: boolean;
 
   constructor() {}
 
