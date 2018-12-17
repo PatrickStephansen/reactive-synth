@@ -92,7 +92,8 @@ export class AudioGraphService {
             sourceIds: [],
             canDelete: false,
             helpText:
-              'Signals must be connected to this node to be audible. Incoming signals are summed and clamped to the range [-1, 1].'
+              `Signals must be connected to this node to be audible. Incoming signals are summed and clamped to the range [-1, 1].
+              Click the visualizations to pause them. Click their headings to hide them to save space.`
           }
         ],
         parameters: [],
