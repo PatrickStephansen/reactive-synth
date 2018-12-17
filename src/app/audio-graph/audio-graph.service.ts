@@ -341,7 +341,10 @@ export class AudioGraphService {
         canDelete: true,
         helpText: `A simple wave shaping distortion that adds more harmonic content to boring waveforms.
           It also makes interference between waves easier to hear.
-          Try connecting a low and a high frequency sine oscillator to the input, and the distortion output to the speakers.`
+          Try connecting a low and a high frequency sine oscillator to the input, and the distortion output to the speakers.
+          Distortion clamps the incoming signal to the range [-1, 1], so it can be used to shape the signal from LFOs.
+          For example, a triangle wave with amplitude > 1 becomes closer to a square wave
+          with smoother transitions between the high and low value.`
       },
       []
     ];
