@@ -11,9 +11,7 @@ export class VisualizationListComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-    console.log(`${this.visualizations.length} visualz`);
-  }
+  ngOnInit() {  }
 
   getVisualizationName(index: number, visualization: Visualization) {
     return visualization.name;
