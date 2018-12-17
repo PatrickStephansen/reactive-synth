@@ -128,6 +128,23 @@ export class AudioGraphEffects {
   );
 
   @Effect()
+  createRectifierNode$: Observable<AudioGraphAction> = this.actions$.pipe(
+    ofType(AudioGraphActionTypes.CreateRectifierNode),
+    mergeMap(() =>
+      of(() => this.graphService.createRectifierNode()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([node, parameters]) =>
+          from([
+            new CreateNodeSuccess(node),
+            ...parameters.map(p => new CreateParameterSuccess(p))
+          ])
+        ),
+        this.handleGraphChangeError
+      )
+    )
+  );
+
+  @Effect()
   createConstantSource$: Observable<AudioGraphAction> = this.actions$.pipe(
     ofType(AudioGraphActionTypes.CreateConstantSource),
     mergeMap(() =>

@@ -8,6 +8,7 @@ import { AudioGraphState } from './state/audio-graph.state';
 import { makeDistortionCurve } from './distortion-curve';
 import { ConnectParameterEvent } from './model/connect-parameter-event';
 import { promise } from 'protractor';
+import { makeRectifierCurve } from './rectifier-curve';
 
 let incrementingId = 0;
 
@@ -342,9 +343,34 @@ export class AudioGraphService {
         helpText: `A simple wave shaping distortion that adds more harmonic content to boring waveforms.
           It also makes interference between waves easier to hear.
           Try connecting a low and a high frequency sine oscillator to the input, and the distortion output to the speakers.
-          Distortion clamps the incoming signal to the range [-1, 1], so it can be used to shape the signal from LFOs.
+          Distortion clips the incoming signal to the range [-1, 1], so it can be used to shape the signal from low frequency oscillators.
           For example, a triangle wave with amplitude > 1 becomes closer to a square wave
           with smoother transitions between the high and low value.`
+      },
+      []
+    ];
+  }
+
+  createRectifierNode(): [NodeModel, ParameterModel[]] {
+    const nodeType = 'rectifier';
+    const id = this.createId(nodeType);
+    const rectifier = this.context.createWaveShaper();
+    rectifier.curve = makeRectifierCurve();
+    rectifier.oversample = '4x';
+    this.graph.set(id, {
+      internalNodes: [rectifier]
+    });
+    return [
+      {
+        id,
+        nodeType,
+        numberInputs: 1,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true,
+        helpText: `Clips incoming samples to the range [0, 1]. Values between 0 and 1 are untouched.
+          Useful for shaping low freqency oscillators for precise controls like pitch (detune or frequency).
+          When used together with a constant source and gain, a waveform can be shifted to any range.`
       },
       []
     ];
