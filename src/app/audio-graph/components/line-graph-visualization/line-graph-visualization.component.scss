@@ -1,4 +1,30 @@
+@import '../../../../variables';
+@import '../../../../../node_modules/bulma/sass/utilities/mixins.sass';
+
 .node-signal-analyser-canvas {
   width: 100%;
   height: 192px;
+  cursor: pointer;
+
+  .is-hidden {
+    display: none;
+  }
+}
+
+.hide-canvas {
+  cursor: pointer;
+  position: relative;
+
+  .arrow:not(.is-closed)::after {
+    @include arrow($grey-dark);
+    right: 1.125em;
+    transform: rotate(135deg);
+    margin-top: -0.2em;
+  }
+
+  .arrow.is-closed::after {
+    @include arrow($grey-dark);
+    right: 1.125em;
+    transform: rotate(-45deg);
+  }
 }

@@ -108,11 +108,12 @@ export class AudioGraphService {
               linearScalingStrategy,
               linearScalingStrategy
             ],
+            isActive: true,
             getVisualizationData: data => visualizer.getByteTimeDomainData(data)
           },
           {
             nodeId: 'Output to Speakers',
-            name: 'spectrum',
+            name: 'spectrum - log',
             dataLength: visualizer.frequencyBinCount,
             visualizationType: 'line-graph',
             visualizationStage: NodeSignalStage.input,
@@ -120,8 +121,22 @@ export class AudioGraphService {
               logarithmicScalingStrategy,
               linearScalingStrategy
             ],
+            isActive: false,
             getVisualizationData: data => visualizer.getByteFrequencyData(data)
-          }
+          },
+          {
+            nodeId: 'Output to Speakers',
+            name: 'spectrum - linear',
+            dataLength: visualizer.frequencyBinCount,
+            visualizationType: 'line-graph',
+            visualizationStage: NodeSignalStage.input,
+            renderingStrategyPerAxis: [
+              linearScalingStrategy,
+              linearScalingStrategy
+            ],
+            isActive: false,
+            getVisualizationData: data => visualizer.getByteFrequencyData(data)
+          },
         ],
         muted: false,
         errors: []

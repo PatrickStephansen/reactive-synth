@@ -9,6 +9,8 @@ import { AudioGraphState } from '../../state/audio-graph.state';
 import { Observable } from 'rxjs';
 import { Visualization } from '../../model/visualization/visualization';
 import { getVisualizationsForNodeState } from '../../state/audio-graph.selectors';
+import { ToggleVisualizationActive } from '../../state/audio-graph.actions';
+import { ChangeVisualizationActiveEvent } from '../../model/visualization/change-visualization-active-event';
 
 @Component({
   selector: 'app-visualizations-shell',
@@ -26,6 +28,14 @@ export class VisualizationsShellComponent implements OnInit {
   ngOnInit() {
     this.visualizations$ = this.store.pipe(
       select(getVisualizationsForNodeState, { nodeId: this.nodeId })
+    );
+  }
+
+  toggleActive(
+    changeVisualizationVisibleEvent: ChangeVisualizationActiveEvent
+  ) {
+    this.store.dispatch(
+      new ToggleVisualizationActive(changeVisualizationVisibleEvent)
     );
   }
 }

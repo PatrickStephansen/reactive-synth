@@ -1,5 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Visualization } from '../../model/visualization/visualization';
+import { ChangeVisualizationActiveEvent } from '../../model/visualization/change-visualization-active-event';
 
 @Component({
   selector: 'app-visualization-list',
@@ -9,11 +10,13 @@ import { Visualization } from '../../model/visualization/visualization';
 export class VisualizationListComponent implements OnInit {
   @Input() visualizations: Visualization[];
 
+  @Output() toggleActive = new EventEmitter<ChangeVisualizationActiveEvent>();
+
   constructor() {}
 
-  ngOnInit() {  }
+  ngOnInit() {}
 
-  getVisualizationName(index: number, visualization: Visualization) {
-    return visualization.name;
+  getVisualizationIdentity(index: number, visualization: Visualization) {
+    return `${visualization.nodeId}-${visualization.name}`;
   }
 }

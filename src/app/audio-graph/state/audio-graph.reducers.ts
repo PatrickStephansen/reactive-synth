@@ -127,6 +127,14 @@ export function reducer(
       const remainingErrors = state.errors.filter(e => e.id !== action.id);
       return { ...state, errors: remainingErrors };
     }
+    case AudioGraphActionTypes.ToggleVisualizationActive: {
+      const visualizations = state.visualizations.map(v =>
+        v.nodeId === action.payload.nodeId && v.name === action.payload.name
+          ? { ...v, isActive: action.payload.show }
+          : v
+      );
+      return { ...state, visualizations };
+    }
     default:
       return state;
   }

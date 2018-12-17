@@ -8,6 +8,7 @@ import { ChoiceParameter } from '../model/choice-parameter';
 import { ChangeChoiceEvent } from '../model/change-choice-event';
 import { ConnectParameterEvent } from '../model/connect-parameter-event';
 import { GraphError } from '../model/graph-error';
+import { ChangeVisualizationActiveEvent } from '../model/visualization/change-visualization-active-event';
 
 export enum AudioGraphActionTypes {
   ResetGraph = '[Audio Graph] Reset Graph',
@@ -40,7 +41,8 @@ export enum AudioGraphActionTypes {
   ToggleGraphActiveSuccess = '[Audio Graph] Toggle Graph Output Active Success',
   AddError = '[Audio Graph] Add Graph Change Error',
   DismissError = '[Audio Graph] Dismiss Graph Change Error',
-  ClearErrors = '[Audio Graph] Clear All Graph Change Errors'
+  ClearErrors = '[Audio Graph] Clear All Graph Change Errors',
+  ToggleVisualizationActive = '[Audio Graph] Toggle Visualization Active'
 }
 
 export class ResetGraph implements Action {
@@ -187,6 +189,12 @@ export class ToggleGraphActiveSuccess implements Action {
   constructor(public payload: boolean) {}
 }
 
+export class ToggleVisualizationActive implements Action {
+  readonly type = AudioGraphActionTypes.ToggleVisualizationActive;
+
+  constructor(public payload: ChangeVisualizationActiveEvent) {}
+}
+
 export class DestroyNode implements Action {
   readonly type = AudioGraphActionTypes.DestroyNode;
 
@@ -238,6 +246,7 @@ export type AudioGraphAction =
   | CreateChoiceParameterSuccess
   | ToggleGraphActive
   | ToggleGraphActiveSuccess
+  | ToggleVisualizationActive
   | CreateGainNode
   | CreateDistortionNode
   | CreateRectifierNode

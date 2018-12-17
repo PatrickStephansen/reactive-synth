@@ -1,3 +1,8 @@
-<ng-container *ngFor="let visualization of visualizations; trackBy:getVisualizationName">
-  <app-line-graph-visualization [visualization]="visualization"></app-line-graph-visualization>
+<ng-container
+  *ngFor="let visualization of visualizations; trackBy: getVisualizationIdentity"
+>
+  <app-line-graph-visualization
+    [visualization]="visualization"
+    (toggleActive)="toggleActive.emit($event)"
+  ></app-line-graph-visualization>
 </ng-container>

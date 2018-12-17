@@ -1,8 +1,11 @@
-<label class="label">
-  {{visualization.name | titlecase}}
-  <canvas
-    class="node-signal-analyser-canvas"
-    id="{{ visualization.nodeId }}-{{ visualization.name }}"
-    #lineGraphCanvas
-  ></canvas>
-</label>
+<h4 class="label hide-canvas" (click)="toggleVisualizationHidden()">
+  <div class="arrow" [ngClass]="{ 'is-closed': hideCanvas }">{{ visualization.name | titlecase }}</div>
+</h4>
+
+<canvas
+  class="node-signal-analyser-canvas"
+  [ngClass]="{ 'is-hidden': hideCanvas }"
+  (click)="toggleVisualizationActive()"
+  id="{{ visualization.nodeId }}-{{ visualization.name }}"
+  #lineGraphCanvas
+></canvas>

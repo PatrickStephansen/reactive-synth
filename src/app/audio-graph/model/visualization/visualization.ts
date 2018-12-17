@@ -8,5 +8,6 @@ export interface Visualization {
   visualizationStage: NodeSignalStage;
   visualizationType: string;
   renderingStrategyPerAxis: ScalingStrategy[];
+  isActive: boolean;
   getVisualizationData(data: Uint8Array): void;
 }

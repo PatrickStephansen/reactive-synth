@@ -2,6 +2,7 @@
   <ng-container *ngIf="visualizations.length">
     <app-visualization-list
       [visualizations]="visualizations"
+      (toggleActive)="toggleActive($event)"
     ></app-visualization-list>
   </ng-container>
 </ng-container>
