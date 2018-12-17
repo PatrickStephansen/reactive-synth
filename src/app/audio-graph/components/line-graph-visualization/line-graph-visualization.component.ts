@@ -34,16 +34,12 @@ export class LineGraphVisualizationComponent implements OnInit {
     this.drawingContext.beginPath();
 
     this.visualizationData.forEach((amplitude, index) => {
+      const x = pixelsPerSample * index;
+      const y = canvasHeight - amplitude * pixelsPerAmplitude;
       if (index) {
-        this.drawingContext.lineTo(
-          pixelsPerSample * index,
-          canvasHeight - amplitude * pixelsPerAmplitude
-        );
+        this.drawingContext.lineTo(x, y);
       } else {
-        this.drawingContext.moveTo(
-          pixelsPerSample * index,
-          canvasHeight - amplitude * pixelsPerAmplitude
-        );
+        this.drawingContext.moveTo(x, y);
       }
     });
 
