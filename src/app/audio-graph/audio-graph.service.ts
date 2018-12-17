@@ -326,7 +326,7 @@ export class AudioGraphService {
     const nodeType = 'distortion';
     const id = this.createId(nodeType);
     const distortion = this.context.createWaveShaper();
-    distortion.curve = makeDistortionCurve();
+    distortion.curve = makeDistortionCurve(this.context.sampleRate);
     distortion.oversample = '4x';
     this.graph.set(id, {
       internalNodes: [distortion]
