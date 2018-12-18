@@ -39,7 +39,7 @@ export class AudioGraphService {
     return Math.max(parameter.minValue, -1000000000);
   }
 
-  constructor() {}
+  constructor() { }
 
   private destroyContext() {
     if (this.context) {
@@ -82,7 +82,7 @@ export class AudioGraphService {
           { internalNodes: [visualizer, this.context.destination] }
         ]
       ]);
-      return this.context.resume().then(() => ({
+      return this.context.suspend().then(() => this.context.suspend()).then(() => ({
         nodes: [
           {
             id: 'Output to Speakers',
@@ -139,13 +139,14 @@ export class AudioGraphService {
             getVisualizationData: data => visualizer.getByteFrequencyData(data)
           },
         ],
-        muted: false,
+        muted: this.context.state && this.context.state === 'suspended',
         errors: []
       }));
     });
   }
 
   createOscillator(): [NodeModel, ParameterModel[], ChoiceParameterModel[]] {
+    console.log(this.context.state)
     const nodeType = 'oscillator';
     const id = this.createId(nodeType);
     const oscillator = this.context.createOscillator();
