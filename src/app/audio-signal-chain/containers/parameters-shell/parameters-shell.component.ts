@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -24,7 +24,8 @@ import { ConnectParameterEvent } from '../../model/connect-parameter-event';
 @Component({
   selector: 'app-parameters-shell',
   templateUrl: './parameters-shell.component.html',
-  styleUrls: ['./parameters-shell.component.scss']
+  styleUrls: ['./parameters-shell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ParametersShellComponent implements OnInit {
   // changes in ID are not catered for

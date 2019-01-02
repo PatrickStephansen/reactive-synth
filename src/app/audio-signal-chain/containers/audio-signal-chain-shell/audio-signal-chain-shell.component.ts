@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
 import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
@@ -27,7 +27,8 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 @Component({
   selector: 'app-audio-signal-chain-shell',
   templateUrl: './audio-signal-chain-shell.component.html',
-  styleUrls: ['./audio-signal-chain-shell.component.scss']
+  styleUrls: ['./audio-signal-chain-shell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioSignalChainShellComponent implements OnInit {
   audioModules$: Observable<AudioModule[]>;
