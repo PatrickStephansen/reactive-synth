@@ -82,7 +82,7 @@ export class AudioGraphService {
           { internalNodes: [visualizer, this.context.destination] }
         ]
       ]);
-      return this.context.suspend().then(() => this.context.suspend()).then(() => ({
+      return this.context.suspend().then(() => ({
         modules: [
           {
             id: 'Output to Speakers',
@@ -443,8 +443,8 @@ export class AudioGraphService {
         numberOutputs: 1,
         sourceIds: [],
         canDelete: true,
-        helpText: `Emits a "constant" stream of samples with the value of the offset parameter.
-          It is not always constant since the offset can be modulated by other modules.
+        helpText: `Emits a "constant" stream of samples with the value of the Output Value parameter.
+          It is not always constant since the output value can be modulated by other modules.
           Useful for adding an offset to a waveform or for controlling multiple parameters from one place.
           It can be used together with a gain module for unit conversions eg.
           feed it into a gain multiplier of 0.016666 to convert beats per minute to hertz.`
