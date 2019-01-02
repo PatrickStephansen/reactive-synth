@@ -1,0 +1,64 @@
+<form [formGroup]="parameterForm">
+  <label class="label">
+    <div class="field">
+      <span class="parameter-name">{{ parameter.name }}</span>
+      <span class="units" *ngIf="parameter.units">
+        ({{ parameter.units }})
+      </span>
+      <div class="control">
+        <input
+          [step]="parameter.stepSize"
+          [min]="parameter.minValue"
+          [max]="parameter.maxValue"
+          type="number"
+          [ngClass]="{ 'is-danger': parameterValue?.errors, input: true }"
+          formControlName="parameterValue"
+        />
+        <div
+          class="validation-errors has-text-danger"
+          *ngIf="parameterValue.invalid"
+        >
+          must be a number between {{ parameter.minValue }} and
+          {{ parameter.maxValue }}
+        </div>
+      </div>
+      <div class="field">
+        <div class="control is-expanded">
+          <div class="select is-fullwidth">
+            <select
+              name="new-input"
+              id="{{ parameter.moduleId }}-{{ parameter.name }}-new-input"
+              formControlName="selectedSourceModule"
+              (change)="connectParameterToSource()"
+            >
+              <option value="" disabled selected hidden
+                >Add Parameter Input</option
+              >
+              <option *ngIf="!availableSourceModules?.length" value="" disabled
+                >No more modules available</option
+              >
+              <option
+                *ngFor="let sourceModule of availableSourceModules"
+                value="{{ sourceModule }}"
+              >
+                {{ sourceModule }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </label>
+</form>
+<div class="tags" *ngIf="parameter.sourceIds?.length">
+  <ng-container *ngFor="let sourceModule of parameter.sourceIds">
+    <span class="tag"
+      >{{ sourceModule }}
+      <button
+        class="delete is-small"
+        type="button"
+        (click)="disconnectParameterFromSource(sourceModule)"
+      ></button
+    ></span>
+  </ng-container>
+</div>

@@ -1,0 +1,70 @@
+<h2 class="title is-3">Controls</h2>
+<app-help-message><p>You may need to click unmute to get started. Due to some browsers' autoplay policies, the app is not always allowed to start playing audio immediately.</p></app-help-message>
+<div class="level">
+  <div class="buttons">
+    <button
+      class="button"
+      (click)="toggleAudioOutputEnabled.emit(!audioOutputEnabled)"
+    >
+      {{ audioOutputEnabled ? 'Mute' : 'Unmute' }}
+    </button>
+    <app-toggle-help></app-toggle-help>
+  </div>
+</div>
+<app-help-message>
+  <p>
+    This is a modular synth that allows you to build up your own signal chain.
+  </p>
+  <p>Use the buttons below to add modules, then connect them together.</p>
+</app-help-message>
+<div class="level">
+  <div class="buttons">
+    <button class="button" (click)="createOscillator.emit()">
+      Add Oscillator
+    </button>
+    <button class="button" (click)="createConstantSource.emit()">
+      Add Constant Source
+    </button>
+    <button class="button" (click)="createGainModule.emit()">
+      Add Gain
+    </button>
+    <button class="button" (click)="createDelayModule.emit()">
+      Add Delay
+    </button>
+    <button class="button" (click)="createFilterModule.emit()">
+      Add Filter
+    </button>
+    <button class="button" (click)="createDistortionModule.emit()">
+      Add Distortion
+    </button>
+    <button class="button" (click)="createRectifierModule.emit()">
+      Add Rectifier
+    </button>
+  </div>
+</div>
+<h2 class="title is-3">Audio Modules</h2>
+<app-errors-shell></app-errors-shell>
+<app-help-message>
+  <p>
+    Modules either produce or process signals based on some parameters.
+  </p>
+  <p>
+    A module's input and parameters may be connected to the output from one or more other modules.
+  </p>
+  <p>If multiple connections end at the same point, the signals are summed.</p>
+</app-help-message>
+
+<div class="columns is-multiline">
+  <div
+    class="column is-one-fifth-fullhd is-one-quarter-desktop is-half-tablet"
+    *ngFor="let module of modules; trackBy: getModuleId"
+  >
+    <app-audio-module
+      [module]="module"
+      [availableSourceModules]="filterSourceModules(module)"
+      (connectSourceModule)="connectModules.emit($event)"
+      (disconnectSourceModule)="disconnectModules.emit($event)"
+      (deleteModule)="deleteModule.emit($event)"
+    ></app-audio-module>
+  </div>
+</div>

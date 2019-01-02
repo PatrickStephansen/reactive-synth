@@ -5,14 +5,14 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppComponent } from './app.component';
-import { AudioGraphModule } from './audio-graph/audio-graph.module';
+import { AudioSignalChainModule } from './audio-signal-chain/audio-signal-chain.module';
 import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
-    AudioGraphModule,
+    AudioSignalChainModule,
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({

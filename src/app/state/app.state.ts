@@ -1,7 +1,7 @@
-import { AudioGraphState } from '../audio-graph/state/audio-graph.state';
+import { AudioSignalChainState } from '../audio-signal-chain/state/audio-signal-chain.state';
 
 export interface State {
-  graph: AudioGraphState;
+  signalChain: AudioSignalChainState;
   app: AppState;
 }
 

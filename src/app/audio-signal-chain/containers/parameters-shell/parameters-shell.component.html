@@ -1,0 +1,9 @@
+<app-parameter-list
+  [parameters]="parameters$ | async"
+  [choiceParameters]="choiceParameters$ | async"
+  [sourceModuleIds]="sourceModuleIds$ | async"
+  (updateParameterValue)="onParameterChanged($event)"
+  (updateChoiceParameterValue)="onChoiceParameterChanged($event)"
+  (connectParameter)="onParameterConnected($event)"
+  (disconnectParameter)="onParameterDisconnected($event)"
+  ></app-parameter-list>
