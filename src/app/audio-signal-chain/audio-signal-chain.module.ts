@@ -1,4 +1,9 @@
 import { NgModule } from '@angular/core';
+import {
+  Location,
+  LocationStrategy,
+  PathLocationStrategy
+} from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
@@ -40,6 +45,10 @@ import { VisualizationsShellComponent } from './containers/visualizations-shell/
     SharedModule
   ],
   exports: [AudioSignalChainShellComponent],
-  providers: [AudioGraphService]
+  providers: [
+    AudioGraphService,
+    Location,
+    { provide: LocationStrategy, useClass: PathLocationStrategy }
+  ]
 })
 export class AudioSignalChainModule {}

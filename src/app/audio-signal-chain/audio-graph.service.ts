@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Location } from '@angular/common';
 import { head, last } from 'ramda';
 import {
   AudioWorkletNode,
@@ -45,7 +46,7 @@ export class AudioGraphService {
     return Math.max(parameter.minValue, -1000000000);
   }
 
-  constructor() {}
+  constructor(private locationService: Location) {}
 
   private destroyContext() {
     if (this.context) {
@@ -93,7 +94,9 @@ export class AudioGraphService {
         .suspend()
         .then(() =>
           this.context.audioWorklet.addModule(
-            '/assets/audio-worklet-processors/noise.js'
+            this.locationService.prepareExternalUrl(
+              '/assets/audio-worklet-processors/noise.js'
+            )
           )
         )
         .then(() => ({
