@@ -172,8 +172,9 @@ export class AudioGraphService {
       // work-around for https://github.com/chrisguttandin/standardized-audio-context/issues/493
       numberOfInputs: 1,
       numberOfOutputs: 1,
-      channelCount: 2,
-      channelCountMode: 'explicit'
+      channelCount: 1,
+      channelCountMode: 'explicit',
+      outputChannelCount: [1]
     });
     const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
     const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
