@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
 import { head, last } from 'ramda';
+import {
+  AudioWorkletNode,
+  AudioContext,
+  IAudioParam,
+  IAudioNode
+} from 'standardized-audio-context';
 
 import { AudioModule as ModuleModel } from './model/audio-module';
 import { Parameter as ParameterModel } from './model/parameter';
@@ -17,9 +23,9 @@ import {
 let incrementingId = 0;
 
 interface ModuleImplementation {
-  internalNodes: AudioNode[];
-  parameterMap?: Map<string, AudioParam>;
-  choiceMap?: Map<string, [AudioNode, string]>;
+  internalNodes: IAudioNode[];
+  parameterMap?: Map<string, IAudioParam>;
+  choiceMap?: Map<string, [IAudioNode, string]>;
 }
 
 @Injectable({
@@ -31,11 +37,11 @@ export class AudioGraphService {
 
   private defaultGain = 0.1;
 
-  private parameterMax(parameter: AudioParam) {
+  private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
   }
 
-  private parameterMin(parameter: AudioParam) {
+  private parameterMin(parameter: IAudioParam) {
     return Math.max(parameter.minValue, -1000000000);
   }
 
@@ -160,17 +166,17 @@ export class AudioGraphService {
     const moduleType = 'noise';
     const id = this.createId(moduleType);
     const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
-      numberOfInputs: 0,
-      numberOfOutputs: 1
+      // work-around for https://github.com/chrisguttandin/standardized-audio-context/issues/493
+      numberOfInputs: 1,
+      numberOfOutputs: 1,
+      channelCount: 2,
+      channelCountMode: 'explicit'
     });
     const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
     const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
     this.graph.set(id, {
       internalNodes: [noiseGeneratorNode],
-      parameterMap: new Map([
-        ['step min', stepMin],
-        ['step max', stepMax]
-      ])
+      parameterMap: new Map([['step min', stepMin], ['step max', stepMax]])
     });
     return [
       {
@@ -223,7 +229,7 @@ export class AudioGraphService {
         ['output gain', volumeControl.gain]
       ]),
       choiceMap: new Map([
-        ['waveform', [oscillator, 'type'] as [AudioNode, string]]
+        ['waveform', [oscillator, 'type'] as [IAudioNode, string]]
       ])
     };
     this.graph.set(id, moduleImplementation);
@@ -380,7 +386,7 @@ export class AudioGraphService {
         ['detune', filter.detune]
       ]),
       choiceMap: new Map([
-        ['filter type', [filter, 'type'] as [AudioNode, string]]
+        ['filter type', [filter, 'type'] as [IAudioNode, string]]
       ])
     });
     return [
