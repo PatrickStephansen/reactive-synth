@@ -20,7 +20,8 @@ import {
   CreateDistortionModule,
   CreateConstantSource,
   CreateFilterModule,
-  CreateRectifierModule
+  CreateRectifierModule,
+  CreateNoiseGenerator
 } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 
@@ -44,6 +45,10 @@ export class AudioSignalChainShellComponent implements OnInit {
 
   addOscillator() {
     this.store.dispatch(new CreateOscillator());
+  }
+
+  addNoiseGenerator() {
+    this.store.dispatch(new CreateNoiseGenerator());
   }
 
   addGainModule() {

@@ -79,6 +79,23 @@ export class AudioSignalChainEffects {
   );
 
   @Effect()
+  createNoiseGenerator$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.CreateNoiseGenerator),
+    mergeMap(() =>
+      of(() => this.graphService.createNoiseGenerator()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([module, parameters]) =>
+          from([
+            new CreateModuleSuccess(module),
+            ...parameters.map(p => new CreateParameterSuccess(p))
+          ])
+        ),
+        this.handleSignalChainChangeError
+      )
+    )
+  );
+
+  @Effect()
   createGainModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateGainModule),
     mergeMap(() =>

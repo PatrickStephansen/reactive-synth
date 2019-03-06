@@ -26,6 +26,7 @@ export enum AudioSignalChainActionTypes {
   DisconnectParameter = '[Audio SignalChain] Disconnect Parameter',
   DisconnectParameterSuccess = '[Audio SignalChain] Disconnect Parameter Success',
   CreateOscillator = '[Audio SignalChain] Create Oscillator',
+  CreateNoiseGenerator = '[Audio SignalChain] Create Noise Generator',
   CreateGainModule = '[Audio SignalChain] Create Gain Module',
   CreateDelayModule = '[Audio SignalChain] Create Delay Module',
   CreateFilterModule = '[Audio SignalChain] Create Filter Module',
@@ -121,6 +122,12 @@ export class DisconnectParameterSuccess implements Action {
 
 export class CreateOscillator implements Action {
   readonly type = AudioSignalChainActionTypes.CreateOscillator;
+
+  constructor() {}
+}
+
+export class CreateNoiseGenerator implements Action {
+  readonly type = AudioSignalChainActionTypes.CreateNoiseGenerator;
 
   constructor() {}
 }
@@ -241,6 +248,7 @@ export type AudioSignalChainAction =
   | DisconnectParameter
   | DisconnectParameterSuccess
   | CreateOscillator
+  | CreateNoiseGenerator
   | CreateModuleSuccess
   | CreateParameterSuccess
   | CreateChoiceParameterSuccess

@@ -4,6 +4,7 @@
     [sourceModules]="audioModules"
     [audioOutputEnabled]="outputEnabled$ | async"
     (createOscillator)="addOscillator()"
+    (createNoiseGenerator)="addNoiseGenerator()"
     (createGainModule)="addGainModule()"
     (createDelayModule)="addDelayModule()"
     (createFilterModule)="addFilterModule()"

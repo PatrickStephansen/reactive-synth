@@ -39,7 +39,7 @@ export class AudioGraphService {
     return Math.max(parameter.minValue, -1000000000);
   }
 
-  constructor() { }
+  constructor() {}
 
   private destroyContext() {
     if (this.context) {
@@ -74,6 +74,7 @@ export class AudioGraphService {
         );
       }
       this.context = new AudioContext();
+
       const visualizer = this.context.createAnalyser();
       visualizer.connect(this.context.destination);
       this.graph = new Map([
@@ -82,67 +83,128 @@ export class AudioGraphService {
           { internalNodes: [visualizer, this.context.destination] }
         ]
       ]);
-      return this.context.suspend().then(() => ({
-        modules: [
-          {
-            id: 'Output to Speakers',
-            moduleType: 'output',
-            numberInputs: 1,
-            numberOutputs: 0,
-            sourceIds: [],
-            canDelete: false,
-            helpText:
-              `Signals must be connected to this module to be audible. Incoming signals are summed and clamped to the range [-1, 1].
+      return this.context
+        .suspend()
+        .then(() =>
+          this.context.audioWorklet.addModule(
+            '/assets/audio-worklet-processors/noise.js'
+          )
+        )
+        .then(() => ({
+          modules: [
+            {
+              id: 'Output to Speakers',
+              moduleType: 'output',
+              numberInputs: 1,
+              numberOutputs: 0,
+              sourceIds: [],
+              canDelete: false,
+              helpText: `Signals must be connected to this module to be audible.
+              Incoming signals are summed and clamped to the range [-1, 1].
               Click the visualizations to pause them. Click their headings to hide them to save space.`
-          }
-        ],
-        parameters: [],
-        choiceParameters: [],
-        visualizations: [
-          {
-            moduleId: 'Output to Speakers',
-            name: 'waveform',
-            dataLength: visualizer.fftSize,
-            visualizationType: 'line-graph',
-            visualizationStage: ModuleSignalStage.input,
-            renderingStrategyPerAxis: [
-              linearScalingStrategy,
-              linearScalingStrategy
-            ],
-            isActive: true,
-            getVisualizationData: data => visualizer.getByteTimeDomainData(data)
-          },
-          {
-            moduleId: 'Output to Speakers',
-            name: 'spectrum - log',
-            dataLength: visualizer.frequencyBinCount,
-            visualizationType: 'line-graph',
-            visualizationStage: ModuleSignalStage.input,
-            renderingStrategyPerAxis: [
-              logarithmicScalingStrategy,
-              linearScalingStrategy
-            ],
-            isActive: false,
-            getVisualizationData: data => visualizer.getByteFrequencyData(data)
-          },
-          {
-            moduleId: 'Output to Speakers',
-            name: 'spectrum - linear',
-            dataLength: visualizer.frequencyBinCount,
-            visualizationType: 'line-graph',
-            visualizationStage: ModuleSignalStage.input,
-            renderingStrategyPerAxis: [
-              linearScalingStrategy,
-              linearScalingStrategy
-            ],
-            isActive: false,
-            getVisualizationData: data => visualizer.getByteFrequencyData(data)
-          },
-        ],
-        muted: this.context.state && this.context.state === 'suspended',
-        errors: []
-      }));
+            }
+          ],
+          parameters: [],
+          choiceParameters: [],
+          visualizations: [
+            {
+              moduleId: 'Output to Speakers',
+              name: 'waveform',
+              dataLength: visualizer.fftSize,
+              visualizationType: 'line-graph',
+              visualizationStage: ModuleSignalStage.input,
+              renderingStrategyPerAxis: [
+                linearScalingStrategy,
+                linearScalingStrategy
+              ],
+              isActive: true,
+              getVisualizationData: data =>
+                visualizer.getByteTimeDomainData(data)
+            },
+            {
+              moduleId: 'Output to Speakers',
+              name: 'spectrum - log',
+              dataLength: visualizer.frequencyBinCount,
+              visualizationType: 'line-graph',
+              visualizationStage: ModuleSignalStage.input,
+              renderingStrategyPerAxis: [
+                logarithmicScalingStrategy,
+                linearScalingStrategy
+              ],
+              isActive: false,
+              getVisualizationData: data =>
+                visualizer.getByteFrequencyData(data)
+            },
+            {
+              moduleId: 'Output to Speakers',
+              name: 'spectrum - linear',
+              dataLength: visualizer.frequencyBinCount,
+              visualizationType: 'line-graph',
+              visualizationStage: ModuleSignalStage.input,
+              renderingStrategyPerAxis: [
+                linearScalingStrategy,
+                linearScalingStrategy
+              ],
+              isActive: false,
+              getVisualizationData: data =>
+                visualizer.getByteFrequencyData(data)
+            }
+          ],
+          muted: this.context.state && this.context.state === 'suspended',
+          errors: []
+        }));
     });
+  }
+
+  createNoiseGenerator(): [ModuleModel, ParameterModel[]] {
+    const moduleType = 'noise';
+    const id = this.createId(moduleType);
+    const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
+      numberOfInputs: 0,
+      numberOfOutputs: 1
+    });
+    const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
+    const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
+    this.graph.set(id, {
+      internalNodes: [noiseGeneratorNode],
+      parameterMap: new Map([
+        ['step min', stepMin],
+        ['step max', stepMax]
+      ])
+    });
+    return [
+      {
+        id,
+        moduleType,
+        numberInputs: 0,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true,
+        helpText: `A noise generator that generates each sample based on the previous sample.
+        The min and max step size can be used to create bias towards different pitches,
+        almost like a highpass and lowpass filter respectively.`
+      },
+      [
+        {
+          moduleId: id,
+          sourceIds: [],
+          name: 'step min',
+          maxValue: this.parameterMax(stepMin),
+          minValue: this.parameterMin(stepMin),
+          value: stepMin.value,
+          stepSize: 0.01
+        },
+        {
+          moduleId: id,
+          sourceIds: [],
+          name: 'step max',
+          maxValue: this.parameterMax(stepMax),
+          minValue: this.parameterMin(stepMax),
+          value: stepMax.value,
+          stepSize: 0.01
+        }
+      ]
+    ];
   }
 
   createOscillator(): [ModuleModel, ParameterModel[], ChoiceParameterModel[]] {
@@ -302,7 +364,11 @@ export class AudioGraphService {
     ];
   }
 
-  createFilterModule(): [ModuleModel, ParameterModel[], ChoiceParameterModel[]] {
+  createFilterModule(): [
+    ModuleModel,
+    ParameterModel[],
+    ChoiceParameterModel[]
+  ] {
     const moduleType = 'filter';
     const id = this.createId(moduleType);
     const filter = this.context.createBiquadFilter();
