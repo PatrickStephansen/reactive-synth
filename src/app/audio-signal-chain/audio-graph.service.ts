@@ -178,9 +178,12 @@ export class AudioGraphService {
     });
     const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
     const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
+    const volumeControl = this.context.createGain();
+    volumeControl.gain.value = this.defaultGain;
+    noiseGeneratorNode.connect(volumeControl);
     this.graph.set(id, {
-      internalNodes: [noiseGeneratorNode],
-      parameterMap: new Map([['step min', stepMin], ['step max', stepMax]])
+      internalNodes: [noiseGeneratorNode, volumeControl],
+      parameterMap: new Map([['minimum step size', stepMin], ['maximum step size', stepMax], ['output gain', volumeControl.gain]])
     });
     return [
       {
@@ -191,14 +194,15 @@ export class AudioGraphService {
         sourceIds: [],
         canDelete: true,
         helpText: `A noise generator that generates each sample based on the previous sample.
-        The min and max step size can be used to create bias towards different pitches,
-        almost like a highpass and lowpass filter respectively.`
+        The minimum and maximum step size can be used to create bias towards different pitches.
+        Increase the minimum to boost high frequencies. Decrease the maximum to boost low frequesncies.
+        If minimum is higher than maximum, their roles swap around.`
       },
       [
         {
           moduleId: id,
           sourceIds: [],
-          name: 'step min',
+          name: 'minimum step size',
           maxValue: this.parameterMax(stepMin),
           minValue: this.parameterMin(stepMin),
           value: stepMin.value,
@@ -207,11 +211,20 @@ export class AudioGraphService {
         {
           moduleId: id,
           sourceIds: [],
-          name: 'step max',
+          name: 'maximum step size',
           maxValue: this.parameterMax(stepMax),
           minValue: this.parameterMin(stepMax),
           value: stepMax.value,
           stepSize: 0.01
+        },
+        {
+          name: 'output gain',
+          moduleId: id,
+          sourceIds: [],
+          maxValue: this.parameterMax(volumeControl.gain),
+          minValue: this.parameterMin(volumeControl.gain),
+          stepSize: 0.01,
+          value: this.defaultGain
         }
       ]
     ];
