@@ -177,12 +177,18 @@ export class AudioGraphService {
     });
     const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
     const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
+    const sampleHold = noiseGeneratorNode.parameters['get']('sampleHold');
     const volumeControl = this.context.createGain();
     volumeControl.gain.value = this.defaultGain;
     noiseGeneratorNode.connect(volumeControl);
     this.graph.set(id, {
       internalNodes: [noiseGeneratorNode, volumeControl],
-      parameterMap: new Map([['minimum step size', stepMin], ['maximum step size', stepMax], ['output gain', volumeControl.gain]])
+      parameterMap: new Map([
+        ['minimum step size', stepMin],
+        ['maximum step size', stepMax],
+        ['sample hold', sampleHold],
+        ['output gain', volumeControl.gain]
+      ])
     });
     return [
       {
@@ -195,7 +201,9 @@ export class AudioGraphService {
         helpText: `A noise generator that generates each sample based on the previous sample.
         The minimum and maximum step size can be used to create bias towards different pitches.
         Increase the minimum to boost high frequencies. Decrease the maximum to boost low frequesncies.
-        If minimum is higher than maximum, their roles swap around.`
+        If minimum is higher than maximum, their roles swap around.
+        Sample hold allows the rate of generation to be slowed down.
+        1 means every sample gets a new value, 2 means every second sample does etc.`
       },
       [
         {
@@ -215,6 +223,15 @@ export class AudioGraphService {
           minValue: this.parameterMin(stepMax),
           value: stepMax.value,
           stepSize: 0.01
+        },
+        {
+          moduleId: id,
+          sourceIds: [],
+          name: 'sample hold',
+          maxValue: this.parameterMax(sampleHold),
+          minValue: this.parameterMin(sampleHold),
+          value: sampleHold.value,
+          stepSize: 1
         },
         {
           name: 'output gain',
