@@ -169,8 +169,7 @@ export class AudioGraphService {
     const moduleType = 'noise';
     const id = this.createId(moduleType);
     const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
-      // work-around for https://github.com/chrisguttandin/standardized-audio-context/issues/493
-      numberOfInputs: 1,
+      numberOfInputs: 0,
       numberOfOutputs: 1,
       channelCount: 1,
       channelCountMode: 'explicit',
