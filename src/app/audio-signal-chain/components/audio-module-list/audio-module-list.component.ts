@@ -18,6 +18,7 @@ export class AudioModuleListComponent implements OnInit {
   @Output() createOscillator = new EventEmitter<void>();
   @Output() createNoiseGenerator = new EventEmitter<void>();
   @Output() createGainModule = new EventEmitter<void>();
+  @Output() createBitCrusherFixedPointModule = new EventEmitter<void>();
   @Output() createDelayModule = new EventEmitter<void>();
   @Output() createFilterModule = new EventEmitter<void>();
   @Output() createDistortionModule = new EventEmitter<void>();

@@ -4,6 +4,7 @@
 /dist
 /tmp
 /out-tsc
+src/assets/audio-worklet-processors/*
 
 # dependencies
 /node_modules

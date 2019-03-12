@@ -6,12 +6,13 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng run reactive-synth:build:production --base-href /reactive-synth/",
+    "start": "webpack --config=webpack.worklets.js && ng serve",
+    "build": "webpack --config=webpack.worklets.js && ng run reactive-synth:build:production --base-href /reactive-synth/",
+    "watch:worklets": "webpack --config=webpack.worklets.js --watch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "deploy": "gh-pages -d dist/reactive-synth"
+    "deploy": "npm run build && gh-pages -d dist/reactive-synth"
   },
   "description": "A modular syth made as an exercise to learn ng-rx",
   "homepage": "https://PatrickStephansen.github.io/reactive-synth",
@@ -58,6 +59,7 @@
     "protractor": "^5.4.2",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
-    "typescript": "~3.1.6"
+    "typescript": "~3.1.6",
+    "webpack-cli": "^3.2.3"
   }
 }

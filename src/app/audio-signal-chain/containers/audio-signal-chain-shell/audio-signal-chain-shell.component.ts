@@ -21,7 +21,8 @@ import {
   CreateConstantSource,
   CreateFilterModule,
   CreateRectifierModule,
-  CreateNoiseGenerator
+  CreateNoiseGenerator,
+  CreateBitCrusherFixedPointModule
 } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 
@@ -53,6 +54,10 @@ export class AudioSignalChainShellComponent implements OnInit {
 
   addGainModule() {
     this.store.dispatch(new CreateGainModule());
+  }
+
+  addBitCrusherFixedPointModule() {
+    this.store.dispatch(new CreateBitCrusherFixedPointModule());
   }
 
   addDelayModule() {

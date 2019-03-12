@@ -99,6 +99,13 @@ export class AudioGraphService {
             )
           )
         )
+        .then(() =>
+          this.context.audioWorklet.addModule(
+            this.locationService.prepareExternalUrl(
+              '/assets/audio-worklet-processors/bit-crusher.js'
+            )
+          )
+        )
         .then(() => ({
           modules: [
             {
@@ -175,9 +182,9 @@ export class AudioGraphService {
       channelCountMode: 'explicit',
       outputChannelCount: [1]
     });
-    const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
-    const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
-    const sampleHold = noiseGeneratorNode.parameters['get']('sampleHold');
+    const stepMin = noiseGeneratorNode.parameters.get('stepMin');
+    const stepMax = noiseGeneratorNode.parameters.get('stepMax');
+    const sampleHold = noiseGeneratorNode.parameters.get('sampleHold');
     const volumeControl = this.context.createGain();
     volumeControl.gain.value = this.defaultGain;
     noiseGeneratorNode.connect(volumeControl);
@@ -356,6 +363,69 @@ export class AudioGraphService {
           sourceIds: [],
           maxValue: this.parameterMax(gain.gain),
           minValue: this.parameterMin(gain.gain),
+          stepSize: 0.01,
+          value: this.defaultGain
+        }
+      ]
+    ];
+  }
+
+  createBitCrusherFixedPointModule(): [ModuleModel, ParameterModel[]] {
+    const moduleType = 'bit crusher (fixed point)';
+    const id = this.createId(moduleType);
+    const crusher = new AudioWorkletNode(
+      this.context,
+      'bit-crusher-fixed-point',
+      {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCount: 2,
+        channelCountMode: 'explicit',
+        outputChannelCount: [2],
+        channelInterpretation: 'speakers'
+      }
+    );
+    const bitDepthParameterKey = 'bit depth';
+    const bitDepthParameter = crusher.parameters.get('bitDepth');
+    const volumeControl = this.context.createGain();
+    volumeControl.gain.value = this.defaultGain;
+    crusher.connect(volumeControl);
+    const moduleImplementation = {
+      internalNodes: [crusher, volumeControl],
+      parameterMap: new Map([
+        [bitDepthParameterKey, bitDepthParameter],
+        ['output gain', volumeControl.gain]
+      ])
+    };
+
+    this.graph.set(id, moduleImplementation);
+    return [
+      {
+        id,
+        moduleType,
+        numberInputs: 1,
+        numberOutputs: 1,
+        sourceIds: [],
+        canDelete: true,
+        helpText: `Maps each sample to the nearest representation as an integer with the given number of bits,
+        then normalizes back to the range [-1, 1].`
+      },
+      [
+        {
+          name: bitDepthParameterKey,
+          moduleId: id,
+          sourceIds: [],
+          maxValue: this.parameterMax(bitDepthParameter),
+          minValue: this.parameterMin(bitDepthParameter),
+          stepSize: 1,
+          value: bitDepthParameter.defaultValue
+        },
+        {
+          name: 'output gain',
+          moduleId: id,
+          sourceIds: [],
+          maxValue: this.parameterMax(volumeControl.gain),
+          minValue: this.parameterMin(volumeControl.gain),
           stepSize: 0.01,
           value: this.defaultGain
         }

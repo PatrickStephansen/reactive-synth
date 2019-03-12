@@ -1,0 +1,14 @@
+const path = require('path');
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    noise: './src/audio-worklet-processors/noise.js',
+    'bit-crusher': './src/audio-worklet-processors/bit-crusher-fixed-point.js'
+  },
+  output: {
+    publicPath: './assets/audio-worklet-processors',
+    path: path.join(__dirname, 'src', 'assets', 'audio-worklet-processors'),
+    filename: '[name].js'
+  }
+};

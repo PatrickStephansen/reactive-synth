@@ -28,6 +28,7 @@ export enum AudioSignalChainActionTypes {
   CreateOscillator = '[Audio SignalChain] Create Oscillator',
   CreateNoiseGenerator = '[Audio SignalChain] Create Noise Generator',
   CreateGainModule = '[Audio SignalChain] Create Gain Module',
+  CreateBitCrusherFixedPointModule = '[Audio SignalChain] Create Fixed Point Bit Crusher Module',
   CreateDelayModule = '[Audio SignalChain] Create Delay Module',
   CreateFilterModule = '[Audio SignalChain] Create Filter Module',
   CreateDistortionModule = '[Audio SignalChain] Create Distortion Module',
@@ -134,6 +135,12 @@ export class CreateNoiseGenerator implements Action {
 
 export class CreateGainModule implements Action {
   readonly type = AudioSignalChainActionTypes.CreateGainModule;
+
+  constructor() {}
+}
+
+export class CreateBitCrusherFixedPointModule implements Action {
+  readonly type = AudioSignalChainActionTypes.CreateBitCrusherFixedPointModule;
 
   constructor() {}
 }
@@ -256,6 +263,7 @@ export type AudioSignalChainAction =
   | ToggleSignalChainActiveSuccess
   | ToggleVisualizationActive
   | CreateGainModule
+  | CreateBitCrusherFixedPointModule
   | CreateDistortionModule
   | CreateRectifierModule
   | CreateDelayModule

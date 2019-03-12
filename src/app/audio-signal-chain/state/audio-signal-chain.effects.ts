@@ -111,6 +111,21 @@ export class AudioSignalChainEffects {
   );
 
   @Effect()
+  createBitCrusherFixedPointModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.CreateBitCrusherFixedPointModule),
+    mergeMap(() =>
+      of(() => this.graphService.createBitCrusherFixedPointModule()).pipe(
+        map(serviceMethod => serviceMethod()),
+        mergeMap(([module, parameters]) => [
+          new CreateModuleSuccess(module),
+          ...parameters.map(p => new CreateParameterSuccess(p))
+        ]),
+        this.handleSignalChainChangeError
+      )
+    )
+  );
+
+  @Effect()
   createDelayModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateDelayModule),
     mergeMap(() =>
