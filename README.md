@@ -4,9 +4,11 @@ A modular synth that runs in the broswer. The live version is hosted at https://
 
 The project was started as an exercise to learn [NgRx](https://ngrx.io/).
 
+The commands that follow may not work in non-bash terminals.
+
 ## Development server
 
-Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm start` for a dev server, then in another tab `watch:worklets`. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 

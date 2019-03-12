@@ -1,3 +1,5 @@
+import { crush } from "./crush-bit-fixed-point";
+
 registerProcessor(
   'bit-crusher-fixed-point',
   class Noise extends AudioWorkletProcessor {
@@ -42,8 +44,4 @@ registerProcessor(
   }
 );
 
-// based on https://webaudio.github.io/web-audio-api/#the-bitcrusher-node
-function crush(sample, bitDepth) {
-  const step = 2 ** -(bitDepth - 1);
-  return step * Math.round(sample / step);
-}
+

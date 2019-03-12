@@ -9,7 +9,7 @@
     "start": "webpack --config=webpack.worklets.js && ng serve",
     "build": "webpack --config=webpack.worklets.js && ng run reactive-synth:build:production --base-href /reactive-synth/",
     "watch:worklets": "webpack --config=webpack.worklets.js --watch",
-    "test": "ng test",
+    "test": "jest",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deploy": "npm run build && gh-pages -d dist/reactive-synth"
@@ -46,20 +46,20 @@
     "@types/jasmine": "^2.8.16",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+    "babel-jest": "^24.5.0",
+    "babel-preset-env": "^1.7.0",
     "codelyzer": "~4.5.0",
     "gh-pages": "^2.0.1",
-    "jasmine-core": "~2.99.1",
-    "jasmine-spec-reporter": "~4.2.1",
-    "karma": "^4.0.1",
-    "karma-chrome-launcher": "~2.2.0",
-    "karma-coverage-istanbul-reporter": "^2.0.5",
-    "karma-jasmine": "~1.1.2",
-    "karma-jasmine-html-reporter": "^0.2.2",
+    "jest": "^24.5.0",
     "prettier": "^1.16.4",
-    "protractor": "^5.4.2",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
     "typescript": "~3.1.6",
     "webpack-cli": "^3.2.3"
+  },
+  "jest": {
+    "transform": {
+      "\\.js$": "babel-jest"
+    }
   }
 }
