@@ -80,6 +80,8 @@ describe('crush-bit-fixed-point', () => {
     [-1.02, 2.9],
     [-0.99, 4.9],
     [-0.99, 2.1],
+    [-1, 1.9],
+    [-0.99, 1.9],
   ])(
     'results in bounds for fractional bits. sample %f, depth %f',
     (sample, bitDepth) => {
