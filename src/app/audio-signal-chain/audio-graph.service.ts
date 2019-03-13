@@ -417,7 +417,7 @@ export class AudioGraphService {
           sourceIds: [],
           maxValue: this.parameterMax(bitDepthParameter),
           minValue: this.parameterMin(bitDepthParameter),
-          stepSize: 1,
+          stepSize: 0.1,
           value: bitDepthParameter.defaultValue
         },
         {

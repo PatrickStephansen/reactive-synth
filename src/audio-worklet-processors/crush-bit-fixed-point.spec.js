@@ -58,13 +58,6 @@ describe('crush-bit-fixed-point', () => {
     }
   );
 
-  test.each([[1, 1.5, 0.67], [1, 2.5, 0.87]])(
-    'approximate results in between whole bit depths. sample %f, depth %f, result %f',
-    (sample, bitDepth, expectedResult) => {
-      expect(crush(sample, bitDepth)).toBeCloseTo(expectedResult, 0.04);
-    }
-  );
-
   test.each([
     [1, 1.2],
     [2, 1.2],
@@ -81,7 +74,7 @@ describe('crush-bit-fixed-point', () => {
     [-0.99, 4.9],
     [-0.99, 2.1],
     [-1, 1.9],
-    [-0.99, 1.9],
+    [-0.99, 1.9]
   ])(
     'results in bounds for fractional bits. sample %f, depth %f',
     (sample, bitDepth) => {
@@ -101,6 +94,23 @@ describe('crush-bit-fixed-point', () => {
       expect(crush(sample, 2.9)).toBeGreaterThanOrEqual(
         crush(increasing[index - 1], 2.9),
         sample
+      );
+    });
+  });
+
+  test('bit depth clamped to valid range [1, 32]', () => {
+    increasing.forEach(sample => {
+      expect(crush(sample, 0)).toBe(
+        crush(sample, 1),
+        `unexpected low bitDepth result ${crush(1, 0)}`
+      );
+      expect(crush(sample, -32)).toBe(
+        crush(sample, 1),
+        `unexpected low bitDepth result ${crush(1, -32)}`
+      );
+      expect(crush(sample, 33)).toBe(
+        crush(sample, 32),
+        `unexpected high bitDepth result ${crush(1, 32)}`
       );
     });
   });
