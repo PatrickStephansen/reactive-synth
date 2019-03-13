@@ -7,7 +7,7 @@ registerProcessor(
       return [
         {
           name: 'bitDepth',
-          defaultValue: 32,
+          defaultValue: 8,
           minValue: 1,
           maxValue: 32,
           automationRate: 'a-rate'

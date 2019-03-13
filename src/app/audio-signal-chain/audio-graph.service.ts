@@ -371,7 +371,7 @@ export class AudioGraphService {
   }
 
   createBitCrusherFixedPointModule(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'bit crusher (fixed point)';
+    const moduleType = 'bit-crusher';
     const id = this.createId(moduleType);
     const crusher = new AudioWorkletNode(
       this.context,
@@ -407,8 +407,11 @@ export class AudioGraphService {
         numberOutputs: 1,
         sourceIds: [],
         canDelete: true,
-        helpText: `Maps each sample to the nearest representation as an integer with the given number of bits,
-        then normalizes back to the range [-1, 1].`
+        helpText: `Maps each sample to a less precise representation as an integer with a given number of bits.
+        The bit depth doesn't need to be a whole number, but is rounded down to the nearest value that results in evenly spaced "steps".
+        For example, since a number with 2 bits it can represent 4 values and a number with 3 bits can represent 8 values,
+        there are bit depths in between 2 and 3 that can represent 5, 6, and 7 values.
+        For best results, the incoming signal should have an amplitude close to 1 (ie. values between -1 and 1).`
       },
       [
         {
