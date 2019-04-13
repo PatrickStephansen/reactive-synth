@@ -4,7 +4,18 @@ import { ChoiceParameter } from '../model/choice-parameter';
 import { Parameter } from '../model/parameter';
 import { Visualization } from '../model/visualization/visualization';
 
-const getSignalChainsFeatureState = createFeatureSelector<AudioSignalChainState>('signalChain');
+import {
+  applySpec,
+  compose,
+  map,
+  omit,
+  pick,
+  prop
+} from 'ramda';
+
+const getSignalChainsFeatureState = createFeatureSelector<
+  AudioSignalChainState
+>('signalChain');
 export const getSignalChainOutputActiveState = createSelector(
   getSignalChainsFeatureState,
   signalChain => !signalChain.muted
@@ -56,4 +67,22 @@ export const getVisualizationsForModuleState = createSelector(
 export const getSignalChainErrors = createSelector(
   getSignalChainsFeatureState,
   signalChain => signalChain.errors
+);
+
+export const getSignalChainStateForSave = createSelector(
+  getSignalChainsFeatureState,
+  applySpec({
+    modules: compose(
+      map(pick(['id', 'moduleType', 'sourceIds'])),
+      prop('modules')
+    ),
+    choiceParameters: compose(
+      map(omit(['choices'])),
+      prop('choiceParameters')
+    ),
+    parameters: compose(
+      map(pick(['name', 'moduleId', 'value', 'sourceIds'])),
+      prop('parameters')
+    )
+  })
 );

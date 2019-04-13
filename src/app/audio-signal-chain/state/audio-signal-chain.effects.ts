@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Location } from '@angular/common';
 import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Store, select } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction } from 'rxjs';
-import { mergeMap, map, catchError } from 'rxjs/operators';
-import { isNil } from 'ramda';
+import { mergeMap, map, catchError, tap } from 'rxjs/operators';
+import { head, isNil } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
 import {
@@ -30,6 +32,8 @@ import {
   CreateModule
 } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
+import { AudioSignalChainState } from './audio-signal-chain.state';
+import { getSignalChainStateForSave } from './audio-signal-chain.selectors';
 
 let errorId = 0;
 
@@ -37,7 +41,9 @@ let errorId = 0;
 export class AudioSignalChainEffects {
   constructor(
     private graphService: AudioGraphService,
-    private actions$: Actions
+    private actions$: Actions,
+    private store$: Store<AudioSignalChainState>,
+    private locationService: Location
   ) {}
 
   private handleSignalChainChangeError: OperatorFunction<
@@ -202,6 +208,17 @@ export class AudioSignalChainEffects {
         map(serviceMethod => serviceMethod()),
         map(() => new DestroyModuleSuccess(moduleId)),
         this.handleSignalChainChangeError
+      )
+    )
+  );
+
+  @Effect({ dispatch: false })
+  stateToQueryString$: Observable<AudioSignalChainState> = this.store$.pipe(
+    select(getSignalChainStateForSave),
+    tap((state: AudioSignalChainState) =>
+      this.locationService.replaceState(
+        head(this.locationService.path(false).split('?')),
+        `signalChain=${encodeURIComponent(JSON.stringify(state))}`
       )
     )
   );

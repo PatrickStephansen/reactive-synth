@@ -8,9 +8,6 @@ import {
   IAudioNode
 } from 'standardized-audio-context';
 
-import { AudioModule as ModuleModel } from './model/audio-module';
-import { Parameter as ParameterModel } from './model/parameter';
-import { ChoiceParameter as ChoiceParameterModel } from './model/choice-parameter';
 import { AudioSignalChainState } from './state/audio-signal-chain.state';
 import { makeDistortionCurve } from './distortion-curve';
 import { ConnectParameterEvent } from './model/connect-parameter-event';
