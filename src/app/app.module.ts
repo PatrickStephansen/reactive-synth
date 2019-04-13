@@ -17,8 +17,8 @@ import { environment } from 'src/environments/environment';
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({
       name: 'Reactive Synth DevTools',
-      maxAge: 25,
-      logOnly: environment.production
+      maxAge: 50,
+      logOnly: environment.production,
     })
   ],
   providers: [],

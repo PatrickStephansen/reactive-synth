@@ -31,7 +31,7 @@ export function reducer(
       const updatedParameters = state.choiceParameters.map(c =>
         c.moduleId === action.payload.moduleId &&
         c.name === action.payload.parameterName
-          ? { ...c, value: action.payload.value }
+          ? { ...c, selection: action.payload.value }
           : c
       );
       return { ...state, choiceParameters: updatedParameters };

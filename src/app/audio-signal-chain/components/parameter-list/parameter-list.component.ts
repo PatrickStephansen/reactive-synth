@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { AudioModule } from '../../model/audio-module';
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { ChoiceParameter } from '../../model/choice-parameter';

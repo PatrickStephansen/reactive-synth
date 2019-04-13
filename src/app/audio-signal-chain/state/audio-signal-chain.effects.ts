@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction } from 'rxjs';
-import { mergeMap, map, catchError, tap } from 'rxjs/operators';
-import { head, isNil } from 'ramda';
+import { mergeMap, map, catchError, tap, filter } from 'rxjs/operators';
+import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
 import {
@@ -29,16 +29,22 @@ import {
   ConnectParameterSuccess,
   DisconnectParameterSuccess,
   AddError,
-  CreateModule
+  CreateModule,
+  LoadSignalChainState,
+  ResetSignalChain
 } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioSignalChainState } from './audio-signal-chain.state';
 import { getSignalChainStateForSave } from './audio-signal-chain.selectors';
+import { CreateModuleEvent } from '../model/create-module-event';
+import { AudioModule } from '../model/audio-module';
 
 let errorId = 0;
 
+const hasSignificantState = path(['modules', 'length']);
+
 @Injectable()
-export class AudioSignalChainEffects {
+export class AudioSignalChainEffects implements OnInitEffects {
   constructor(
     private graphService: AudioGraphService,
     private actions$: Actions,
@@ -70,6 +76,71 @@ export class AudioSignalChainEffects {
   );
 
   @Effect()
+  loadSignalChainState$: Observable<
+    AudioSignalChainAction
+  > = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.LoadSignalChainState),
+    mergeMap(({ signalChain }: LoadSignalChainState) =>
+      from(this.graphService.resetGraph()).pipe(
+        map(newState => new ResetSignalChainSuccess(newState)),
+        mergeMap(resetSuccess => {
+          const events = [
+            resetSuccess,
+            ...signalChain.modules.map(
+              (audioModule: AudioModule) =>
+                new CreateModule(
+                  new CreateModuleEvent(audioModule.moduleType, audioModule.id)
+                )
+            ),
+            ...flatten(
+              signalChain.modules.map(audioModule =>
+                audioModule.sourceIds.map(
+                  sourceId =>
+                    new ConnectModules({
+                      sourceId,
+                      destinationId: audioModule.id
+                    })
+                )
+              )
+            ),
+            ...signalChain.parameters.map(
+              parameter =>
+                new ChangeParameter({
+                  moduleId: parameter.moduleId,
+                  parameterName: parameter.name,
+                  value: parameter.value
+                })
+            ),
+            ...signalChain.choiceParameters.map(
+              parameter =>
+                new ChangeChoiceParameter({
+                  moduleId: parameter.moduleId,
+                  parameterName: parameter.name,
+                  value: parameter.selection
+                })
+            ),
+            ...flatten(
+              signalChain.parameters.map(parameter =>
+                parameter.sourceIds.map(
+                  sourceModuleId =>
+                    new ConnectParameter({
+                      sourceModuleId,
+                      destinationModuleId: parameter.moduleId,
+                      destinationParameterName: parameter.name
+                    })
+                )
+              )
+            )
+          ];
+          console.log('restoring state', events);
+          return from(events);
+        }),
+        this.handleSignalChainChangeError
+      )
+    )
+  );
+
+  @Effect()
   CreateModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateModule),
     mergeMap(({ payload }: CreateModule) =>
@@ -77,17 +148,21 @@ export class AudioSignalChainEffects {
         this.graphService.createModule(payload.moduleType, payload.id)
       ).pipe(
         map(serviceMethod => serviceMethod()),
-        mergeMap((result: CreateModuleResult) => {
-          if (!isNil(result)) {
-            return from([
-              new CreateModuleSuccess(result.module),
-              ...result.parameters.map(p => new CreateParameterSuccess(p)),
-              ...result.choiceParameters.map(
-                p => new CreateChoiceParameterSuccess(p)
-              )
-            ]);
-          }
-        }),
+        filter(
+          compose(
+            not,
+            isNil
+          )
+        ),
+        mergeMap((result: CreateModuleResult) =>
+          from([
+            new CreateModuleSuccess(result.module),
+            ...result.parameters.map(p => new CreateParameterSuccess(p)),
+            ...result.choiceParameters.map(
+              p => new CreateChoiceParameterSuccess(p)
+            )
+          ])
+        ),
         this.handleSignalChainChangeError
       )
     )
@@ -215,6 +290,7 @@ export class AudioSignalChainEffects {
   @Effect({ dispatch: false })
   stateToQueryString$: Observable<AudioSignalChainState> = this.store$.pipe(
     select(getSignalChainStateForSave),
+    filter(hasSignificantState),
     tap((state: AudioSignalChainState) =>
       this.locationService.replaceState(
         head(this.locationService.path(false).split('?')),
@@ -222,4 +298,16 @@ export class AudioSignalChainEffects {
       )
     )
   );
+
+  ngrxOnInitEffects(): AudioSignalChainAction {
+    if (this.locationService.path(false).includes('?signalChain=')) {
+      const state = JSON.parse(
+        decodeURIComponent(
+          last(this.locationService.path(false).split('?signalChain='))
+        )
+      );
+      return new LoadSignalChainState(state);
+    }
+    return new ResetSignalChain();
+  }
 }

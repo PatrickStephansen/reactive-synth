@@ -196,16 +196,11 @@ export class AudioGraphService {
     });
   }
 
-  createModule(
-    moduleType: AudioModuleType,
-    id?: string
-  ): CreateModuleResult {
+  createModule(moduleType: AudioModuleType, id?: string): CreateModuleResult {
     return this.createModuleMap.get(moduleType)(id);
   }
 
-  createNoiseGenerator(
-    id?: string
-  ): CreateModuleResult {
+  createNoiseGenerator(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.NoiseGenerator;
     id = this.createId(moduleType, id);
     const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
@@ -287,9 +282,7 @@ export class AudioGraphService {
     );
   }
 
-  createOscillator(
-    id?: string
-  ): CreateModuleResult {
+  createOscillator(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Oscillator;
     id = this.createId(moduleType, id);
     const oscillator = this.context.createOscillator();
@@ -342,8 +335,8 @@ export class AudioGraphService {
           units: 'cents',
           moduleId: id,
           sourceIds: [],
-          maxValue: this.parameterMax(oscillator.detune),
-          minValue: this.parameterMin(oscillator.detune),
+          maxValue: 1000000000,
+          minValue: -1000000000,
           value: oscillator.detune.defaultValue,
           stepSize: 1
         },
@@ -368,9 +361,7 @@ export class AudioGraphService {
     );
   }
 
-  createGainModule(
-    id?: string
-  ): CreateModuleResult {
+  createGainModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Gain;
     id = this.createId(moduleType, id);
     const gain = this.context.createGain();
@@ -409,9 +400,7 @@ export class AudioGraphService {
     );
   }
 
-  createBitCrusherFixedPointModule(
-    id?: string
-  ): CreateModuleResult {
+  createBitCrusherFixedPointModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.BitCrusher;
     id = this.createId(moduleType, id);
     const crusher = new AudioWorkletNode(
@@ -478,9 +467,7 @@ export class AudioGraphService {
     );
   }
 
-  createDelayModule(
-    id?: string
-  ): CreateModuleResult {
+  createDelayModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Delay;
     id = this.createId(moduleType, id);
     const delay = this.context.createDelay(60);
@@ -521,9 +508,7 @@ export class AudioGraphService {
     );
   }
 
-  createFilterModule(
-    id?: string
-  ): CreateModuleResult {
+  createFilterModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Filter;
     id = this.createId(moduleType, id);
     const filter = this.context.createBiquadFilter();
@@ -594,9 +579,7 @@ export class AudioGraphService {
     );
   }
 
-  createDistortionModule(
-    id?: string
-  ): CreateModuleResult {
+  createDistortionModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Distortion;
     id = this.createId(moduleType, id);
     const distortion = this.context.createWaveShaper();
@@ -625,9 +608,7 @@ export class AudioGraphService {
     );
   }
 
-  createRectifierModule(
-    id?: string
-  ): CreateModuleResult {
+  createRectifierModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Rectifier;
     id = this.createId(moduleType, id);
     const rectifier = this.context.createWaveShaper();
@@ -653,9 +634,7 @@ export class AudioGraphService {
     );
   }
 
-  createConstantSource(
-    id?: string
-  ): CreateModuleResult {
+  createConstantSource(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.ConstantSource;
     id = this.createId(moduleType, id);
     const constant = this.context.createConstantSource();
@@ -761,8 +740,8 @@ export class AudioGraphService {
     if (this.graph.has(moduleId) && this.graph.get(moduleId).choiceMap) {
       const choice = this.graph.get(moduleId).choiceMap.get(choiceName);
       if (choice) {
-        const [module, property] = choice;
-        module[property] = value;
+        const [node, property] = choice;
+        node[property] = value;
       }
     }
   }
