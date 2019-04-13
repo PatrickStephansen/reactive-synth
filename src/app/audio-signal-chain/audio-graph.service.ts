@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
-import { head, last } from 'ramda';
+import { head, isNil, last } from 'ramda';
 import {
   AudioWorkletNode,
   AudioContext,
@@ -20,6 +20,8 @@ import {
   linearScalingStrategy,
   logarithmicScalingStrategy
 } from './model/visualization/scaling-strategy';
+import { AudioModuleType } from './model/audio-module-type';
+import { CreateModuleResult } from './model/create-module-result';
 
 let incrementingId = 0;
 
@@ -38,6 +40,11 @@ export class AudioGraphService {
 
   private defaultGain = 0.1;
 
+  private createModuleMap: Map<
+    AudioModuleType,
+    (id: string) => CreateModuleResult
+  >;
+
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
   }
@@ -46,7 +53,23 @@ export class AudioGraphService {
     return Math.max(parameter.minValue, -1000000000);
   }
 
-  constructor(private locationService: Location) {}
+  constructor(private locationService: Location) {
+    this.createModuleMap = new Map([
+      [AudioModuleType.Oscillator, id => this.createOscillator(id)],
+      [
+        AudioModuleType.BitCrusher,
+        id => this.createBitCrusherFixedPointModule(id)
+      ],
+      [AudioModuleType.ConstantSource, id => this.createConstantSource(id)],
+      [AudioModuleType.Delay, id => this.createDelayModule(id)],
+      [AudioModuleType.Distortion, id => this.createDistortionModule(id)],
+      [AudioModuleType.Filter, id => this.createFilterModule(id)],
+      [AudioModuleType.Gain, id => this.createGainModule(id)],
+      [AudioModuleType.NoiseGenerator, id => this.createNoiseGenerator(id)],
+      [AudioModuleType.Rectifier, id => this.createRectifierModule(id)],
+      [AudioModuleType.Output, id => null]
+    ]);
+  }
 
   private destroyContext() {
     if (this.context) {
@@ -55,8 +78,12 @@ export class AudioGraphService {
     return Promise.resolve();
   }
 
-  private createId(moduleType: string) {
-    return `${moduleType}-${incrementingId++}`;
+  private createId(moduleType: string, id?: string) {
+    if (isNil(id)) {
+      return `${moduleType}-${incrementingId++}`;
+    }
+    incrementingId = Number.parseInt(last(id.split('-')), 10) + 1;
+    return id;
   }
 
   unmute(): Promise<void> {
@@ -110,7 +137,7 @@ export class AudioGraphService {
           modules: [
             {
               id: 'Output to Speakers',
-              moduleType: 'output',
+              moduleType: AudioModuleType.Output,
               numberInputs: 1,
               numberOutputs: 0,
               sourceIds: [],
@@ -172,9 +199,18 @@ export class AudioGraphService {
     });
   }
 
-  createNoiseGenerator(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'noise';
-    const id = this.createId(moduleType);
+  createModule(
+    moduleType: AudioModuleType,
+    id?: string
+  ): CreateModuleResult {
+    return this.createModuleMap.get(moduleType)(id);
+  }
+
+  createNoiseGenerator(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.NoiseGenerator;
+    id = this.createId(moduleType, id);
     const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
       numberOfInputs: 0,
       numberOfOutputs: 1,
@@ -197,7 +233,7 @@ export class AudioGraphService {
         ['output gain', volumeControl.gain]
       ])
     });
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -249,13 +285,16 @@ export class AudioGraphService {
           stepSize: 0.01,
           value: this.defaultGain
         }
-      ]
-    ];
+      ],
+      []
+    );
   }
 
-  createOscillator(): [ModuleModel, ParameterModel[], ChoiceParameterModel[]] {
-    const moduleType = 'oscillator';
-    const id = this.createId(moduleType);
+  createOscillator(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.Oscillator;
+    id = this.createId(moduleType, id);
     const oscillator = this.context.createOscillator();
     const volumeControl = this.context.createGain();
     volumeControl.gain.value = this.defaultGain;
@@ -273,7 +312,7 @@ export class AudioGraphService {
       ])
     };
     this.graph.set(id, moduleImplementation);
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -329,12 +368,14 @@ export class AudioGraphService {
           selection: 'sine'
         }
       ]
-    ];
+    );
   }
 
-  createGainModule(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'gain';
-    const id = this.createId(moduleType);
+  createGainModule(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.Gain;
+    id = this.createId(moduleType, id);
     const gain = this.context.createGain();
     gain.gain.value = this.defaultGain;
     const gainParameterKey = 'signal multiplier';
@@ -344,7 +385,7 @@ export class AudioGraphService {
     };
 
     this.graph.set(id, moduleImplementation);
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -366,13 +407,16 @@ export class AudioGraphService {
           stepSize: 0.01,
           value: this.defaultGain
         }
-      ]
-    ];
+      ],
+      []
+    );
   }
 
-  createBitCrusherFixedPointModule(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'bit-crusher';
-    const id = this.createId(moduleType);
+  createBitCrusherFixedPointModule(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.BitCrusher;
+    id = this.createId(moduleType, id);
     const crusher = new AudioWorkletNode(
       this.context,
       'bit-crusher-fixed-point',
@@ -399,7 +443,7 @@ export class AudioGraphService {
     };
 
     this.graph.set(id, moduleImplementation);
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -432,13 +476,16 @@ export class AudioGraphService {
           stepSize: 0.01,
           value: this.defaultGain
         }
-      ]
-    ];
+      ],
+      []
+    );
   }
 
-  createDelayModule(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'delay';
-    const id = this.createId(moduleType);
+  createDelayModule(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.Delay;
+    id = this.createId(moduleType, id);
     const delay = this.context.createDelay(60);
     const delayParameterKey = 'delay time';
     const moduleImplementation = {
@@ -447,7 +494,7 @@ export class AudioGraphService {
     };
 
     this.graph.set(id, moduleImplementation);
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -472,17 +519,16 @@ export class AudioGraphService {
           stepSize: 0.01,
           value: delay.delayTime.value
         }
-      ]
-    ];
+      ],
+      []
+    );
   }
 
-  createFilterModule(): [
-    ModuleModel,
-    ParameterModel[],
-    ChoiceParameterModel[]
-  ] {
-    const moduleType = 'filter';
-    const id = this.createId(moduleType);
+  createFilterModule(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.Filter;
+    id = this.createId(moduleType, id);
     const filter = this.context.createBiquadFilter();
     this.graph.set(id, {
       internalNodes: [filter],
@@ -495,7 +541,7 @@ export class AudioGraphService {
         ['filter type', [filter, 'type'] as [IAudioNode, string]]
       ])
     });
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -548,19 +594,21 @@ export class AudioGraphService {
           selection: filter.type
         }
       ]
-    ];
+    );
   }
 
-  createDistortionModule(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'distortion';
-    const id = this.createId(moduleType);
+  createDistortionModule(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.Distortion;
+    id = this.createId(moduleType, id);
     const distortion = this.context.createWaveShaper();
     distortion.curve = makeDistortionCurve(this.context.sampleRate);
     distortion.oversample = '4x';
     this.graph.set(id, {
       internalNodes: [distortion]
     });
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -575,20 +623,23 @@ export class AudioGraphService {
           For example, a triangle wave with amplitude > 1 becomes closer to a square wave
           with smoother transitions between the high and low value.`
       },
+      [],
       []
-    ];
+    );
   }
 
-  createRectifierModule(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'rectifier';
-    const id = this.createId(moduleType);
+  createRectifierModule(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.Rectifier;
+    id = this.createId(moduleType, id);
     const rectifier = this.context.createWaveShaper();
     rectifier.curve = makeRectifierCurve();
     rectifier.oversample = '4x';
     this.graph.set(id, {
       internalNodes: [rectifier]
     });
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -600,20 +651,23 @@ export class AudioGraphService {
           Useful for shaping low freqency oscillators for precise controls like pitch (detune or frequency).
           When used together with a constant source and gain, a waveform can be shifted to any range.`
       },
+      [],
       []
-    ];
+    );
   }
 
-  createConstantSource(): [ModuleModel, ParameterModel[]] {
-    const moduleType = 'constant';
-    const id = this.createId(moduleType);
+  createConstantSource(
+    id?: string
+  ): CreateModuleResult {
+    const moduleType = AudioModuleType.ConstantSource;
+    id = this.createId(moduleType, id);
     const constant = this.context.createConstantSource();
     constant.start();
     this.graph.set(id, {
       internalNodes: [constant],
       parameterMap: new Map([['output value', constant.offset]])
     });
-    return [
+    return new CreateModuleResult(
       {
         id,
         moduleType,
@@ -637,8 +691,9 @@ export class AudioGraphService {
           value: constant.offset.value,
           stepSize: 0.01
         }
-      ]
-    ];
+      ],
+      []
+    );
   }
 
   connectModules(sourceId: string, destinationId: string): void {

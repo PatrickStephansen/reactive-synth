@@ -9,50 +9,50 @@ import { ChangeChoiceEvent } from '../model/change-choice-event';
 import { ConnectParameterEvent } from '../model/connect-parameter-event';
 import { SignalChainError } from '../model/signal-chain-error';
 import { ChangeVisualizationActiveEvent } from '../model/visualization/change-visualization-active-event';
+import { CreateModuleEvent } from '../model/create-module-event';
 
 export enum AudioSignalChainActionTypes {
-  ResetSignalChain = '[Audio SignalChain] Reset SignalChain',
-  ResetSignalChainSuccess = '[Audio SignalChain] Reset SignalChain Success',
-  ChangeParameter = '[Audio SignalChain] Change Parameter',
-  ChangeParameterSuccess = '[Audio SignalChain] Change Parameter Success',
-  ChangeChoiceParameter = '[Audio SignalChain] Change Choice Parameter',
-  ChangeChoiceParameterSuccess = '[Audio SignalChain] Change Choice Parameter Success',
-  ConnectModules = '[Audio SignalChain] Connect Modules',
-  ConnectModulesSuccess = '[Audio SignalChain] Connect Modules Success',
-  DisconnectModules = '[Audio SignalChain] Disconnect Modules',
-  DisconnectModulesSuccess = '[Audio SignalChain] Disconnect Modules Success',
-  ConnectParameter = '[Audio SignalChain] Connect Parameter',
-  ConnectParameterSuccess = '[Audio SignalChain] Connect Parameter Success',
-  DisconnectParameter = '[Audio SignalChain] Disconnect Parameter',
-  DisconnectParameterSuccess = '[Audio SignalChain] Disconnect Parameter Success',
-  CreateOscillator = '[Audio SignalChain] Create Oscillator',
-  CreateNoiseGenerator = '[Audio SignalChain] Create Noise Generator',
-  CreateGainModule = '[Audio SignalChain] Create Gain Module',
-  CreateBitCrusherFixedPointModule = '[Audio SignalChain] Create Fixed Point Bit Crusher Module',
-  CreateDelayModule = '[Audio SignalChain] Create Delay Module',
-  CreateFilterModule = '[Audio SignalChain] Create Filter Module',
-  CreateDistortionModule = '[Audio SignalChain] Create Distortion Module',
-  CreateRectifierModule = '[Audio SignalChain] Create Rectifier Module',
-  CreateConstantSource = '[Audio SignalChain] Create Constant Source',
-  CreateModuleSuccess = '[Audio SignalChain] Create Module Success',
-  DestroyModule = '[Audio SignalChain] Destroy Module',
-  DestroyModuleSuccess = '[Audio SignalChain] Destroy ModuleSuccess',
-  CreateParameterSuccess = '[Audio SignalChain] Create Parameter Success',
-  CreateChoiceParameterSuccess = '[Audio SignalChain] Create Choice Parameter Success',
-  ToggleSignalChainActive = '[Audio SignalChain] Toggle SignalChain Output Active',
-  ToggleSignalChainActiveSuccess = '[Audio SignalChain] Toggle SignalChain Output Active Success',
-  AddError = '[Audio SignalChain] Add SignalChain Change Error',
-  DismissError = '[Audio SignalChain] Dismiss SignalChain Change Error',
-  ClearErrors = '[Audio SignalChain] Clear All SignalChain Change Errors',
-  ToggleVisualizationActive = '[Audio SignalChain] Toggle Visualization Active'
+  ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
+  ResetSignalChainSuccess = '[Audio Signal Chain] Reset SignalChain Success',
+  LoadSignalChainState = '[Audio Signal Chain] Load State',
+  ChangeParameter = '[Audio Signal Chain] Change Parameter',
+  ChangeParameterSuccess = '[Audio Signal Chain] Change Parameter Success',
+  ChangeChoiceParameter = '[Audio Signal Chain] Change Choice Parameter',
+  ChangeChoiceParameterSuccess = '[Audio Signal Chain] Change Choice Parameter Success',
+  ConnectModules = '[Audio Signal Chain] Connect Modules',
+  ConnectModulesSuccess = '[Audio Signal Chain] Connect Modules Success',
+  DisconnectModules = '[Audio Signal Chain] Disconnect Modules',
+  DisconnectModulesSuccess = '[Audio Signal Chain] Disconnect Modules Success',
+  ConnectParameter = '[Audio Signal Chain] Connect Parameter',
+  ConnectParameterSuccess = '[Audio Signal Chain] Connect Parameter Success',
+  DisconnectParameter = '[Audio Signal Chain] Disconnect Parameter',
+  DisconnectParameterSuccess = '[Audio Signal Chain] Disconnect Parameter Success',
+  CreateModule = '[Audio Signal Chain] Create Module',
+  CreateModuleSuccess = '[Audio Signal Chain] Create Module Success',
+  DestroyModule = '[Audio Signal Chain] Destroy Module',
+  DestroyModuleSuccess = '[Audio Signal Chain] Destroy ModuleSuccess',
+  CreateParameterSuccess = '[Audio Signal Chain] Create Parameter Success',
+  CreateChoiceParameterSuccess = '[Audio Signal Chain] Create Choice Parameter Success',
+  ToggleSignalChainActive = '[Audio Signal Chain] Toggle SignalChain Output Active',
+  ToggleSignalChainActiveSuccess = '[Audio Signal Chain] Toggle SignalChain Output Active Success',
+  AddError = '[Audio Signal Chain] Add SignalChain Change Error',
+  DismissError = '[Audio Signal Chain] Dismiss SignalChain Change Error',
+  ClearErrors = '[Audio Signal Chain] Clear All SignalChain Change Errors',
+  ToggleVisualizationActive = '[Audio Signal Chain] Toggle Visualization Active'
 }
 
 export class ResetSignalChain implements Action {
   readonly type = AudioSignalChainActionTypes.ResetSignalChain;
   constructor() {}
 }
+
 export class ResetSignalChainSuccess implements Action {
   readonly type = AudioSignalChainActionTypes.ResetSignalChainSuccess;
+  constructor(public signalChain: AudioSignalChainState) {}
+}
+
+export class LoadSignalChainState implements Action {
+  readonly type = AudioSignalChainActionTypes.LoadSignalChainState;
   constructor(public signalChain: AudioSignalChainState) {}
 }
 
@@ -121,58 +121,10 @@ export class DisconnectParameterSuccess implements Action {
   constructor(public payload: ConnectParameterEvent) {}
 }
 
-export class CreateOscillator implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateOscillator;
+export class CreateModule implements Action {
+  readonly type = AudioSignalChainActionTypes.CreateModule;
 
-  constructor() {}
-}
-
-export class CreateNoiseGenerator implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateNoiseGenerator;
-
-  constructor() {}
-}
-
-export class CreateGainModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateGainModule;
-
-  constructor() {}
-}
-
-export class CreateBitCrusherFixedPointModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateBitCrusherFixedPointModule;
-
-  constructor() {}
-}
-
-export class CreateDistortionModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateDistortionModule;
-
-  constructor() {}
-}
-
-export class CreateRectifierModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateRectifierModule;
-
-  constructor() {}
-}
-
-export class CreateConstantSource implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateConstantSource;
-
-  constructor() {}
-}
-
-export class CreateDelayModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateDelayModule;
-
-  constructor() {}
-}
-
-export class CreateFilterModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateFilterModule;
-
-  constructor() {}
+  constructor(public payload: CreateModuleEvent) {}
 }
 
 export class CreateModuleSuccess implements Action {
@@ -242,6 +194,7 @@ export class ClearErrors implements Action {
 export type AudioSignalChainAction =
   | ResetSignalChain
   | ResetSignalChainSuccess
+  | LoadSignalChainState
   | ChangeParameter
   | ChangeParameterSuccess
   | ChangeChoiceParameter
@@ -254,21 +207,13 @@ export type AudioSignalChainAction =
   | ConnectParameterSuccess
   | DisconnectParameter
   | DisconnectParameterSuccess
-  | CreateOscillator
-  | CreateNoiseGenerator
+  | CreateModule
   | CreateModuleSuccess
   | CreateParameterSuccess
   | CreateChoiceParameterSuccess
   | ToggleSignalChainActive
   | ToggleSignalChainActiveSuccess
   | ToggleVisualizationActive
-  | CreateGainModule
-  | CreateBitCrusherFixedPointModule
-  | CreateDistortionModule
-  | CreateRectifierModule
-  | CreateDelayModule
-  | CreateFilterModule
-  | CreateConstantSource
   | DestroyModule
   | DestroyModuleSuccess
   | AddError

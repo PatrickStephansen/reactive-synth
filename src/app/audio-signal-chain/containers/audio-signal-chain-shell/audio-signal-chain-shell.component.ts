@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
 import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
@@ -10,19 +10,11 @@ import {
 } from '../../state/audio-signal-chain.selectors';
 import {
   ResetSignalChain,
-  CreateOscillator,
   ConnectModules,
   ToggleSignalChainActive,
   DisconnectModules,
-  CreateGainModule,
   DestroyModule,
-  CreateDelayModule,
-  CreateDistortionModule,
-  CreateConstantSource,
-  CreateFilterModule,
-  CreateRectifierModule,
-  CreateNoiseGenerator,
-  CreateBitCrusherFixedPointModule
+  CreateModule
 } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 
@@ -44,40 +36,8 @@ export class AudioSignalChainShellComponent implements OnInit {
 
   ngOnInit() {}
 
-  addOscillator() {
-    this.store.dispatch(new CreateOscillator());
-  }
-
-  addNoiseGenerator() {
-    this.store.dispatch(new CreateNoiseGenerator());
-  }
-
-  addGainModule() {
-    this.store.dispatch(new CreateGainModule());
-  }
-
-  addBitCrusherFixedPointModule() {
-    this.store.dispatch(new CreateBitCrusherFixedPointModule());
-  }
-
-  addDelayModule() {
-    this.store.dispatch(new CreateDelayModule());
-  }
-
-  addFilterModule() {
-    this.store.dispatch(new CreateFilterModule());
-  }
-
-  addDistortionModule() {
-    this.store.dispatch(new CreateDistortionModule());
-  }
-
-  addRectifierModule() {
-    this.store.dispatch(new CreateRectifierModule());
-  }
-
-  addConstantSource() {
-    this.store.dispatch(new CreateConstantSource());
+  addModule(event) {
+    this.store.dispatch(new CreateModule(event));
   }
 
   connectModules(event: ConnectModulesEvent) {

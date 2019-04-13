@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
+import { from, Observable, of, OperatorFunction } from 'rxjs';
+import { mergeMap, map, catchError } from 'rxjs/operators';
+import { isNil } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
 import {
@@ -23,10 +26,10 @@ import {
   ConnectParameter,
   ConnectParameterSuccess,
   DisconnectParameterSuccess,
-  AddError
+  AddError,
+  CreateModule
 } from './audio-signal-chain.actions';
-import { from, Observable, of, OperatorFunction } from 'rxjs';
-import { mergeMap, map, catchError } from 'rxjs/operators';
+import { CreateModuleResult } from '../model/create-module-result';
 
 let errorId = 0;
 
@@ -61,151 +64,24 @@ export class AudioSignalChainEffects {
   );
 
   @Effect()
-  createOscillator$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateOscillator),
-    mergeMap(() =>
-      of(() => this.graphService.createOscillator()).pipe(
+  CreateModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.CreateModule),
+    mergeMap(({ payload }: CreateModule) =>
+      of(() =>
+        this.graphService.createModule(payload.moduleType, payload.id)
+      ).pipe(
         map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters, choiceParameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p)),
-            ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
-          ])
-        ),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createNoiseGenerator$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateNoiseGenerator),
-    mergeMap(() =>
-      of(() => this.graphService.createNoiseGenerator()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p))
-          ])
-        ),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createGainModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateGainModule),
-    mergeMap(() =>
-      of(() => this.graphService.createGainModule()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) => [
-          new CreateModuleSuccess(module),
-          ...parameters.map(p => new CreateParameterSuccess(p))
-        ]),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createBitCrusherFixedPointModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateBitCrusherFixedPointModule),
-    mergeMap(() =>
-      of(() => this.graphService.createBitCrusherFixedPointModule()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) => [
-          new CreateModuleSuccess(module),
-          ...parameters.map(p => new CreateParameterSuccess(p))
-        ]),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createDelayModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateDelayModule),
-    mergeMap(() =>
-      of(() => this.graphService.createDelayModule()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p))
-          ])
-        ),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createDistortionModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateDistortionModule),
-    mergeMap(() =>
-      of(() => this.graphService.createDistortionModule()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p))
-          ])
-        ),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createRectifierModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateRectifierModule),
-    mergeMap(() =>
-      of(() => this.graphService.createRectifierModule()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p))
-          ])
-        ),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createConstantSource$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateConstantSource),
-    mergeMap(() =>
-      of(() => this.graphService.createConstantSource()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p))
-          ])
-        ),
-        this.handleSignalChainChangeError
-      )
-    )
-  );
-
-  @Effect()
-  createFilterModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
-    ofType(AudioSignalChainActionTypes.CreateFilterModule),
-    mergeMap(() =>
-      of(() => this.graphService.createFilterModule()).pipe(
-        map(serviceMethod => serviceMethod()),
-        mergeMap(([module, parameters, choiceParameters]) =>
-          from([
-            new CreateModuleSuccess(module),
-            ...parameters.map(p => new CreateParameterSuccess(p)),
-            ...choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
-          ])
-        ),
+        mergeMap((result: CreateModuleResult) => {
+          if (!isNil(result)) {
+            return from([
+              new CreateModuleSuccess(result.module),
+              ...result.parameters.map(p => new CreateParameterSuccess(p)),
+              ...result.choiceParameters.map(
+                p => new CreateChoiceParameterSuccess(p)
+              )
+            ]);
+          }
+        }),
         this.handleSignalChainChangeError
       )
     )
@@ -282,7 +158,9 @@ export class AudioSignalChainEffects {
   );
 
   @Effect()
-  changeChoiceParameter$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  changeChoiceParameter$: Observable<
+    AudioSignalChainAction
+  > = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ChangeChoiceParameter),
     mergeMap(({ payload: event }: ChangeChoiceParameter) =>
       of(() =>
@@ -300,7 +178,9 @@ export class AudioSignalChainEffects {
   );
 
   @Effect()
-  toggleSignalChainActive$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  toggleSignalChainActive$: Observable<
+    AudioSignalChainAction
+  > = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ToggleSignalChainActive),
     mergeMap(({ payload: activate }: ToggleSignalChainActive) => {
       const servicePromise = activate

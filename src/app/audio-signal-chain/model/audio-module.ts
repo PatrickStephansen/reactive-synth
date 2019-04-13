@@ -1,6 +1,8 @@
+import { AudioModuleType } from './audio-module-type';
+
 export interface AudioModule {
   id: string;
-  moduleType: string;
+  moduleType: AudioModuleType;
   numberInputs: number;
   numberOutputs: number;
   sourceIds: string[];

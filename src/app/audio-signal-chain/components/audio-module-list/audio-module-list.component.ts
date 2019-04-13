@@ -2,6 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { AudioModule } from '../../model/audio-module';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
+import { CreateModuleEvent } from '../../model/create-module-event';
+import { thisExpression } from '@babel/types';
+import { AudioModuleType } from '../../model/audio-module-type';
 
 @Component({
   selector: 'app-audio-module-list',
@@ -15,15 +18,7 @@ export class AudioModuleListComponent implements OnInit {
 
   @Output() connectModules = new EventEmitter<ConnectModulesEvent>();
   @Output() disconnectModules = new EventEmitter<ConnectModulesEvent>();
-  @Output() createOscillator = new EventEmitter<void>();
-  @Output() createNoiseGenerator = new EventEmitter<void>();
-  @Output() createGainModule = new EventEmitter<void>();
-  @Output() createBitCrusherFixedPointModule = new EventEmitter<void>();
-  @Output() createDelayModule = new EventEmitter<void>();
-  @Output() createFilterModule = new EventEmitter<void>();
-  @Output() createDistortionModule = new EventEmitter<void>();
-  @Output() createRectifierModule = new EventEmitter<void>();
-  @Output() createConstantSource = new EventEmitter<void>();
+  @Output() createModule = new EventEmitter<CreateModuleEvent>();
   @Output() toggleAudioOutputEnabled = new EventEmitter<boolean>();
   @Output() deleteModule = new EventEmitter<string>();
 
@@ -40,5 +35,37 @@ export class AudioModuleListComponent implements OnInit {
 
   getModuleId(index: number, module: AudioModule) {
     return (module && module.id) || null;
+  }
+
+  createOscillator() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.Oscillator));
+  }
+  createNoiseGenerator() {
+    this.createModule.emit(
+      new CreateModuleEvent(AudioModuleType.NoiseGenerator)
+    );
+  }
+  createConstantSource() {
+    this.createModule.emit(
+      new CreateModuleEvent(AudioModuleType.ConstantSource)
+    );
+  }
+  createGainModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.Gain));
+  }
+  createBitCrusher() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.BitCrusher));
+  }
+  createDelayModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.Delay));
+  }
+  createFilterModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.Filter));
+  }
+  createDistortionModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.Distortion));
+  }
+  createRectifierModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.Rectifier));
   }
 }
