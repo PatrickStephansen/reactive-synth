@@ -3,7 +3,14 @@ import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction } from 'rxjs';
-import { mergeMap, map, catchError, tap, filter, debounceTime } from 'rxjs/operators';
+import {
+  mergeMap,
+  map,
+  catchError,
+  tap,
+  filter,
+  debounceTime
+} from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
@@ -103,6 +110,18 @@ export class AudioSignalChainEffects implements OnInitEffects {
                 )
               )
             ),
+            ...flatten(
+              signalChain.parameters.map(parameter =>
+                parameter.sourceIds.map(
+                  sourceModuleId =>
+                    new ConnectParameter({
+                      sourceModuleId,
+                      destinationModuleId: parameter.moduleId,
+                      destinationParameterName: parameter.name
+                    })
+                )
+              )
+            ),
             ...signalChain.parameters.map(
               parameter =>
                 new ChangeParameter({
@@ -118,21 +137,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
                   parameterName: parameter.name,
                   value: parameter.selection
                 })
-            ),
-            ...flatten(
-              signalChain.parameters.map(parameter =>
-                parameter.sourceIds.map(
-                  sourceModuleId =>
-                    new ConnectParameter({
-                      sourceModuleId,
-                      destinationModuleId: parameter.moduleId,
-                      destinationParameterName: parameter.name
-                    })
-                )
-              )
             )
           ];
-          console.log('restoring state', events);
           return from(events);
         }),
         this.handleSignalChainChangeError
@@ -303,9 +309,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   ngrxOnInitEffects(): AudioSignalChainAction {
     if (this.locationService.path(true).includes('#')) {
       const state = JSON.parse(
-        decodeURIComponent(
-          last(this.locationService.path(true).split('#'))
-        )
+        decodeURIComponent(last(this.locationService.path(true).split('#')))
       );
       return new LoadSignalChainState(state);
     }

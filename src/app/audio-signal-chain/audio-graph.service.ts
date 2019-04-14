@@ -677,6 +677,12 @@ export class AudioGraphService {
       last(this.graph.get(sourceId).internalNodes).connect(
         head(this.graph.get(destinationId).internalNodes)
       );
+    } else {
+      console.warn(
+        'attempted to connect modules that do not exist',
+        sourceId,
+        destinationId
+      );
     }
   }
 
@@ -702,6 +708,13 @@ export class AudioGraphService {
           destinationParameter
         );
       }
+    } else {
+      console.warn(
+        'attempted to connect parameters that do not exist',
+        event.sourceModuleId,
+        event.destinationModuleId,
+        event.destinationParameterName
+      );
     }
   }
 
