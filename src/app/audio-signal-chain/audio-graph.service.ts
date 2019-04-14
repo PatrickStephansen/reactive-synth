@@ -114,13 +114,10 @@ export class AudioGraphService {
           { internalNodes: [visualizer, this.context.destination] }
         ]
       ]);
-      return this.context
-        .suspend()
-        .then(() =>
-          this.context.audioWorklet.addModule(
-            this.locationService.prepareExternalUrl(
-              '/assets/audio-worklet-processors/noise.js'
-            )
+      return this.context.audioWorklet
+        .addModule(
+          this.locationService.prepareExternalUrl(
+            '/assets/audio-worklet-processors/noise.js'
           )
         )
         .then(() =>
