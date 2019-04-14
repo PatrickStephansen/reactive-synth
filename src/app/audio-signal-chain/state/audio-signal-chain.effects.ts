@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction } from 'rxjs';
-import { mergeMap, map, catchError, tap, filter } from 'rxjs/operators';
+import { mergeMap, map, catchError, tap, filter, debounceTime } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
@@ -290,20 +290,21 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect({ dispatch: false })
   stateToQueryString$: Observable<AudioSignalChainState> = this.store$.pipe(
     select(getSignalChainStateForSave),
+    debounceTime(1000),
     filter(hasSignificantState),
     tap((state: AudioSignalChainState) =>
       this.locationService.replaceState(
-        head(this.locationService.path(false).split('?')),
-        `signalChain=${encodeURIComponent(JSON.stringify(state))}`
+        head(this.locationService.path(true).split('#')),
+        `#${encodeURIComponent(JSON.stringify(state))}`
       )
     )
   );
 
   ngrxOnInitEffects(): AudioSignalChainAction {
-    if (this.locationService.path(false).includes('?signalChain=')) {
+    if (this.locationService.path(true).includes('#')) {
       const state = JSON.parse(
         decodeURIComponent(
-          last(this.locationService.path(false).split('?signalChain='))
+          last(this.locationService.path(true).split('#'))
         )
       );
       return new LoadSignalChainState(state);
