@@ -38,7 +38,8 @@ import {
   AddError,
   CreateModule,
   LoadSignalChainState,
-  ResetSignalChain
+  ResetSignalChain,
+  LoadSignalChainStateFailure
 } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioSignalChainState } from './audio-signal-chain.state';
@@ -77,6 +78,25 @@ export class AudioSignalChainEffects implements OnInitEffects {
     mergeMap(() =>
       from(this.graphService.resetGraph()).pipe(
         map(signalChain => new ResetSignalChainSuccess(signalChain)),
+        this.handleSignalChainChangeError
+      )
+    )
+  );
+
+  @Effect()
+  loadSignalChainStateFailure$: Observable<
+    AudioSignalChainAction
+  > = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.LoadSignalChainStateFailure),
+    mergeMap(({ reason }: LoadSignalChainStateFailure) =>
+      from(this.graphService.resetGraph()).pipe(
+        mergeMap(signalChain => [
+          new ResetSignalChainSuccess(signalChain),
+          new AddError({
+            id: `signal-chain-error-${errorId++}`,
+            errorMessage: reason
+          })
+        ]),
         this.handleSignalChainChangeError
       )
     )
@@ -308,10 +328,17 @@ export class AudioSignalChainEffects implements OnInitEffects {
 
   ngrxOnInitEffects(): AudioSignalChainAction {
     if (this.locationService.path(true).includes('#')) {
-      const state = JSON.parse(
-        decodeURIComponent(last(this.locationService.path(true).split('#')))
-      );
-      return new LoadSignalChainState(state);
+      try {
+        const state = JSON.parse(
+          decodeURIComponent(last(this.locationService.path(true).split('#')))
+        );
+        return new LoadSignalChainState(state);
+      } catch (error) {
+        return new LoadSignalChainStateFailure(
+          `Error restoring state. Defaulting to new patch. ${error.message ||
+            error}`
+        );
+      }
     }
     return new ResetSignalChain();
   }

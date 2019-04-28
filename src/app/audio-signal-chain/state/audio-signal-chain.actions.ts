@@ -15,6 +15,7 @@ export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
   ResetSignalChainSuccess = '[Audio Signal Chain] Reset SignalChain Success',
   LoadSignalChainState = '[Audio Signal Chain] Load State',
+  LoadSignalChainStateFailure = '[Audio Signal Chain] Load State Failure',
   ChangeParameter = '[Audio Signal Chain] Change Parameter',
   ChangeParameterSuccess = '[Audio Signal Chain] Change Parameter Success',
   ChangeChoiceParameter = '[Audio Signal Chain] Change Choice Parameter',
@@ -54,6 +55,11 @@ export class ResetSignalChainSuccess implements Action {
 export class LoadSignalChainState implements Action {
   readonly type = AudioSignalChainActionTypes.LoadSignalChainState;
   constructor(public signalChain: AudioSignalChainState) {}
+}
+
+export class LoadSignalChainStateFailure implements Action {
+  readonly type = AudioSignalChainActionTypes.LoadSignalChainStateFailure;
+  constructor(public reason: string) {}
 }
 
 export class ChangeParameter implements Action {
@@ -195,6 +201,7 @@ export type AudioSignalChainAction =
   | ResetSignalChain
   | ResetSignalChainSuccess
   | LoadSignalChainState
+  | LoadSignalChainStateFailure
   | ChangeParameter
   | ChangeParameterSuccess
   | ChangeChoiceParameter
