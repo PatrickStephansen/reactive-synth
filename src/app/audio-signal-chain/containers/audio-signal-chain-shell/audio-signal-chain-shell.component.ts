@@ -57,4 +57,8 @@ export class AudioSignalChainShellComponent implements OnInit {
   deleteModule(moduleId: string) {
     this.store.dispatch(new DestroyModule(moduleId));
   }
+
+  resetSignalChain() {
+    this.store.dispatch(new ResetSignalChain());
+  }
 }

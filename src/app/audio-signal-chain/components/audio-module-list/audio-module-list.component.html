@@ -7,6 +7,7 @@
     >
       {{ audioOutputEnabled ? 'Mute' : 'Unmute' }}
     </button>
+    <button class="button" (click)="resetSignalChain.emit()" title="Reset to an empty signal chain">New patch</button>
     <app-toggle-help></app-toggle-help>
   </div>
 </div>

@@ -21,6 +21,7 @@ export class AudioModuleListComponent implements OnInit {
   @Output() createModule = new EventEmitter<CreateModuleEvent>();
   @Output() toggleAudioOutputEnabled = new EventEmitter<boolean>();
   @Output() deleteModule = new EventEmitter<string>();
+  @Output() resetSignalChain = new EventEmitter<void>();
 
   constructor() {}
 
