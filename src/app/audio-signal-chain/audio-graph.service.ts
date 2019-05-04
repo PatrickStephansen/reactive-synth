@@ -105,6 +105,7 @@ export class AudioGraphService {
         );
       }
       this.context = new AudioContext();
+      incrementingId = 0;
 
       const visualizer = this.context.createAnalyser();
       visualizer.connect(this.context.destination);

@@ -75,12 +75,13 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect()
   resetSignalChain$: Observable<AudioSignalChainAction> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ResetSignalChain),
-    mergeMap(() =>
-      from(this.graphService.resetGraph()).pipe(
+    mergeMap(() => {
+      this.locationService.go(this.locationService.path(false));
+      return from(this.graphService.resetGraph()).pipe(
         map(signalChain => new ResetSignalChainSuccess(signalChain)),
         this.handleSignalChainChangeError
-      )
-    )
+      );
+    })
   );
 
   @Effect()
@@ -326,19 +327,33 @@ export class AudioSignalChainEffects implements OnInitEffects {
     )
   );
 
+  private tryLoadState(unparsedState: string): AudioSignalChainAction {
+    try {
+      const state = JSON.parse(decodeURIComponent(unparsedState));
+      return new LoadSignalChainState(state);
+    } catch (error) {
+      return new LoadSignalChainStateFailure(
+        `Error restoring state. Defaulting to new patch. ${error.message ||
+          error}`
+      );
+    }
+  }
+
   ngrxOnInitEffects(): AudioSignalChainAction {
-    if (this.locationService.path(true).includes('#')) {
-      try {
-        const state = JSON.parse(
-          decodeURIComponent(last(this.locationService.path(true).split('#')))
-        );
-        return new LoadSignalChainState(state);
-      } catch (error) {
-        return new LoadSignalChainStateFailure(
-          `Error restoring state. Defaulting to new patch. ${error.message ||
-            error}`
+    this.locationService.subscribe((stateEvent: PopStateEvent) => {
+      if (
+        stateEvent.type === 'popstate' &&
+        this.locationService.path(true).includes('#')
+      ) {
+        this.store$.dispatch(
+          this.tryLoadState(last(this.locationService.path(true).split('#')))
         );
       }
+    });
+    if (this.locationService.path(true).includes('#')) {
+      return this.tryLoadState(
+        last(this.locationService.path(true).split('#'))
+      );
     }
     return new ResetSignalChain();
   }
