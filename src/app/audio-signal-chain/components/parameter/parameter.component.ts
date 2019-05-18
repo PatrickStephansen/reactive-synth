@@ -8,10 +8,11 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { path } from 'ramda';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { ConnectParameterEvent } from '../../model/connect-parameter-event';
 
 @Component({
@@ -66,16 +67,15 @@ export class ParameterComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const selectedSourceNoLongerAvailable =
-      changes.availableSourceModules &&
-      !changes.availableSourceModules.isFirstChange() &&
-      this.parameterForm.value.selectedSourceModule &&
-      !this.availableSourceModules.includes(
-        this.parameterForm.value.selectedSourceModule
-      );
-
-    if (selectedSourceNoLongerAvailable) {
-      this.parameterForm.patchValue({ selectedSourceModule: '' });
+    const currentValue = path(['parameter', 'currentValue', 'value'], changes);
+    const previousValue = path(
+      ['parameter', 'previousValue', 'value'],
+      changes
+    );
+    if (this.parameterForm && currentValue !== previousValue) {
+      this.parameterForm.patchValue({
+        parameterValue: changes.parameter.currentValue.value + ''
+      });
     }
   }
 
@@ -88,6 +88,7 @@ export class ParameterComponent implements OnInit, OnChanges {
         destinationModuleId: this.parameter.moduleId,
         destinationParameterName: this.parameter.name
       });
+      this.parameterForm.patchValue({ selectedSourceModule: '' });
     }
   }
 
@@ -99,5 +100,7 @@ export class ParameterComponent implements OnInit, OnChanges {
     });
   }
 
-  get parameterValue() { return this.parameterForm.get('parameterValue'); }
+  get parameterValue() {
+    return this.parameterForm.get('parameterValue');
+  }
 }
