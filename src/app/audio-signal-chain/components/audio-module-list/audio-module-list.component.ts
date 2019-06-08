@@ -48,6 +48,9 @@ export class AudioModuleListComponent implements OnInit {
   createGainModule() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.Gain));
   }
+  createInverseGainModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.InverseGain));
+  }
   createBitCrusher() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.BitCrusher));
   }

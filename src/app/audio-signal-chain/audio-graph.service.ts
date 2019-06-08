@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
-import { isNil, last } from 'ramda';
+import { clamp, isNil, last } from 'ramda';
 import {
   AudioWorkletNode,
   AudioContext,
@@ -65,6 +65,7 @@ export class AudioGraphService {
       [AudioModuleType.Distortion, id => this.createDistortionModule(id)],
       [AudioModuleType.Filter, id => this.createFilterModule(id)],
       [AudioModuleType.Gain, id => this.createGainModule(id)],
+      [AudioModuleType.InverseGain, id => this.createInverseGainModule(id)],
       [AudioModuleType.NoiseGenerator, id => this.createNoiseGenerator(id)],
       [AudioModuleType.Rectifier, id => this.createRectifierModule(id)],
       [AudioModuleType.Output, id => null]
@@ -131,6 +132,13 @@ export class AudioGraphService {
           this.context.audioWorklet.addModule(
             this.locationService.prepareExternalUrl(
               '/assets/audio-worklet-processors/bit-crusher.js'
+            )
+          )
+        )
+        .then(() =>
+          this.context.audioWorklet.addModule(
+            this.locationService.prepareExternalUrl(
+              '/assets/audio-worklet-processors/inverse-gain.js'
             )
           )
         )
@@ -431,6 +439,76 @@ export class AudioGraphService {
     );
   }
 
+  createInverseGainModule(id?: string): CreateModuleResult {
+    const moduleType = AudioModuleType.InverseGain;
+    id = this.createModuleId(moduleType, id);
+    const inverseGain = new AudioWorkletNode(this.context, 'inverse-gain', {
+      numberOfInputs: 1,
+      numberOfOutputs: 1,
+      channelCount: 2,
+      channelCountMode: 'explicit',
+      outputChannelCount: [2],
+      channelInterpretation: 'speakers'
+    });
+    const divisorParameterKey = 'signal divisor';
+    const fallBackValueKey = 'Output when divisor is zero';
+
+    const moduleImplementation = {
+      internalNodes: [inverseGain],
+      inputMap: new Map([['input', inverseGain]]),
+      outputMap: new Map([['output', inverseGain]]),
+      parameterMap: new Map([
+        [divisorParameterKey, inverseGain.parameters.get('divisor')],
+        [fallBackValueKey, inverseGain.parameters.get('zeroDivisorFallback')]
+      ])
+    };
+
+    this.graph.set(id, moduleImplementation);
+    return new CreateModuleResult(
+      {
+        id,
+        moduleType,
+        canDelete: true,
+        helpText: `Divides each sample of the incoming signal by the given divisor.
+          Useful for converting between units like frequency and wavelength.`
+      },
+      [
+        {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
+      [
+        {
+          name: divisorParameterKey,
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(inverseGain.parameters.get('divisor')),
+          minValue: this.parameterMin(inverseGain.parameters.get('divisor')),
+          stepSize: 0.01,
+          value: inverseGain.parameters.get('divisor').value
+        },
+        {
+          name: fallBackValueKey,
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(inverseGain.parameters.get('zeroDivisorFallback')),
+          minValue: this.parameterMin(inverseGain.parameters.get('zeroDivisorFallback')),
+          stepSize: 0.01,
+          value: inverseGain.parameters.get('zeroDivisorFallback').value
+        }
+      ],
+      []
+    );
+  }
+
   createBitCrusherFixedPointModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.BitCrusher;
     id = this.createModuleId(moduleType, id);
@@ -712,7 +790,10 @@ export class AudioGraphService {
     rectifier.connect(outputGain);
     this.graph.set(id, {
       internalNodes: [rectifier, outputGain],
-      parameterMap: new Map([['input gain',inputGain.gain],['output gain', outputGain.gain]]),
+      parameterMap: new Map([
+        ['input gain', inputGain.gain],
+        ['output gain', outputGain.gain]
+      ]),
       inputMap: new Map([['input', rectifier]]),
       outputMap: new Map([['output', outputGain]])
     });
