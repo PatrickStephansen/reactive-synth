@@ -1,10 +1,9 @@
-// based on https://developer.mozilla.org/en-US/docs/Web/API/WaveShaperNode
-export function makeDistortionCurve(n_samples = 44100, amount = 50) {
-  const curve = new Float32Array(n_samples),
-    deg = Math.PI / 180;
+// sigmoid curve
+export function makeDistortionCurve(n_samples = 44100) {
+  const curve = new Float32Array(n_samples);
   for (let i = 0; i < n_samples; ++i) {
-    const x = (i * 2) / n_samples - 1;
-    curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+    const x = (i / n_samples) * Math.PI;
+    curve[i] = -Math.cos(x);
   }
   return curve;
 }

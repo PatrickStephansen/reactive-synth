@@ -652,9 +652,12 @@ export class AudioGraphService {
     const distortion = this.context.createWaveShaper();
     distortion.curve = makeDistortionCurve(this.context.sampleRate);
     distortion.oversample = '4x';
+    const preGain = this.context.createGain();
+    preGain.connect(distortion);
     this.graph.set(id, {
-      internalNodes: [distortion],
-      inputMap: new Map([['input', distortion]]),
+      internalNodes: [preGain, distortion],
+      parameterMap: new Map([['pre-gain', preGain.gain]]),
+      inputMap: new Map([['input', preGain]]),
       outputMap: new Map([['output', distortion]])
     });
     return new CreateModuleResult(
@@ -682,7 +685,17 @@ export class AudioGraphService {
           moduleId: id
         }
       ],
-      [],
+      [
+        {
+          name: 'pre-gain',
+          moduleId: id,
+          sources: [],
+          value: preGain.gain.value,
+          minValue: this.parameterMin(preGain.gain),
+          maxValue: this.parameterMax(preGain.gain),
+          stepSize: 0.01
+        }
+      ],
       []
     );
   }
