@@ -652,12 +652,12 @@ export class AudioGraphService {
     const distortion = this.context.createWaveShaper();
     distortion.curve = makeDistortionCurve(this.context.sampleRate);
     distortion.oversample = '4x';
-    const preGain = this.context.createGain();
-    preGain.connect(distortion);
+    const inputGain = this.context.createGain();
+    inputGain.connect(distortion);
     this.graph.set(id, {
-      internalNodes: [preGain, distortion],
-      parameterMap: new Map([['pre-gain', preGain.gain]]),
-      inputMap: new Map([['input', preGain]]),
+      internalNodes: [inputGain, distortion],
+      parameterMap: new Map([['input gain', inputGain.gain]]),
+      inputMap: new Map([['input', inputGain]]),
       outputMap: new Map([['output', distortion]])
     });
     return new CreateModuleResult(
@@ -687,12 +687,12 @@ export class AudioGraphService {
       ],
       [
         {
-          name: 'pre-gain',
+          name: 'input gain',
           moduleId: id,
           sources: [],
-          value: preGain.gain.value,
-          minValue: this.parameterMin(preGain.gain),
-          maxValue: this.parameterMax(preGain.gain),
+          value: inputGain.gain.value,
+          minValue: this.parameterMin(inputGain.gain),
+          maxValue: this.parameterMax(inputGain.gain),
           stepSize: 0.01
         }
       ],
@@ -706,10 +706,15 @@ export class AudioGraphService {
     const rectifier = this.context.createWaveShaper();
     rectifier.curve = makeRectifierCurve();
     rectifier.oversample = '4x';
+    const inputGain = this.context.createGain();
+    inputGain.connect(rectifier);
+    const outputGain = this.context.createGain();
+    rectifier.connect(outputGain);
     this.graph.set(id, {
-      internalNodes: [rectifier],
+      internalNodes: [rectifier, outputGain],
+      parameterMap: new Map([['input gain',inputGain.gain],['output gain', outputGain.gain]]),
       inputMap: new Map([['input', rectifier]]),
-      outputMap: new Map([['output', rectifier]])
+      outputMap: new Map([['output', outputGain]])
     });
     return new CreateModuleResult(
       {
@@ -733,7 +738,26 @@ export class AudioGraphService {
           moduleId: id
         }
       ],
-      [],
+      [
+        {
+          name: 'input gain',
+          moduleId: id,
+          minValue: this.parameterMin(inputGain.gain),
+          maxValue: this.parameterMax(inputGain.gain),
+          value: inputGain.gain.value,
+          stepSize: 0.01,
+          sources: []
+        },
+        {
+          name: 'output gain',
+          moduleId: id,
+          minValue: this.parameterMin(outputGain.gain),
+          maxValue: this.parameterMax(outputGain.gain),
+          value: outputGain.gain.value,
+          stepSize: 0.01,
+          sources: []
+        }
+      ],
       []
     );
   }
