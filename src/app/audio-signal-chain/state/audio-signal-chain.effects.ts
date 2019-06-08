@@ -327,7 +327,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
     tap((state: AudioSignalChainState) =>
       this.locationService.replaceState(
         head(this.locationService.path(true).split('#')),
-        `#${encodeURIComponent(JSON.stringify(state))}`
+        `#${JSON.stringify(state)}`
       )
     )
   );
