@@ -13,6 +13,7 @@ import { AudioModuleListComponent } from './components/audio-module-list/audio-m
 import { AudioGraphService } from './audio-graph.service';
 import { ParameterComponent } from './components/parameter/parameter.component';
 import { ParametersShellComponent } from './containers/parameters-shell/parameters-shell.component';
+import { InputsShellComponent } from './containers/inputs-shell/inputs-shell.component';
 import { ParameterListComponent } from './components/parameter-list/parameter-list.component';
 import { SharedModule } from '../shared/shared.module';
 import { AudioSignalChainEffects } from './state/audio-signal-chain.effects';
@@ -23,6 +24,8 @@ import { ErrorListComponent } from './components/error-list/error-list.component
 import { VisualizationListComponent } from './components/visualization-list/visualization-list.component';
 import { LineGraphVisualizationComponent } from './components/line-graph-visualization/line-graph-visualization.component';
 import { VisualizationsShellComponent } from './containers/visualizations-shell/visualizations-shell.component';
+import { InputListComponent } from './components/input-list/input-list.component';
+import { InputComponent } from './components/input/input.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +34,9 @@ import { VisualizationsShellComponent } from './containers/visualizations-shell/
     AudioModuleListComponent,
     ParameterComponent,
     ParametersShellComponent,
+    InputsShellComponent,
+    InputListComponent,
+    InputComponent,
     ParameterListComponent,
     ChoiceParameterComponent,
     ErrorsShellComponent,

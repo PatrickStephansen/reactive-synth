@@ -4,14 +4,8 @@ import { ChoiceParameter } from '../model/choice-parameter';
 import { Parameter } from '../model/parameter';
 import { Visualization } from '../model/visualization/visualization';
 
-import {
-  applySpec,
-  compose,
-  map,
-  omit,
-  pick,
-  prop
-} from 'ramda';
+import { always, applySpec, compose, map, omit, pick, prop } from 'ramda';
+import { AudioModuleInput } from '../model/audio-module-input';
 
 const getSignalChainsFeatureState = createFeatureSelector<
   AudioSignalChainState
@@ -24,10 +18,14 @@ export const getModulesState = createSelector(
   getSignalChainsFeatureState,
   signalChain => signalChain.modules
 );
-export const getSourceModuleIds = createSelector(
-  getModulesState,
-  (modules, { moduleId }: { moduleId: string }) =>
-    modules.filter(n => n.id !== moduleId && n.numberOutputs).map(n => n.id)
+export const getOutputsState = createSelector(
+  getSignalChainsFeatureState,
+  signalChain => signalChain.outputs
+);
+export const getSources = createSelector(
+  getOutputsState,
+  (outputs, { moduleId }: { moduleId: string }) =>
+    outputs.filter(o => o.moduleId !== moduleId)
 );
 
 const getParametersState = createSelector(
@@ -45,11 +43,22 @@ const getVisualizationsState = createSelector(
   signalChain => signalChain.visualizations
 );
 
+const getInputs = createSelector(
+  getSignalChainsFeatureState,
+  signalChain => signalChain.inputs
+);
+
 // This will crash if given bad arguments
 export const getParametersForModuleState = createSelector(
   getParametersState,
   (parameters: Parameter[], { moduleId }: { moduleId: string }) =>
     parameters.filter(parameter => parameter.moduleId === moduleId)
+);
+
+export const getInputsForModuleState = createSelector(
+  getInputs,
+  (inputs: AudioModuleInput[], { moduleId }: { moduleId: string }) =>
+    inputs.filter(input => input.moduleId === moduleId)
 );
 
 export const getChoiceParametersForModuleState = createSelector(
@@ -72,16 +81,19 @@ export const getSignalChainErrors = createSelector(
 export const getSignalChainStateForSave = createSelector(
   getSignalChainsFeatureState,
   applySpec({
+    stateVersion: always(2),
     modules: compose(
-      map(pick(['id', 'moduleType', 'sourceIds'])),
+      map(pick(['id', 'moduleType'])),
       prop('modules')
     ),
+    inputs: prop('inputs'),
+    outputs: prop('outputs'),
     choiceParameters: compose(
       map(omit(['choices'])),
       prop('choiceParameters')
     ),
     parameters: compose(
-      map(pick(['name', 'moduleId', 'value', 'sourceIds'])),
+      map(pick(['name', 'moduleId', 'value', 'sources'])),
       prop('parameters')
     )
   })

@@ -5,6 +5,7 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { CreateModuleEvent } from '../../model/create-module-event';
 import { thisExpression } from '@babel/types';
 import { AudioModuleType } from '../../model/audio-module-type';
+import { AudioModuleOutput } from '../../model/audio-module-output';
 
 @Component({
   selector: 'app-audio-module-list',
@@ -13,7 +14,7 @@ import { AudioModuleType } from '../../model/audio-module-type';
 })
 export class AudioModuleListComponent implements OnInit {
   @Input() modules: AudioModule[];
-  @Input() sourceModules: AudioModule[];
+  @Input() sources: AudioModuleOutput[];
   @Input() audioOutputEnabled: boolean;
 
   @Output() connectModules = new EventEmitter<ConnectModulesEvent>();
@@ -26,13 +27,6 @@ export class AudioModuleListComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
-
-  filterSourceModules({ id, sourceIds }: AudioModule) {
-    const excludeIds = [id, ...sourceIds];
-    return this.sourceModules
-      .filter(n => !excludeIds.includes(n.id) && n.numberOutputs)
-      .map(n => n.id);
-  }
 
   getModuleId(index: number, module: AudioModule) {
     return (module && module.id) || null;

@@ -6,9 +6,8 @@ import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
 import {
   getParametersForModuleState,
   getChoiceParametersForModuleState,
-  getSourceModuleIds
+  getSources
 } from '../../state/audio-signal-chain.selectors';
-import { AudioModule } from '../../model/audio-module';
 import { Parameter } from '../../model/parameter';
 import {
   ChangeParameter,
@@ -20,6 +19,7 @@ import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { ChoiceParameter } from '../../model/choice-parameter';
 import { ChangeChoiceEvent } from '../../model/change-choice-event';
 import { ConnectParameterEvent } from '../../model/connect-parameter-event';
+import { AudioModuleOutput } from '../../model/audio-module-output';
 
 @Component({
   selector: 'app-parameters-shell',
@@ -33,7 +33,7 @@ export class ParametersShellComponent implements OnInit {
 
   parameters$: Observable<Parameter[]>;
   choiceParameters$: Observable<ChoiceParameter[]>;
-  sourceModuleIds$: Observable<string[]>;
+  sources$: Observable<AudioModuleOutput>;
 
   constructor(private store: Store<AudioSignalChainState>) {}
 
@@ -46,8 +46,8 @@ export class ParametersShellComponent implements OnInit {
       select(getChoiceParametersForModuleState, { moduleId: this.moduleId })
     );
 
-    this.sourceModuleIds$ = this.store.pipe(
-      select(getSourceModuleIds, { moduleId: this.moduleId })
+    this.sources$ = this.store.pipe(
+      select(getSources, { moduleId: this.moduleId })
     );
   }
 

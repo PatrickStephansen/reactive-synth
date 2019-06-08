@@ -7,9 +7,9 @@
 <div *ngFor="let parameter of parameters; trackBy: getParameterId">
   <app-parameter
     [parameter]="parameter"
-    [availableSourceModules]="filterSourceModules(parameter)"
+    [availableSources]="filterSources(parameter)"
     (updateParameterValue)="updateParameterValue.emit($event)"
-    (connectSourceModule)="connectParameter.emit($event)"
-    (disconnectSourceModule)="disconnectParameter.emit($event)"
+    (connectSource)="connectParameter.emit($event)"
+    (disconnectSource)="disconnectParameter.emit($event)"
   ></app-parameter>
 </div>

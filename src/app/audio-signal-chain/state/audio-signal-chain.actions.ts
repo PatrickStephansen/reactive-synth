@@ -10,6 +10,8 @@ import { ConnectParameterEvent } from '../model/connect-parameter-event';
 import { SignalChainError } from '../model/signal-chain-error';
 import { ChangeVisualizationActiveEvent } from '../model/visualization/change-visualization-active-event';
 import { CreateModuleEvent } from '../model/create-module-event';
+import { AudioModuleInput } from '../model/audio-module-input';
+import { AudioModuleOutput } from '../model/audio-module-output';
 
 export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
@@ -33,6 +35,8 @@ export enum AudioSignalChainActionTypes {
   DestroyModule = '[Audio Signal Chain] Destroy Module',
   DestroyModuleSuccess = '[Audio Signal Chain] Destroy ModuleSuccess',
   CreateParameterSuccess = '[Audio Signal Chain] Create Parameter Success',
+  CreateInputSuccess = '[Audio Signal Chain] Create Input Success',
+  CreateOutputSuccess = '[Audio Signal Chain] Create Output Success',
   CreateChoiceParameterSuccess = '[Audio Signal Chain] Create Choice Parameter Success',
   ToggleSignalChainActive = '[Audio Signal Chain] Toggle SignalChain Output Active',
   ToggleSignalChainActiveSuccess = '[Audio Signal Chain] Toggle SignalChain Output Active Success',
@@ -144,6 +148,16 @@ export class CreateParameterSuccess implements Action {
 
   constructor(public payload: Parameter) {}
 }
+export class CreateInputSuccess implements Action {
+  readonly type = AudioSignalChainActionTypes.CreateInputSuccess;
+
+  constructor(public payload: AudioModuleInput) {}
+}
+export class CreateOutputSuccess implements Action {
+  readonly type = AudioSignalChainActionTypes.CreateOutputSuccess;
+
+  constructor(public payload: AudioModuleOutput) {}
+}
 export class CreateChoiceParameterSuccess implements Action {
   readonly type = AudioSignalChainActionTypes.CreateChoiceParameterSuccess;
 
@@ -217,6 +231,8 @@ export type AudioSignalChainAction =
   | CreateModule
   | CreateModuleSuccess
   | CreateParameterSuccess
+  | CreateInputSuccess
+  | CreateOutputSuccess
   | CreateChoiceParameterSuccess
   | ToggleSignalChainActive
   | ToggleSignalChainActiveSuccess

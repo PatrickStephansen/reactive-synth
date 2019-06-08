@@ -1,7 +1,7 @@
 <app-parameter-list
   [parameters]="parameters$ | async"
   [choiceParameters]="choiceParameters$ | async"
-  [sourceModuleIds]="sourceModuleIds$ | async"
+  [sources]="sources$ | async"
   (updateParameterValue)="onParameterChanged($event)"
   (updateChoiceParameterValue)="onChoiceParameterChanged($event)"
   (connectParameter)="onParameterConnected($event)"

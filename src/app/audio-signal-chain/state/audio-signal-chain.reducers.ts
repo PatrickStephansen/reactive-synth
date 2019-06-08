@@ -1,8 +1,13 @@
 import { AudioSignalChainState } from './audio-signal-chain.state';
-import { AudioSignalChainActionTypes, AudioSignalChainAction } from './audio-signal-chain.actions';
+import {
+  AudioSignalChainActionTypes,
+  AudioSignalChainAction
+} from './audio-signal-chain.actions';
 
 const initialState = {
   modules: [],
+  inputs: [],
+  outputs: [],
   parameters: [],
   choiceParameters: [],
   visualizations: [],
@@ -37,29 +42,55 @@ export function reducer(
       return { ...state, choiceParameters: updatedParameters };
     }
     case AudioSignalChainActionTypes.ConnectModulesSuccess: {
-      const updatedModules = state.modules.map(n =>
-        n.id === action.payload.destinationId
-          ? { ...n, sourceIds: [...n.sourceIds, action.payload.sourceId] }
-          : n
+      const updatedInputs = state.inputs.map(i =>
+        i.moduleId === action.payload.destinationId &&
+        i.name === action.payload.destinationInputName
+          ? {
+              ...i,
+              sources: [
+                ...i.sources,
+                {
+                  moduleId: action.payload.sourceId,
+                  name: action.payload.sourceOutputName
+                }
+              ]
+            }
+          : i
       );
-      return { ...state, modules: updatedModules };
+      return { ...state, inputs: updatedInputs };
     }
     case AudioSignalChainActionTypes.DisconnectModulesSuccess: {
-      const updatedModules = state.modules.map(n =>
-        n.id === action.payload.destinationId
+      const updatedInputs = state.inputs.map(i =>
+        i.moduleId === action.payload.destinationId &&
+        i.name === action.payload.destinationInputName
           ? {
-              ...n,
-              sourceIds: n.sourceIds.filter(s => s !== action.payload.sourceId)
+              ...i,
+              sources: i.sources.filter(
+                s =>
+                  !(
+                    s.moduleId === action.payload.sourceId &&
+                    s.name === action.payload.sourceOutputName
+                  )
+              )
             }
-          : n
+          : i
       );
-      return { ...state, modules: updatedModules };
+      return { ...state, inputs: updatedInputs };
     }
     case AudioSignalChainActionTypes.ConnectParameterSuccess: {
       const updatedParameters = state.parameters.map(p =>
         p.moduleId === action.payload.destinationModuleId &&
         p.name === action.payload.destinationParameterName
-          ? { ...p, sourceIds: [...p.sourceIds, action.payload.sourceModuleId] }
+          ? {
+              ...p,
+              sources: [
+                ...p.sources,
+                {
+                  moduleId: action.payload.sourceModuleId,
+                  name: action.payload.sourceOutputName
+                }
+              ]
+            }
           : p
       );
       return { ...state, parameters: updatedParameters };
@@ -70,8 +101,12 @@ export function reducer(
         p.name === action.payload.destinationParameterName
           ? {
               ...p,
-              sourceIds: p.sourceIds.filter(
-                s => action.payload.sourceModuleId !== s
+              sources: p.sources.filter(
+                s =>
+                  !(
+                    action.payload.sourceModuleId === s.moduleId &&
+                    action.payload.sourceOutputName === s.name
+                  )
               )
             }
           : p
@@ -90,21 +125,39 @@ export function reducer(
         choiceParameters: [...state.choiceParameters, action.payload]
       };
     }
+    case AudioSignalChainActionTypes.CreateInputSuccess: {
+      return {
+        ...state,
+        inputs: [...state.inputs, action.payload]
+      };
+    }
+    case AudioSignalChainActionTypes.CreateOutputSuccess: {
+      return {
+        ...state,
+        outputs: [...state.outputs, action.payload]
+      };
+    }
     case AudioSignalChainActionTypes.ToggleSignalChainActiveSuccess: {
       return { ...state, muted: !action.payload };
     }
     case AudioSignalChainActionTypes.DestroyModuleSuccess: {
-      const remainingModules = state.modules
-        .filter(n => n.id !== action.moduleId)
-        .map(n => ({
-          ...n,
-          sourceIds: n.sourceIds.filter(s => s !== action.moduleId)
+      const remainingModules = state.modules.filter(
+        m => m.id !== action.moduleId
+      );
+      const remainingOutputs = state.outputs.filter(
+        o => o.moduleId !== action.moduleId
+      );
+      const remainingInputs = state.inputs
+        .filter(i => i.moduleId !== action.moduleId)
+        .map(i => ({
+          ...i,
+          sources: i.sources.filter(s => s.moduleId !== action.moduleId)
         }));
       const remainingParameters = state.parameters
         .filter(p => p.moduleId !== action.moduleId)
         .map(p => ({
           ...p,
-          sourceIds: p.sourceIds.filter(s => s !== action.moduleId)
+          sources: p.sources.filter(s => s.moduleId !== action.moduleId)
         }));
       const remainingChoiceParameters = state.choiceParameters.filter(
         p => p.moduleId !== action.moduleId
@@ -113,6 +166,8 @@ export function reducer(
       return {
         ...state,
         modules: remainingModules,
+        inputs: remainingInputs,
+        outputs: remainingOutputs,
         parameters: remainingParameters,
         choiceParameters: remainingChoiceParameters
       };

@@ -1,0 +1,42 @@
+<label class="label">
+  <span class="field">
+    <div class="input-name">
+      {{ input.name }}
+    </div>
+    <span class="control">
+      <div class="control is-expanded">
+        <div class="select is-fullwidth">
+          <select
+            name="new-input"
+            id="{{ input.moduleId }}-{{ input.name }}-new-input"
+            #sourceSelector
+            (change)="onSourceConnected($event)"
+          >
+            <option value="" disabled selected hidden>Connect Input</option>
+            <option *ngIf="!availableSources?.length" value="" disabled
+              >No more sources available</option
+            >
+            <option
+              *ngFor="let sourceModule of availableSources"
+              value="{{ sourceModule.moduleId }}~{{ sourceModule.name }}"
+            >
+              {{ sourceModule.moduleId }}-{{ sourceModule.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </span>
+    <div class="tags" *ngIf="input.sources?.length">
+      <ng-container *ngFor="let sourceModuleOutput of input.sources">
+        <span class="tag"
+          >{{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+          <button
+            class="delete is-small"
+            type="button"
+            (click)="onSourceDisconnected(sourceModuleOutput)"
+          ></button
+        ></span>
+      </ng-container>
+    </div>
+  </span>
+</label>

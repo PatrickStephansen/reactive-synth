@@ -14,6 +14,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { ConnectParameterEvent } from '../../model/connect-parameter-event';
+import { AudioModuleOutput } from '../../model/audio-module-output';
 
 @Component({
   selector: 'app-parameter',
@@ -22,11 +23,11 @@ import { ConnectParameterEvent } from '../../model/connect-parameter-event';
 })
 export class ParameterComponent implements OnInit, OnChanges {
   @Input() parameter: Parameter;
-  @Input() availableSourceModules: string[];
+  @Input() availableSources: AudioModuleOutput[];
 
   @Output() updateParameterValue = new EventEmitter<ChangeParameterEvent>();
-  @Output() connectSourceModule = new EventEmitter<ConnectParameterEvent>();
-  @Output() disconnectSourceModule = new EventEmitter<ConnectParameterEvent>();
+  @Output() connectSource = new EventEmitter<ConnectParameterEvent>();
+  @Output() disconnectSource = new EventEmitter<ConnectParameterEvent>();
 
   parameterForm: FormGroup;
 
@@ -42,7 +43,7 @@ export class ParameterComponent implements OnInit, OnChanges {
           Validators.min(this.parameter.minValue)
         ]
       ],
-      selectedSourceModule: ['', Validators.required]
+      selectedSource: ['', Validators.required]
     });
 
     this.parameterForm.valueChanges
@@ -83,18 +84,20 @@ export class ParameterComponent implements OnInit, OnChanges {
     if (this.parameterForm.valid) {
       const formValue = this.parameterForm.value;
 
-      this.connectSourceModule.emit({
-        sourceModuleId: formValue.selectedSourceModule,
+      this.connectSource.emit({
+        sourceModuleId: formValue.selectedSource.split('~')[0],
+        sourceOutputName: formValue.selectedSource.split('~')[1],
         destinationModuleId: this.parameter.moduleId,
         destinationParameterName: this.parameter.name
       });
-      this.parameterForm.patchValue({ selectedSourceModule: '' });
+      this.parameterForm.patchValue({ selectedSource: '' });
     }
   }
 
-  disconnectParameterFromSource(sourceModuleId) {
-    this.disconnectSourceModule.emit({
-      sourceModuleId,
+  disconnectParameterFromSource(source) {
+    this.disconnectSource.emit({
+      sourceModuleId: source.moduleId,
+      sourceOutputName: source.name,
       destinationModuleId: this.parameter.moduleId,
       destinationParameterName: this.parameter.name
     });

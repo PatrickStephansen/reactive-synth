@@ -68,7 +68,7 @@
   >
     <app-audio-module
       [module]="module"
-      [availableSourceModules]="filterSourceModules(module)"
+      [availableSourceModules]="sources"
       (connectSourceModule)="connectModules.emit($event)"
       (disconnectSourceModule)="disconnectModules.emit($event)"
       (deleteModule)="deleteModule.emit($event)"

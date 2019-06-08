@@ -39,13 +39,17 @@ import {
   CreateModule,
   LoadSignalChainState,
   ResetSignalChain,
-  LoadSignalChainStateFailure
+  LoadSignalChainStateFailure,
+  DisconnectModules,
+  CreateInputSuccess,
+  CreateOutputSuccess
 } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioSignalChainState } from './audio-signal-chain.state';
 import { getSignalChainStateForSave } from './audio-signal-chain.selectors';
 import { CreateModuleEvent } from '../model/create-module-event';
 import { AudioModule } from '../model/audio-module';
+import { upgradeAudioChainStateVersion } from './upgrade-audio-signal-chain-version';
 
 let errorId = 0;
 
@@ -121,22 +125,25 @@ export class AudioSignalChainEffects implements OnInitEffects {
                 )
             ),
             ...flatten(
-              signalChain.modules.map(audioModule =>
-                audioModule.sourceIds.map(
-                  sourceId =>
+              signalChain.inputs.map(input =>
+                input.sources.map(
+                  source =>
                     new ConnectModules({
-                      sourceId,
-                      destinationId: audioModule.id
+                      sourceId: source.moduleId,
+                      sourceOutputName: source.name,
+                      destinationId: input.moduleId,
+                      destinationInputName: input.name
                     })
                 )
               )
             ),
             ...flatten(
               signalChain.parameters.map(parameter =>
-                parameter.sourceIds.map(
-                  sourceModuleId =>
+                parameter.sources.map(
+                  source =>
                     new ConnectParameter({
-                      sourceModuleId,
+                      sourceModuleId: source.moduleId,
+                      sourceOutputName: source.name,
                       destinationModuleId: parameter.moduleId,
                       destinationParameterName: parameter.name
                     })
@@ -184,6 +191,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
         mergeMap((result: CreateModuleResult) =>
           from([
             new CreateModuleSuccess(result.module),
+            ...result.inputs.map(i => new CreateInputSuccess(i)),
+            ...result.outputs.map(i => new CreateOutputSuccess(i)),
             ...result.parameters.map(p => new CreateParameterSuccess(p)),
             ...result.choiceParameters.map(
               p => new CreateChoiceParameterSuccess(p)
@@ -199,9 +208,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   connectModules$: Observable<AudioSignalChainAction> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ConnectModules),
     mergeMap(({ payload: event }: ConnectModules) =>
-      of(() =>
-        this.graphService.connectModules(event.sourceId, event.destinationId)
-      ).pipe(
+      of(() => this.graphService.connectModules(event)).pipe(
         map(serviceMethod => serviceMethod()),
         map(() => new ConnectModulesSuccess(event)),
         this.handleSignalChainChangeError
@@ -212,10 +219,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect()
   disconnectModules$: Observable<AudioSignalChainAction> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.DisconnectModules),
-    mergeMap(({ payload: event }: ConnectModules) =>
-      of(() =>
-        this.graphService.disconnectModules(event.sourceId, event.destinationId)
-      ).pipe(
+    mergeMap(({ payload: event }: DisconnectModules) =>
+      of(() => this.graphService.disconnectModules(event)).pipe(
         map(serviceMethod => serviceMethod()),
         map(() => new DisconnectModulesSuccess(event)),
         this.handleSignalChainChangeError
@@ -330,7 +335,9 @@ export class AudioSignalChainEffects implements OnInitEffects {
   private tryLoadState(unparsedState: string): AudioSignalChainAction {
     try {
       const state = JSON.parse(decodeURIComponent(unparsedState));
-      return new LoadSignalChainState(state);
+      return new LoadSignalChainState(
+        upgradeAudioChainStateVersion(state, state.stateVersion || 1)
+      );
     } catch (error) {
       return new LoadSignalChainStateFailure(
         `Error restoring state. Defaulting to new patch. ${error.message ||

@@ -11,57 +11,6 @@
   </div>
   <app-help-message *ngIf="module.helpText"> {{ module.helpText }} </app-help-message>
   <app-visualizations-shell [moduleId]="module.id"></app-visualizations-shell>
-  <ng-container *ngIf="module.numberInputs">
-    <div class="content" *ngIf="module.sourceIds?.length">
-      <div class="label">Connected inputs</div>
-      <ul>
-        <li *ngFor="let sourceModule of module.sourceIds">
-          <span class="tag"
-            >{{ sourceModule }}
-            <button
-              class="delete is-small"
-              type="button"
-              (click)="disconnectModule(sourceModule)"
-            ></button
-          ></span>
-        </li>
-      </ul>
-    </div>
-    <form [formGroup]="connectModuleForm" (ngSubmit)="submitModuleConnectionForm()">
-      <div class="field">
-        <div class="control is-expanded">
-          <div class="select is-fullwidth">
-            <select
-              name="new-input"
-              id="{{ module.id }}-new-input"
-              formControlName="selectedSourceModule"
-              (change)="submitModuleConnectionForm()"
-            >
-              <option value="" disabled selected hidden>Add Module Input</option>
-              <option
-                *ngIf="!availableSourceModules?.length && module.sourceIds?.length"
-                value=""
-                disabled
-                >No more inputs available</option
-              >
-              <option
-                *ngIf="!availableSourceModules?.length && !module.sourceIds?.length"
-                value=""
-                disabled
-                >No other modules in signal-chain</option
-              >
-              <option
-                *ngFor="let sourceModule of availableSourceModules"
-                value="{{ sourceModule }}"
-              >
-                {{ sourceModule }}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </form>
-  </ng-container>
-
+  <app-inputs-shell [moduleId]="module.id"></app-inputs-shell>
   <app-parameters-shell [moduleId]="module.id"></app-parameters-shell>
 </div>

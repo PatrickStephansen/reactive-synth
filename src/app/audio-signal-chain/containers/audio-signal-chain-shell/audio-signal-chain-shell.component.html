@@ -1,7 +1,7 @@
 <ng-container *ngIf="(audioModules$ | async) as audioModules">
   <app-audio-module-list
     [modules]="audioModules"
-    [sourceModules]="audioModules"
+    [sources]="(sources$ | async)"
     [audioOutputEnabled]="outputEnabled$ | async"
     (createModule)="addModule($event)"
     (connectModules)="connectModules($event)"

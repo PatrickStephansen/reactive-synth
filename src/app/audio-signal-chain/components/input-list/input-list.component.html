@@ -1,0 +1,8 @@
+<div *ngFor="let input of inputs; trackBy: getInputId">
+  <app-input
+    [input]="input"
+    [availableSources]="filterSources(input)"
+    (connectInput)="connectInput.emit($event)"
+    (disconnectInput)="disconnectInput.emit($event)"
+  ></app-input>
+</div>

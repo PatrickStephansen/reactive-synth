@@ -5,6 +5,7 @@ import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { ChoiceParameter } from '../../model/choice-parameter';
 import { ChangeChoiceEvent } from '../../model/change-choice-event';
 import { ConnectParameterEvent } from '../../model/connect-parameter-event';
+import { AudioModuleOutput } from '../../model/audio-module-output';
 
 @Component({
   selector: 'app-parameter-list',
@@ -14,7 +15,7 @@ import { ConnectParameterEvent } from '../../model/connect-parameter-event';
 export class ParameterListComponent implements OnInit {
   @Input() parameters: Parameter[];
   @Input() choiceParameters: ChoiceParameter[];
-  @Input() sourceModuleIds: string[];
+  @Input() sources: AudioModuleOutput[];
 
   @Output() updateParameterValue = new EventEmitter<ChangeParameterEvent>();
   @Output() updateChoiceParameterValue = new EventEmitter<ChangeChoiceEvent>();
@@ -29,7 +30,12 @@ export class ParameterListComponent implements OnInit {
     return (parameter && `${parameter.moduleId}-${parameter.name}`) || null;
   }
 
-  filterSourceModules({ sourceIds }: Parameter) {
-    return this.sourceModuleIds.filter(n => !sourceIds.includes(n));
+  filterSources({ sources }: Parameter) {
+    return this.sources.filter(
+      source =>
+        !sources.some(
+          s => s.moduleId === source.moduleId && s.name === source.name
+        )
+    );
   }
 }

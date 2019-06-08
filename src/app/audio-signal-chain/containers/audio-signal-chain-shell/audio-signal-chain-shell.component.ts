@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { Location } from '@angular/common';
 import { Store, select } from '@ngrx/store';
 
 import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
 import { AudioModule } from '../../model/audio-module';
 import { Observable } from 'rxjs';
-import { last } from 'ramda';
 import {
   getModulesState,
-  getSignalChainOutputActiveState
+  getSignalChainOutputActiveState,
+  getOutputsState
 } from '../../state/audio-signal-chain.selectors';
 import {
   ResetSignalChain,
@@ -16,10 +15,10 @@ import {
   ToggleSignalChainActive,
   DisconnectModules,
   DestroyModule,
-  CreateModule,
-  LoadSignalChainState
+  CreateModule
 } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
+import { AudioModuleOutput } from '../../model/audio-module-output';
 
 @Component({
   selector: 'app-audio-signal-chain-shell',
@@ -29,10 +28,12 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 })
 export class AudioSignalChainShellComponent implements OnInit {
   audioModules$: Observable<AudioModule[]>;
+  sources$: Observable<AudioModuleOutput[]>;
   outputEnabled$: Observable<boolean>;
 
-  constructor(private store: Store<AudioSignalChainState>, location: Location) {
+  constructor(private store: Store<AudioSignalChainState>) {
     this.audioModules$ = store.pipe(select(getModulesState));
+    this.sources$ = store.pipe(select(getOutputsState));
     this.outputEnabled$ = store.pipe(select(getSignalChainOutputActiveState));
   }
 

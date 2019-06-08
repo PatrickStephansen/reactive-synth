@@ -28,20 +28,20 @@
             <select
               name="new-input"
               id="{{ parameter.moduleId }}-{{ parameter.name }}-new-input"
-              formControlName="selectedSourceModule"
+              formControlName="selectedSource"
               (change)="connectParameterToSource()"
             >
               <option value="" disabled selected hidden
                 >Add Parameter Input</option
               >
-              <option *ngIf="!availableSourceModules?.length" value="" disabled
+              <option *ngIf="!availableSources?.length" value="" disabled
                 >No more inputs available</option
               >
               <option
-                *ngFor="let sourceModule of availableSourceModules"
-                value="{{ sourceModule }}"
+                *ngFor="let sourceModuleOutput of availableSources"
+                value="{{ sourceModuleOutput.moduleId }}~{{ sourceModuleOutput.name }}"
               >
-                {{ sourceModule }}
+                {{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
               </option>
             </select>
           </div>
@@ -50,14 +50,14 @@
     </div>
   </label>
 </form>
-<div class="tags" *ngIf="parameter.sourceIds?.length">
-  <ng-container *ngFor="let sourceModule of parameter.sourceIds">
+<div class="tags" *ngIf="parameter.sources?.length">
+  <ng-container *ngFor="let sourceModuleOutput of parameter.sources">
     <span class="tag"
-      >{{ sourceModule }}
+      >{{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
       <button
         class="delete is-small"
         type="button"
-        (click)="disconnectParameterFromSource(sourceModule)"
+        (click)="disconnectParameterFromSource(sourceModuleOutput)"
       ></button
     ></span>
   </ng-container>

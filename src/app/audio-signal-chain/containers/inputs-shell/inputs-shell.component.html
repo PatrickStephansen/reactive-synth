@@ -1,0 +1,6 @@
+<app-input-list
+  [inputs]="inputs$ | async"
+  [sources]="sources$ | async"
+  (connectInput)="onInputConnected($event)"
+  (disconnectInput)="onInputDisconnected($event)"
+  ></app-input-list>

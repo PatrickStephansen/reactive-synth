@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
-import { head, isNil, last } from 'ramda';
+import { isNil, last } from 'ramda';
 import {
   AudioWorkletNode,
   AudioContext,
@@ -19,11 +19,14 @@ import {
 } from './model/visualization/scaling-strategy';
 import { AudioModuleType } from './model/audio-module-type';
 import { CreateModuleResult } from './model/create-module-result';
+import { ConnectModulesEvent } from './model/connect-modules-event';
 
 let incrementingId = 0;
 
 interface ModuleImplementation {
   internalNodes: IAudioNode[];
+  inputMap?: Map<string, IAudioNode>;
+  outputMap?: Map<string, IAudioNode>;
   parameterMap?: Map<string, IAudioParam>;
   choiceMap?: Map<string, [IAudioNode, string]>;
 }
@@ -75,7 +78,7 @@ export class AudioGraphService {
     return Promise.resolve();
   }
 
-  private createId(moduleType: string, id?: string) {
+  private createModuleId(moduleType: string, id?: string) {
     if (isNil(id)) {
       return `${moduleType}-${incrementingId++}`;
     }
@@ -112,7 +115,10 @@ export class AudioGraphService {
       this.graph = new Map([
         [
           'Output to Speakers',
-          { internalNodes: [visualizer, this.context.destination] }
+          {
+            internalNodes: [visualizer, this.context.destination],
+            inputMap: new Map([['audio to play', visualizer]])
+          }
         ]
       ]);
       return this.context.audioWorklet
@@ -133,15 +139,20 @@ export class AudioGraphService {
             {
               id: 'Output to Speakers',
               moduleType: AudioModuleType.Output,
-              numberInputs: 1,
-              numberOutputs: 0,
-              sourceIds: [],
               canDelete: false,
               helpText: `Signals must be connected to this module to be audible.
               Incoming signals are summed and clamped to the range [-1, 1].
               Click the visualizations to pause them. Click their headings to hide them to save space.`
             }
           ],
+          inputs: [
+            {
+              moduleId: 'Output to Speakers',
+              name: 'audio to play',
+              sources: []
+            }
+          ],
+          outputs: [],
           parameters: [],
           choiceParameters: [],
           visualizations: [
@@ -200,7 +211,7 @@ export class AudioGraphService {
 
   createNoiseGenerator(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.NoiseGenerator;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
       numberOfInputs: 0,
       numberOfOutputs: 1,
@@ -216,6 +227,7 @@ export class AudioGraphService {
     noiseGeneratorNode.connect(volumeControl);
     this.graph.set(id, {
       internalNodes: [noiseGeneratorNode, volumeControl],
+      outputMap: new Map([['output', volumeControl]]),
       parameterMap: new Map([
         ['minimum step size', stepMin],
         ['maximum step size', stepMax],
@@ -227,9 +239,6 @@ export class AudioGraphService {
       {
         id,
         moduleType,
-        numberInputs: 0,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `A noise generator that generates each sample based on the previous sample.
         The minimum and maximum step size can be used to create bias towards different pitches.
@@ -238,10 +247,17 @@ export class AudioGraphService {
         Sample hold allows the rate of generation to be slowed down.
         1 means every sample gets a new value, 2 means every second sample does etc.`
       },
+      [],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
       [
         {
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           name: 'minimum step size',
           maxValue: this.parameterMax(stepMin),
           minValue: this.parameterMin(stepMin),
@@ -250,7 +266,7 @@ export class AudioGraphService {
         },
         {
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           name: 'maximum step size',
           maxValue: this.parameterMax(stepMax),
           minValue: this.parameterMin(stepMax),
@@ -259,7 +275,7 @@ export class AudioGraphService {
         },
         {
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           name: 'sample hold',
           maxValue: this.parameterMax(sampleHold),
           minValue: this.parameterMin(sampleHold),
@@ -269,7 +285,7 @@ export class AudioGraphService {
         {
           name: 'output gain',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(volumeControl.gain),
           minValue: this.parameterMin(volumeControl.gain),
           stepSize: 0.01,
@@ -282,7 +298,7 @@ export class AudioGraphService {
 
   createOscillator(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Oscillator;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const oscillator = this.context.createOscillator();
     const volumeControl = this.context.createGain();
     volumeControl.gain.value = this.defaultGain;
@@ -290,6 +306,7 @@ export class AudioGraphService {
     oscillator.start();
     const moduleImplementation = {
       internalNodes: [oscillator, volumeControl],
+      outputMap: new Map([['output', volumeControl]]),
       parameterMap: new Map([
         ['frequency', oscillator.frequency],
         ['detune', oscillator.detune],
@@ -304,9 +321,6 @@ export class AudioGraphService {
       {
         id,
         moduleType,
-        numberInputs: 0,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `A source that emits a periodic wave.
           Similar to a Voltage Controlled Oscillator or Low Frequency Oscillator in a physical synth.
@@ -317,12 +331,19 @@ export class AudioGraphService {
           The frequency and gain parameters can be modulated by connecting them to another oscillator.
           Try connecting a low frequency inverted sawtooth to the output gain of an audible oscillator for a percussive sound.`
       },
+      [],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
       [
         {
           name: 'frequency',
           units: 'hertz',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(oscillator.frequency),
           minValue: this.parameterMin(oscillator.frequency),
           value: oscillator.frequency.defaultValue,
@@ -332,7 +353,7 @@ export class AudioGraphService {
           name: 'detune',
           units: 'cents',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: 1000000000,
           minValue: -1000000000,
           value: oscillator.detune.defaultValue,
@@ -341,7 +362,7 @@ export class AudioGraphService {
         {
           name: 'output gain',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(volumeControl.gain),
           minValue: this.parameterMin(volumeControl.gain),
           stepSize: 0.01,
@@ -361,12 +382,14 @@ export class AudioGraphService {
 
   createGainModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Gain;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const gain = this.context.createGain();
     gain.gain.value = this.defaultGain;
     const gainParameterKey = 'signal multiplier';
     const moduleImplementation = {
       internalNodes: [gain],
+      inputMap: new Map([['input', gain]]),
+      outputMap: new Map([['output', gain]]),
       parameterMap: new Map([[gainParameterKey, gain.gain]])
     };
 
@@ -375,9 +398,6 @@ export class AudioGraphService {
       {
         id,
         moduleType,
-        numberInputs: 1,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `Multiplies each sample of the incoming signal by a factor to boost or attenuate it.
           Similar to a Voltage Controlled Amplifier in a physical synth.
@@ -385,9 +405,22 @@ export class AudioGraphService {
       },
       [
         {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
+      [
+        {
           name: gainParameterKey,
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(gain.gain),
           minValue: this.parameterMin(gain.gain),
           stepSize: 0.01,
@@ -400,7 +433,7 @@ export class AudioGraphService {
 
   createBitCrusherFixedPointModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.BitCrusher;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const crusher = new AudioWorkletNode(
       this.context,
       'bit-crusher-fixed-point',
@@ -420,6 +453,8 @@ export class AudioGraphService {
     crusher.connect(volumeControl);
     const moduleImplementation = {
       internalNodes: [crusher, volumeControl],
+      inputMap: new Map([['input', crusher]]),
+      outputMap: new Map([['output', volumeControl]]),
       parameterMap: new Map([
         [bitDepthParameterKey, bitDepthParameter],
         ['output gain', volumeControl.gain]
@@ -431,9 +466,6 @@ export class AudioGraphService {
       {
         id,
         moduleType,
-        numberInputs: 1,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `Maps each sample to a less precise representation as an integer with a given number of bits.
         The bit depth doesn't need to be a whole number, but is rounded down to the nearest value that results in evenly spaced "steps".
@@ -443,9 +475,22 @@ export class AudioGraphService {
       },
       [
         {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
+      [
+        {
           name: bitDepthParameterKey,
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(bitDepthParameter),
           minValue: this.parameterMin(bitDepthParameter),
           stepSize: 0.1,
@@ -454,7 +499,7 @@ export class AudioGraphService {
         {
           name: 'output gain',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(volumeControl.gain),
           minValue: this.parameterMin(volumeControl.gain),
           stepSize: 0.01,
@@ -467,11 +512,13 @@ export class AudioGraphService {
 
   createDelayModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Delay;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const delay = this.context.createDelay(60);
     const delayParameterKey = 'delay time';
     const moduleImplementation = {
       internalNodes: [delay],
+      inputMap: new Map([['input', delay]]),
+      outputMap: new Map([['output', delay]]),
       parameterMap: new Map([[delayParameterKey, delay.delayTime]])
     };
 
@@ -480,9 +527,6 @@ export class AudioGraphService {
       {
         id,
         moduleType,
-        numberInputs: 1,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `Emits the incoming signal unchanged after the set delay time.
           Allows feedback loops to be created in the audio signal-chain.
@@ -492,10 +536,23 @@ export class AudioGraphService {
       },
       [
         {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
+      [
+        {
           name: delayParameterKey,
           units: 'seconds',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(delay.delayTime),
           minValue: this.parameterMin(delay.delayTime),
           stepSize: 0.01,
@@ -508,10 +565,12 @@ export class AudioGraphService {
 
   createFilterModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Filter;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const filter = this.context.createBiquadFilter();
     this.graph.set(id, {
       internalNodes: [filter],
+      inputMap: new Map([['input', filter]]),
+      outputMap: new Map([['output', filter]]),
       parameterMap: new Map([
         ['frequency', filter.frequency],
         ['quality factor', filter.Q],
@@ -525,9 +584,6 @@ export class AudioGraphService {
       {
         id,
         moduleType,
-        numberInputs: 1,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `Shapes the frequency response of the incoming signal.
           Use it in lowpass mode to tame the upper harmonics and make sawtooth and square waves more listenable,
@@ -537,20 +593,33 @@ export class AudioGraphService {
       },
       [
         {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
+      [
+        {
           name: 'frequency',
           units: 'hertz',
           moduleId: id,
           maxValue: this.parameterMax(filter.frequency),
           minValue: this.parameterMin(filter.frequency),
           stepSize: 1,
-          sourceIds: [],
+          sources: [],
           value: filter.frequency.value
         },
         {
           name: 'detune',
           units: 'cents',
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           maxValue: this.parameterMax(filter.detune),
           minValue: this.parameterMin(filter.detune),
           value: filter.detune.defaultValue,
@@ -562,7 +631,7 @@ export class AudioGraphService {
           maxValue: this.parameterMax(filter.Q),
           minValue: 0,
           stepSize: 1,
-          sourceIds: [],
+          sources: [],
           value: filter.Q.value
         }
       ],
@@ -579,20 +648,19 @@ export class AudioGraphService {
 
   createDistortionModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Distortion;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const distortion = this.context.createWaveShaper();
     distortion.curve = makeDistortionCurve(this.context.sampleRate);
     distortion.oversample = '4x';
     this.graph.set(id, {
-      internalNodes: [distortion]
+      internalNodes: [distortion],
+      inputMap: new Map([['input', distortion]]),
+      outputMap: new Map([['output', distortion]])
     });
     return new CreateModuleResult(
       {
         id,
         moduleType,
-        numberInputs: 1,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `A simple wave shaping distortion that adds more harmonic content to boring waveforms.
           It also makes interference between waves easier to hear.
@@ -601,6 +669,19 @@ export class AudioGraphService {
           For example, a triangle wave with amplitude > 1 becomes closer to a square wave
           with smoother transitions between the high and low value.`
       },
+      [
+        {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
       [],
       []
     );
@@ -608,25 +689,37 @@ export class AudioGraphService {
 
   createRectifierModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Rectifier;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const rectifier = this.context.createWaveShaper();
     rectifier.curve = makeRectifierCurve();
     rectifier.oversample = '4x';
     this.graph.set(id, {
-      internalNodes: [rectifier]
+      internalNodes: [rectifier],
+      inputMap: new Map([['input', rectifier]]),
+      outputMap: new Map([['output', rectifier]])
     });
     return new CreateModuleResult(
       {
         id,
         moduleType,
-        numberInputs: 1,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `Clips incoming samples to the range [0, 1]. Values between 0 and 1 are untouched.
           Useful for shaping low freqency oscillators for precise controls like pitch (detune or frequency).
           When used together with a constant source and gain, a waveform can be shifted to any range.`
       },
+      [
+        {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
       [],
       []
     );
@@ -634,20 +727,18 @@ export class AudioGraphService {
 
   createConstantSource(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.ConstantSource;
-    id = this.createId(moduleType, id);
+    id = this.createModuleId(moduleType, id);
     const constant = this.context.createConstantSource();
     constant.start();
     this.graph.set(id, {
       internalNodes: [constant],
-      parameterMap: new Map([['output value', constant.offset]])
+      parameterMap: new Map([['output value', constant.offset]]),
+      outputMap: new Map([['output', constant]])
     });
     return new CreateModuleResult(
       {
         id,
         moduleType,
-        numberInputs: 0,
-        numberOutputs: 1,
-        sourceIds: [],
         canDelete: true,
         helpText: `Emits a "constant" stream of samples with the value of the Output Value parameter.
           It is not always constant since the output value can be modulated.
@@ -655,10 +746,17 @@ export class AudioGraphService {
           It can be used together with a gain module for unit conversions eg.
           feed it into a gain multiplier of 0.016666 to convert beats per minute to hertz.`
       },
+      [],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
       [
         {
           moduleId: id,
-          sourceIds: [],
+          sources: [],
           name: 'output value',
           maxValue: this.parameterMax(constant.offset),
           minValue: this.parameterMin(constant.offset),
@@ -670,11 +768,27 @@ export class AudioGraphService {
     );
   }
 
-  connectModules(sourceId: string, destinationId: string): void {
-    if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
-      last(this.graph.get(sourceId).internalNodes).connect(
-        head(this.graph.get(destinationId).internalNodes)
-      );
+  connectModules({
+    sourceId,
+    sourceOutputName,
+    destinationId,
+    destinationInputName
+  }: ConnectModulesEvent): void {
+    if (
+      this.graph.has(sourceId) &&
+      this.graph.has(destinationId) &&
+      this.graph.get(sourceId).outputMap &&
+      this.graph.get(sourceId).outputMap.has(sourceOutputName) &&
+      this.graph.get(destinationId).inputMap &&
+      this.graph.get(destinationId).inputMap.has(destinationInputName)
+    ) {
+      const sourceNode = this.graph
+        .get(sourceId)
+        .outputMap.get(sourceOutputName);
+      const destinationNode = this.graph
+        .get(destinationId)
+        .inputMap.get(destinationInputName);
+      sourceNode.connect(destinationNode);
     } else {
       console.warn(
         'attempted to connect modules that do not exist',
@@ -684,32 +798,56 @@ export class AudioGraphService {
     }
   }
 
-  disconnectModules(sourceId: string, destinationId: string): void {
-    if (this.graph.has(sourceId) && this.graph.has(destinationId)) {
-      last(this.graph.get(sourceId).internalNodes).disconnect(
-        head(this.graph.get(destinationId).internalNodes)
-      );
+  disconnectModules({
+    sourceId,
+    sourceOutputName,
+    destinationId,
+    destinationInputName
+  }: ConnectModulesEvent): void {
+    if (
+      this.graph.has(sourceId) &&
+      this.graph.has(destinationId) &&
+      this.graph.get(sourceId).outputMap &&
+      this.graph.get(sourceId).outputMap.has(sourceOutputName) &&
+      this.graph.get(destinationId).inputMap &&
+      this.graph.get(destinationId).inputMap.has(destinationInputName)
+    ) {
+      const sourceNode = this.graph
+        .get(sourceId)
+        .outputMap.get(sourceOutputName);
+      const destinationNode = this.graph
+        .get(destinationId)
+        .inputMap.get(destinationInputName);
+      sourceNode.disconnect(destinationNode);
     }
   }
 
   connectParameter(event: ConnectParameterEvent): void {
     if (
       this.graph.has(event.sourceModuleId) &&
+      this.graph.get(event.sourceModuleId).outputMap &&
+      this.graph
+        .get(event.sourceModuleId)
+        .outputMap.has(event.sourceOutputName) &&
       this.graph.has(event.destinationModuleId) &&
-      this.graph.get(event.destinationModuleId).parameterMap
-    ) {
-      const destinationParameter = this.graph
+      this.graph.get(event.destinationModuleId).parameterMap &&
+      this.graph
         .get(event.destinationModuleId)
-        .parameterMap.get(event.destinationParameterName);
-      if (destinationParameter) {
-        last(this.graph.get(event.sourceModuleId).internalNodes).connect(
-          destinationParameter
+        .parameterMap.has(event.destinationParameterName)
+    ) {
+      this.graph
+        .get(event.sourceModuleId)
+        .outputMap.get(event.sourceOutputName)
+        .connect(
+          this.graph
+            .get(event.destinationModuleId)
+            .parameterMap.get(event.destinationParameterName)
         );
-      }
     } else {
       console.warn(
         'attempted to connect parameters that do not exist',
         event.sourceModuleId,
+        event.sourceOutputName,
         event.destinationModuleId,
         event.destinationParameterName
       );
@@ -719,17 +857,24 @@ export class AudioGraphService {
   disconnectParameter(event: ConnectParameterEvent): void {
     if (
       this.graph.has(event.sourceModuleId) &&
+      this.graph.get(event.sourceModuleId).outputMap &&
+      this.graph
+        .get(event.sourceModuleId)
+        .outputMap.has(event.sourceOutputName) &&
       this.graph.has(event.destinationModuleId) &&
-      this.graph.get(event.destinationModuleId).parameterMap
-    ) {
-      const destinationParameter = this.graph
+      this.graph.get(event.destinationModuleId).parameterMap &&
+      this.graph
         .get(event.destinationModuleId)
-        .parameterMap.get(event.destinationParameterName);
-      if (destinationParameter) {
-        last(this.graph.get(event.sourceModuleId).internalNodes).disconnect(
-          destinationParameter
+        .parameterMap.has(event.destinationParameterName)
+    ) {
+      this.graph
+        .get(event.sourceModuleId)
+        .outputMap.get(event.sourceOutputName)
+        .disconnect(
+          this.graph
+            .get(event.destinationModuleId)
+            .parameterMap.get(event.destinationParameterName)
         );
-      }
     }
   }
 

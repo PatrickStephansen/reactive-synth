@@ -46,22 +46,4 @@ export class AudioModuleComponent implements OnInit, OnChanges {
       this.connectModuleForm.patchValue({ selectedSourceModule: '' });
     }
   }
-
-  submitModuleConnectionForm() {
-    if (this.connectModuleForm.valid) {
-      const formValue = this.connectModuleForm.value;
-
-      this.connectSourceModule.emit({
-        sourceId: formValue.selectedSourceModule,
-        destinationId: this.module.id
-      });
-    }
-  }
-
-  disconnectModule(sourceId) {
-    this.disconnectSourceModule.emit({
-      sourceId,
-      destinationId: this.module.id
-    });
-  }
 }
