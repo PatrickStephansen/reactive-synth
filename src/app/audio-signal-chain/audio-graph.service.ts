@@ -499,8 +499,12 @@ export class AudioGraphService {
           name: fallBackValueKey,
           moduleId: id,
           sources: [],
-          maxValue: this.parameterMax(inverseGain.parameters.get('zeroDivisorFallback')),
-          minValue: this.parameterMin(inverseGain.parameters.get('zeroDivisorFallback')),
+          maxValue: this.parameterMax(
+            inverseGain.parameters.get('zeroDivisorFallback')
+          ),
+          minValue: this.parameterMin(
+            inverseGain.parameters.get('zeroDivisorFallback')
+          ),
           stepSize: 0.01,
           value: inverseGain.parameters.get('zeroDivisorFallback').value
         }
@@ -999,13 +1003,20 @@ export class AudioGraphService {
   changeParameterValue(
     moduleId: string,
     parameterName: string,
-    value: number
+    value: number,
+    setImmediately?: boolean
   ): void {
     if (this.graph.has(moduleId) && this.graph.get(moduleId).parameterMap) {
       const param = this.graph.get(moduleId).parameterMap.get(parameterName);
-      if (param && param.setTargetAtTime) {
+      if (param && param.setTargetAtTime && !setImmediately) {
         // don't change immediately as an anti-pop precaution
-        param.setTargetAtTime(value, this.context.currentTime, 0.005);
+        param.setTargetAtTime(
+          value,
+          this.context.currentTime,
+          setImmediately ? 0 : 0.005
+        );
+      } else {
+        param.value = value;
       }
     }
   }

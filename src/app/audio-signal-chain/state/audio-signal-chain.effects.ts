@@ -117,6 +117,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
         map(newState => new ResetSignalChainSuccess(newState)),
         mergeMap(resetSuccess => {
           const events = [
+            new ToggleSignalChainActive(false),
             resetSuccess,
             ...signalChain.modules.map(
               (audioModule: AudioModule) =>
@@ -155,7 +156,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
                 new ChangeParameter({
                   moduleId: parameter.moduleId,
                   parameterName: parameter.name,
-                  value: parameter.value
+                  value: parameter.value,
+                  setImmediately: true
                 })
             ),
             ...signalChain.choiceParameters.map(
@@ -165,7 +167,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
                   parameterName: parameter.name,
                   value: parameter.selection
                 })
-            )
+            ),
+            new ToggleSignalChainActive(true),
           ];
           return from(events);
         }),
@@ -260,7 +263,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
         this.graphService.changeParameterValue(
           event.moduleId,
           event.parameterName,
-          event.value
+          event.value,
+          event.setImmediately
         )
       ).pipe(
         map(serviceMethod => serviceMethod()),
