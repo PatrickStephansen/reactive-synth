@@ -789,12 +789,12 @@ export class AudioGraphService {
     const outputGain = this.context.createGain();
     rectifier.connect(outputGain);
     this.graph.set(id, {
-      internalNodes: [rectifier, outputGain],
+      internalNodes: [inputGain, rectifier, outputGain],
       parameterMap: new Map([
         ['input gain', inputGain.gain],
         ['output gain', outputGain.gain]
       ]),
-      inputMap: new Map([['input', rectifier]]),
+      inputMap: new Map([['input', inputGain]]),
       outputMap: new Map([['output', outputGain]])
     });
     return new CreateModuleResult(
