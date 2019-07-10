@@ -125,21 +125,7 @@ export class AudioGraphService {
       return this.context.audioWorklet
         .addModule(
           this.locationService.prepareExternalUrl(
-            '/assets/audio-worklet-processors/noise.js'
-          )
-        )
-        .then(() =>
-          this.context.audioWorklet.addModule(
-            this.locationService.prepareExternalUrl(
-              '/assets/audio-worklet-processors/bit-crusher.js'
-            )
-          )
-        )
-        .then(() =>
-          this.context.audioWorklet.addModule(
-            this.locationService.prepareExternalUrl(
-              '/assets/audio-worklet-processors/inverse-gain.js'
-            )
+            '/assets/audio-worklet-processors/worklets.js'
           )
         )
         .then(() => ({
