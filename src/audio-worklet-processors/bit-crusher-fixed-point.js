@@ -1,4 +1,4 @@
-import { crush } from "./crush-bit-fixed-point";
+import { crush } from './crush-bit-fixed-point';
 
 registerProcessor(
   'bit-crusher-fixed-point',
@@ -13,6 +13,21 @@ registerProcessor(
           automationRate: 'a-rate'
         }
       ];
+    }
+
+    constructor() {
+      super();
+      this.fractionalBitDepthMode = 'quantize-evenly';
+      this.port.onmessage = this.handleMessage.bind(this);
+    }
+
+    handleMessage(event) {
+      if (
+        event.data &&
+        event.data.type === 'change-fractional-bit-depth-mode'
+      ) {
+        this.fractionalBitDepthMode = event.data.newMode;
+      }
     }
 
     process(inputs, outputs, parameters) {
@@ -35,7 +50,8 @@ registerProcessor(
           const inputSample = inputChannel[sampleIndex];
           outputChannel[sampleIndex] = crush(
             inputSample,
-            getBitDepth(sampleIndex)
+            getBitDepth(sampleIndex),
+            this.fractionalBitDepthMode
           );
         }
       }
@@ -43,5 +59,3 @@ registerProcessor(
     }
   }
 );
-
-

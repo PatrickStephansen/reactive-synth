@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
-import { clamp, isNil, last } from 'ramda';
+import { isNil, last } from 'ramda';
 import {
   AudioWorkletNode,
   AudioContext,
   IAudioParam,
-  IAudioNode
+  IAudioNode,
+  TBiquadFilterType
 } from 'standardized-audio-context';
 
 import { AudioSignalChainState } from './state/audio-signal-chain.state';
@@ -28,7 +29,7 @@ interface ModuleImplementation {
   inputMap?: Map<string, IAudioNode>;
   outputMap?: Map<string, IAudioNode>;
   parameterMap?: Map<string, IAudioParam>;
-  choiceMap?: Map<string, [IAudioNode, string]>;
+  choiceMap?: Map<string, (newValue: string) => void>;
 }
 
 @Injectable({
@@ -307,7 +308,7 @@ export class AudioGraphService {
         ['output gain', volumeControl.gain]
       ]),
       choiceMap: new Map([
-        ['waveform', [oscillator, 'type'] as [IAudioNode, string]]
+        ['waveform', waveForm => (oscillator.type = waveForm)]
       ])
     };
     this.graph.set(id, moduleImplementation);
@@ -526,6 +527,16 @@ export class AudioGraphService {
       parameterMap: new Map([
         [bitDepthParameterKey, bitDepthParameter],
         ['output gain', volumeControl.gain]
+      ]),
+      choiceMap: new Map([
+        [
+          'fractional bit depth mode',
+          mode =>
+            crusher.port.postMessage({
+              type: 'change-fractional-bit-depth-mode',
+              newMode: mode
+            })
+        ]
       ])
     };
 
@@ -535,8 +546,13 @@ export class AudioGraphService {
         id,
         moduleType,
         canDelete: true,
-        helpText: `Maps each sample to a less precise representation as an integer with a given number of bits.
-        The bit depth doesn't need to be a whole number, but is rounded down to the nearest value that results in evenly spaced "steps".
+        helpText: `Maps each sample to a less precise representation imitating an integer with a given number of bits.
+        Fractional bit depth mode tells the module how to deal with cases where bit depth is not a whole number.
+        Trve mode rounds down to the nearest whole number
+        so it outputs only numbers that would be representable using the given number of bits in real hardware.
+        Quantize-evenly mode causes bit depth to be rounded down to the nearest value that results in evenly spaced "steps"
+        in the output.
+        Continuous mode allows uneven quantization of the output space, so even small changes in bit depth will sound different.
         For example, since a number with 2 bits it can represent 4 values and a number with 3 bits can represent 8 values,
         there are bit depths in between 2 and 3 that can represent 5, 6, and 7 values.
         For best results, the incoming signal should have an amplitude close to 1 (ie. values between -1 and 1).`
@@ -574,7 +590,14 @@ export class AudioGraphService {
           value: this.defaultGain
         }
       ],
-      []
+      [
+        {
+          name: 'fractional bit depth mode',
+          moduleId: id,
+          choices: ['quantize-evenly', 'continuous', 'trve'],
+          selection: 'quantize-evenly'
+        }
+      ]
     );
   }
 
@@ -645,7 +668,10 @@ export class AudioGraphService {
         ['detune', filter.detune]
       ]),
       choiceMap: new Map([
-        ['filter type', [filter, 'type'] as [IAudioNode, string]]
+        [
+          'filter type',
+          filterType => (filter.type = filterType as TBiquadFilterType)
+        ]
       ])
     });
     return new CreateModuleResult(
@@ -1011,8 +1037,7 @@ export class AudioGraphService {
     if (this.graph.has(moduleId) && this.graph.get(moduleId).choiceMap) {
       const choice = this.graph.get(moduleId).choiceMap.get(choiceName);
       if (choice) {
-        const [node, property] = choice;
-        node[property] = value;
+        choice(value);
       }
     }
   }
