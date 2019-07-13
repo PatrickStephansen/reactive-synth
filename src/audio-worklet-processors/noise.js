@@ -63,7 +63,7 @@ registerProcessor(
         }
 
         if (this.samplesHeld >= getSampleHold(i)) {
-          this.samplesHeld = 0;
+          this.samplesHeld-= getSampleHold(i);
           this.previousValue = next;
         }
         for (let channel = 0; channel < output.length; ++channel) {
