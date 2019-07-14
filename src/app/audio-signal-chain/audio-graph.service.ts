@@ -217,6 +217,7 @@ export class AudioGraphService {
     const stepMin = noiseGeneratorNode.parameters.get('stepMin');
     const stepMax = noiseGeneratorNode.parameters.get('stepMax');
     const sampleHold = noiseGeneratorNode.parameters.get('sampleHold');
+    const nextValueTrigger = noiseGeneratorNode.parameters.get('nextValueTrigger');
     const volumeControl = this.context.createGain();
     volumeControl.gain.value = this.defaultGain;
     noiseGeneratorNode.connect(volumeControl);
@@ -227,6 +228,7 @@ export class AudioGraphService {
         ['minimum step size', stepMin],
         ['maximum step size', stepMax],
         ['sample hold', sampleHold],
+        ['next value trigger', nextValueTrigger],
         ['output gain', volumeControl.gain]
       ])
     });
@@ -240,7 +242,11 @@ export class AudioGraphService {
         Increase the minimum to boost high frequencies. Decrease the maximum to boost low frequesncies.
         If minimum is higher than maximum, their roles swap around.
         Sample hold allows the rate of generation to be slowed down.
-        1 means every sample gets a new value, 2 means every second sample does etc.`
+        1 means every sample gets a new value, 2 means every second sample does etc.
+        Values less than 1 mean new samples are never generated.
+        The next value trigger parameter causes 1 new sample to be generated when its value becomes positive.
+        Its value must become 0 or less before it will trigger a new sample again
+        ie. connecting an oscillator running at 440hz will cause new samples to be generated at 220hz.`
       },
       [],
       [
@@ -275,6 +281,15 @@ export class AudioGraphService {
           maxValue: this.parameterMax(sampleHold),
           minValue: this.parameterMin(sampleHold),
           value: sampleHold.value,
+          stepSize: 1
+        },
+        {
+          moduleId: id,
+          sources: [],
+          name: 'next value trigger',
+          maxValue: this.parameterMax(nextValueTrigger),
+          minValue: this.parameterMin(nextValueTrigger),
+          value: nextValueTrigger.value,
           stepSize: 1
         },
         {
