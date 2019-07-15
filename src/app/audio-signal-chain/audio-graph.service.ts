@@ -246,7 +246,7 @@ export class AudioGraphService {
         Values less than 1 mean new samples are never generated.
         The next value trigger parameter causes 1 new sample to be generated when its value becomes positive.
         Its value must become 0 or less before it will trigger a new sample again
-        ie. connecting an oscillator running at 440hz will cause new samples to be generated at 220hz.`
+        ie. connecting an oscillator running at 440Hz will cause new samples to be generated at 440 times a second.`
       },
       [],
       [
