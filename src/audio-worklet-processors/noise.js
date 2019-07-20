@@ -47,8 +47,6 @@ registerProcessor(
         {
           name: 'nextValueTrigger',
           defaultValue: 0,
-          minValue: 0,
-          maxValue: 1,
           automationRate: 'a-rate'
         }
       ];
