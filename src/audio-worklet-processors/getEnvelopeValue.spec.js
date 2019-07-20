@@ -78,7 +78,7 @@ describe('linear envelope generator', () => {
     [10, allStagesHaveTimeState, 0.2, 'attack', 0, 'release'],
     [10, skipAttackState, 0.1, 'attack', 1, 'decay']
   ])(
-    'transitions to the correct state. sample rate: %f, start state: %j, seconds since trigger on: %f, seconds since trigger off: %f, start stage: %s, trigger value: %f, expected stage: %s',
+    'transitions to the correct state. sample rate: %f, start state: %j, seconds since state transition: %f, start stage: %s, trigger value: %f, expected stage: %s',
     (
       sampleRate,
       state,
