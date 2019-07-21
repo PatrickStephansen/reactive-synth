@@ -9,15 +9,16 @@ export const getEnvelopeValue = (
   triggerValue
 ) => {
   let outputStage;
+  const sampleTime = 1 / sampleRate;
   if (stage === 'rest') {
     if (triggerValue <= 0) {
       outputStage = 'rest';
     } else {
-      if (attackTime) {
+      if (sampleTime < attackTime) {
         outputStage = 'attack';
-      } else if (holdTime) {
+      } else if (sampleTime - attackTime < holdTime) {
         outputStage = 'hold';
-      } else if (decayTime) {
+      } else if (sampleTime - attackTime - holdTime < decayTime) {
         outputStage = 'decay';
       } else {
         outputStage = 'sustain';
@@ -32,13 +33,13 @@ export const getEnvelopeValue = (
         outputStage = 'rest';
       }
     } else {
-      if (secondsSinceStateTransition < attackTime) {
+      if (secondsSinceStateTransition + sampleTime < attackTime) {
         outputStage = 'attack';
-      } else if (secondsSinceStateTransition - attackTime < holdTime) {
+      } else if (secondsSinceStateTransition + sampleTime - attackTime < holdTime) {
         outputStage = 'hold';
       } else if (
-        secondsSinceStateTransition - attackTime <
-        holdTime + decayTime
+        secondsSinceStateTransition + sampleTime - attackTime - holdTime <
+        decayTime
       ) {
         outputStage = 'decay';
       } else {
@@ -54,9 +55,9 @@ export const getEnvelopeValue = (
         outputStage = 'rest';
       }
     } else {
-      if (secondsSinceStateTransition < holdTime) {
+      if (secondsSinceStateTransition + sampleTime < holdTime) {
         outputStage = 'hold';
-      } else if (secondsSinceStateTransition - holdTime < decayTime) {
+      } else if (secondsSinceStateTransition + sampleTime - holdTime < decayTime) {
         outputStage = 'decay';
       } else {
         outputStage = 'sustain';
@@ -71,7 +72,7 @@ export const getEnvelopeValue = (
         outputStage = 'rest';
       }
     } else {
-      if (secondsSinceStateTransition < decayTime) {
+      if (secondsSinceStateTransition + sampleTime < decayTime) {
         outputStage = 'decay';
       } else {
         outputStage = 'sustain';
@@ -91,7 +92,7 @@ export const getEnvelopeValue = (
   }
   if (stage === 'release') {
     if (triggerValue <= 0) {
-      if (secondsSinceStateTransition < releaseTime) {
+      if (secondsSinceStateTransition + sampleTime < releaseTime) {
         outputStage = 'release';
       } else {
         outputStage = 'rest';
