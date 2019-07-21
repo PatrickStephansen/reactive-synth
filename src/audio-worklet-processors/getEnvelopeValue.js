@@ -9,23 +9,28 @@ export const getEnvelopeValue = (
   stage,
   triggerValue
 ) => {
-  let outputStage;
   const sampleTime = 1 / sampleRate;
-  let secondsSinceStateTransitionOutput =
-    secondsSinceStateTransition + sampleTime;
+  let outputStage;
+  let secondsSinceStateTransitionOutput;
+  let stageProgressOutput = 0;
   if (stage === 'rest') {
     if (triggerValue <= 0) {
       outputStage = 'rest';
+      secondsSinceStateTransitionOutput =
+        secondsSinceStateTransition + sampleTime;
     } else {
       if (sampleTime < attackTime) {
         outputStage = 'attack';
         secondsSinceStateTransitionOutput = sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / attackTime;
       } else if (sampleTime - attackTime < holdTime) {
         outputStage = 'hold';
         secondsSinceStateTransitionOutput = sampleTime - attackTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / holdTime;
       } else if (sampleTime - attackTime - holdTime < decayTime) {
         outputStage = 'decay';
         secondsSinceStateTransitionOutput = sampleTime - attackTime - holdTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / decayTime;
       } else {
         outputStage = 'sustain';
         secondsSinceStateTransitionOutput =
@@ -38,6 +43,7 @@ export const getEnvelopeValue = (
       if (sampleTime < releaseTime) {
         outputStage = 'release';
         secondsSinceStateTransitionOutput = sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / releaseTime;
       } else {
         outputStage = 'rest';
         secondsSinceStateTransitionOutput = sampleTime - releaseTime;
@@ -45,6 +51,9 @@ export const getEnvelopeValue = (
     } else {
       if (secondsSinceStateTransition + sampleTime < attackTime) {
         outputStage = 'attack';
+        secondsSinceStateTransitionOutput =
+          secondsSinceStateTransition + sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / attackTime;
       } else if (
         secondsSinceStateTransition + sampleTime - attackTime <
         holdTime
@@ -52,6 +61,7 @@ export const getEnvelopeValue = (
         outputStage = 'hold';
         secondsSinceStateTransitionOutput =
           secondsSinceStateTransition + sampleTime - attackTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / holdTime;
       } else if (
         secondsSinceStateTransition + sampleTime - attackTime - holdTime <
         decayTime
@@ -59,6 +69,7 @@ export const getEnvelopeValue = (
         outputStage = 'decay';
         secondsSinceStateTransitionOutput =
           secondsSinceStateTransition + sampleTime - attackTime - holdTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / decayTime;
       } else {
         outputStage = 'sustain';
         secondsSinceStateTransitionOutput =
@@ -75,6 +86,7 @@ export const getEnvelopeValue = (
       if (sampleTime < releaseTime) {
         outputStage = 'release';
         secondsSinceStateTransitionOutput = sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / releaseTime;
       } else {
         outputStage = 'rest';
         secondsSinceStateTransitionOutput = sampleTime - releaseTime;
@@ -82,6 +94,9 @@ export const getEnvelopeValue = (
     } else {
       if (secondsSinceStateTransition + sampleTime < holdTime) {
         outputStage = 'hold';
+        secondsSinceStateTransitionOutput =
+          secondsSinceStateTransition + sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / holdTime;
       } else if (
         secondsSinceStateTransition + sampleTime - holdTime <
         decayTime
@@ -89,6 +104,7 @@ export const getEnvelopeValue = (
         outputStage = 'decay';
         secondsSinceStateTransitionOutput =
           secondsSinceStateTransition + sampleTime - holdTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / decayTime;
       } else {
         outputStage = 'sustain';
         secondsSinceStateTransitionOutput =
@@ -101,6 +117,7 @@ export const getEnvelopeValue = (
       if (sampleTime < releaseTime) {
         outputStage = 'release';
         secondsSinceStateTransitionOutput = sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / releaseTime;
       } else {
         outputStage = 'rest';
         secondsSinceStateTransitionOutput = sampleTime - releaseTime;
@@ -108,6 +125,9 @@ export const getEnvelopeValue = (
     } else {
       if (secondsSinceStateTransition + sampleTime < decayTime) {
         outputStage = 'decay';
+        secondsSinceStateTransitionOutput =
+          secondsSinceStateTransition + sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / decayTime;
       } else {
         outputStage = 'sustain';
         secondsSinceStateTransitionOutput =
@@ -120,18 +140,24 @@ export const getEnvelopeValue = (
       if (sampleTime < releaseTime) {
         outputStage = 'release';
         secondsSinceStateTransitionOutput = sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / releaseTime;
       } else {
         outputStage = 'rest';
         secondsSinceStateTransitionOutput = sampleTime - releaseTime;
       }
     } else {
       outputStage = 'sustain';
+      secondsSinceStateTransitionOutput =
+        secondsSinceStateTransition + sampleTime;
     }
   }
   if (stage === 'release') {
     if (triggerValue <= 0) {
       if (secondsSinceStateTransition + sampleTime < releaseTime) {
         outputStage = 'release';
+        secondsSinceStateTransitionOutput =
+          secondsSinceStateTransition + sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / releaseTime;
       } else {
         outputStage = 'rest';
         secondsSinceStateTransitionOutput =
@@ -141,12 +167,15 @@ export const getEnvelopeValue = (
       if (sampleTime < attackTime) {
         outputStage = 'attack';
         secondsSinceStateTransitionOutput = sampleTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / attackTime;
       } else if (sampleTime - attackTime < holdTime) {
         outputStage = 'hold';
         secondsSinceStateTransitionOutput = sampleTime - attackTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / holdTime;
       } else if (sampleTime - attackTime - holdTime < decayTime) {
         outputStage = 'decay';
         secondsSinceStateTransitionOutput = sampleTime - attackTime - holdTime;
+        stageProgressOutput = secondsSinceStateTransitionOutput / decayTime;
       } else {
         outputStage = 'sustain';
         secondsSinceStateTransitionOutput =
@@ -156,7 +185,7 @@ export const getEnvelopeValue = (
   }
   return {
     stage: outputStage,
-    stageProgress: undefined,
+    stageProgress: stageProgressOutput,
     secondsSinceStateTransition: secondsSinceStateTransitionOutput,
     outputValue: undefined
   };
