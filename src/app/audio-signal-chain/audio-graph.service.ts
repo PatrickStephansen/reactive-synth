@@ -308,7 +308,7 @@ export class AudioGraphService {
     this.graph.set(id, {
       internalNodes: [envelopeGeneratorNode, outputGain],
       outputMap: new Map([['output', outputGain]]),
-      inputMap: new Map([['input', envelopeGeneratorNode]]),
+      inputMap: new Map([['trigger input', envelopeGeneratorNode]]),
       parameterMap: new Map([
         ['attack value', attackValue],
         ['attack time', attackTime],
@@ -337,7 +337,7 @@ export class AudioGraphService {
       },
       [
         {
-          name: 'input',
+          name: 'trigger input',
           moduleId: id,
           sources: []
         }

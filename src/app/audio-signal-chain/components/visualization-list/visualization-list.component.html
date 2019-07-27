@@ -1,7 +1,7 @@
 <ng-container
   *ngFor="let visualization of visualizations; trackBy: getVisualizationIdentity"
 >
-  <app-line-graph-visualization
+  <app-line-graph-visualization *ngIf="visualization.visualizationType === 'line-graph'"
     [visualization]="visualization"
     (toggleActive)="toggleActive.emit($event)"
   ></app-line-graph-visualization>
