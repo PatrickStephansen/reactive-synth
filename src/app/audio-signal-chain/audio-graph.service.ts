@@ -41,10 +41,7 @@ export class AudioGraphService {
 
   private defaultGain = 0.1;
 
-  private createModuleMap: Map<
-    AudioModuleType,
-    (id: string) => CreateModuleResult
-  >;
+  private createModuleMap: Map<AudioModuleType, (id: string) => CreateModuleResult>;
 
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
@@ -57,10 +54,7 @@ export class AudioGraphService {
   constructor(private locationService: Location) {
     this.createModuleMap = new Map([
       [AudioModuleType.Oscillator, id => this.createOscillator(id)],
-      [
-        AudioModuleType.BitCrusher,
-        id => this.createBitCrusherFixedPointModule(id)
-      ],
+      [AudioModuleType.BitCrusher, id => this.createBitCrusherFixedPointModule(id)],
       [AudioModuleType.ConstantSource, id => this.createConstantSource(id)],
       [AudioModuleType.Delay, id => this.createDelayModule(id)],
       [AudioModuleType.Distortion, id => this.createDistortionModule(id)],
@@ -69,6 +63,7 @@ export class AudioGraphService {
       [AudioModuleType.InverseGain, id => this.createInverseGainModule(id)],
       [AudioModuleType.NoiseGenerator, id => this.createNoiseGenerator(id)],
       [AudioModuleType.Rectifier, id => this.createRectifierModule(id)],
+      [AudioModuleType.EnvelopeGenerator, id => this.createEnvelopeGeneratorModule(id)],
       [AudioModuleType.Output, id => null]
     ]);
   }
@@ -89,15 +84,11 @@ export class AudioGraphService {
   }
 
   unmute(): Promise<void> {
-    return this.context
-      ? this.context.resume()
-      : Promise.reject('No audio context to resume');
+    return this.context ? this.context.resume() : Promise.reject('No audio context to resume');
   }
 
   mute(): Promise<void> {
-    return this.context
-      ? this.context.suspend()
-      : Promise.reject('No audio context to suspend');
+    return this.context ? this.context.suspend() : Promise.reject('No audio context to suspend');
   }
 
   resetGraph(): Promise<AudioSignalChainState> {
@@ -125,9 +116,7 @@ export class AudioGraphService {
       ]);
       return this.context.audioWorklet
         .addModule(
-          this.locationService.prepareExternalUrl(
-            '/assets/audio-worklet-processors/worklets.js'
-          )
+          this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/worklets.js')
         )
         .then(() => ({
           modules: [
@@ -157,13 +146,9 @@ export class AudioGraphService {
               dataLength: visualizer.fftSize,
               visualizationType: 'line-graph',
               visualizationStage: ModuleSignalStage.input,
-              renderingStrategyPerAxis: [
-                linearScalingStrategy,
-                linearScalingStrategy
-              ],
+              renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
               isActive: true,
-              getVisualizationData: data =>
-                visualizer.getByteTimeDomainData(data)
+              getVisualizationData: data => visualizer.getByteTimeDomainData(data)
             },
             {
               moduleId: 'Output to Speakers',
@@ -171,13 +156,9 @@ export class AudioGraphService {
               dataLength: visualizer.frequencyBinCount,
               visualizationType: 'line-graph',
               visualizationStage: ModuleSignalStage.input,
-              renderingStrategyPerAxis: [
-                logarithmicScalingStrategy,
-                linearScalingStrategy
-              ],
+              renderingStrategyPerAxis: [logarithmicScalingStrategy, linearScalingStrategy],
               isActive: false,
-              getVisualizationData: data =>
-                visualizer.getByteFrequencyData(data)
+              getVisualizationData: data => visualizer.getByteFrequencyData(data)
             },
             {
               moduleId: 'Output to Speakers',
@@ -185,13 +166,9 @@ export class AudioGraphService {
               dataLength: visualizer.frequencyBinCount,
               visualizationType: 'line-graph',
               visualizationStage: ModuleSignalStage.input,
-              renderingStrategyPerAxis: [
-                linearScalingStrategy,
-                linearScalingStrategy
-              ],
+              renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
               isActive: false,
-              getVisualizationData: data =>
-                visualizer.getByteFrequencyData(data)
+              getVisualizationData: data => visualizer.getByteFrequencyData(data)
             }
           ],
           muted: this.context.state && this.context.state === 'suspended',
@@ -306,6 +283,132 @@ export class AudioGraphService {
     );
   }
 
+  createEnvelopeGeneratorModule(id?: string): CreateModuleResult {
+    const moduleType = AudioModuleType.EnvelopeGenerator;
+    id = this.createModuleId(moduleType, id);
+    const envelopeGeneratorNode = new AudioWorkletNode(this.context, 'envelope-generator', {
+      numberOfInputs: 1,
+      numberOfOutputs: 1,
+      channelCount: 1,
+      channelCountMode: 'explicit',
+      outputChannelCount: [1]
+    });
+
+    const attackValue = envelopeGeneratorNode.parameters.get('attackValue');
+    const attackTime = envelopeGeneratorNode.parameters.get('attackTime');
+    const holdTime = envelopeGeneratorNode.parameters.get('holdTime');
+    const decayTime = envelopeGeneratorNode.parameters.get('decayTime');
+    const sustainValue = envelopeGeneratorNode.parameters.get('sustainValue');
+    const releaseTime = envelopeGeneratorNode.parameters.get('releaseTime');
+
+    const outputGain = this.context.createGain();
+    outputGain.gain.value = this.defaultGain;
+    envelopeGeneratorNode.connect(outputGain);
+
+    this.graph.set(id, {
+      internalNodes: [envelopeGeneratorNode, outputGain],
+      outputMap: new Map([['output', outputGain]]),
+      inputMap: new Map([['input', envelopeGeneratorNode]]),
+      parameterMap: new Map([
+        ['attack value', attackValue],
+        ['attack time', attackTime],
+        ['hold time', holdTime],
+        ['decay time', decayTime],
+        ['sustain value', sustainValue],
+        ['release time', releaseTime],
+        ['output gain', outputGain.gain]
+      ])
+    });
+
+    return new CreateModuleResult(
+      {
+        id,
+        moduleType,
+        canDelete: true,
+        helpText: ``
+      },
+      [
+        {
+          name: 'input',
+          moduleId: id,
+          sources: []
+        }
+      ],
+      [
+        {
+          name: 'output',
+          moduleId: id
+        }
+      ],
+      [
+        {
+          name: 'attack value',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(attackValue),
+          minValue: this.parameterMin(attackValue),
+          stepSize: 0.01,
+          value: attackValue.defaultValue
+        },
+        {
+          name: 'attack time',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(attackTime),
+          minValue: this.parameterMin(attackTime),
+          stepSize: 0.01,
+          value: attackTime.defaultValue
+        },
+        {
+          name: 'hold time',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(holdTime),
+          minValue: this.parameterMin(holdTime),
+          stepSize: 0.01,
+          value: holdTime.defaultValue
+        },
+        {
+          name: 'decay time',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(decayTime),
+          minValue: this.parameterMin(decayTime),
+          stepSize: 0.01,
+          value: decayTime.defaultValue
+        },
+        {
+          name: 'sustain value',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(sustainValue),
+          minValue: this.parameterMin(sustainValue),
+          stepSize: 0.01,
+          value: sustainValue.defaultValue
+        },
+        {
+          name: 'release time',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(releaseTime),
+          minValue: this.parameterMin(releaseTime),
+          stepSize: 0.01,
+          value: releaseTime.defaultValue
+        },
+        {
+          name: 'output gain',
+          moduleId: id,
+          sources: [],
+          maxValue: this.parameterMax(outputGain.gain),
+          minValue: this.parameterMin(outputGain.gain),
+          stepSize: 0.01,
+          value: this.defaultGain
+        },
+      ],
+      []
+    );
+  }
+
   createOscillator(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Oscillator;
     id = this.createModuleId(moduleType, id);
@@ -322,9 +425,7 @@ export class AudioGraphService {
         ['detune', oscillator.detune],
         ['output gain', volumeControl.gain]
       ]),
-      choiceMap: new Map([
-        ['waveform', waveForm => (oscillator.type = waveForm)]
-      ])
+      choiceMap: new Map([['waveform', waveForm => (oscillator.type = waveForm)]])
     };
     this.graph.set(id, moduleImplementation);
     return new CreateModuleResult(
@@ -501,12 +602,8 @@ export class AudioGraphService {
           name: fallBackValueKey,
           moduleId: id,
           sources: [],
-          maxValue: this.parameterMax(
-            inverseGain.parameters.get('zeroDivisorFallback')
-          ),
-          minValue: this.parameterMin(
-            inverseGain.parameters.get('zeroDivisorFallback')
-          ),
+          maxValue: this.parameterMax(inverseGain.parameters.get('zeroDivisorFallback')),
+          minValue: this.parameterMin(inverseGain.parameters.get('zeroDivisorFallback')),
           stepSize: 0.01,
           value: inverseGain.parameters.get('zeroDivisorFallback').value
         }
@@ -518,18 +615,14 @@ export class AudioGraphService {
   createBitCrusherFixedPointModule(id?: string): CreateModuleResult {
     const moduleType = AudioModuleType.BitCrusher;
     id = this.createModuleId(moduleType, id);
-    const crusher = new AudioWorkletNode(
-      this.context,
-      'bit-crusher-fixed-point',
-      {
-        numberOfInputs: 1,
-        numberOfOutputs: 1,
-        channelCount: 2,
-        channelCountMode: 'explicit',
-        outputChannelCount: [2],
-        channelInterpretation: 'speakers'
-      }
-    );
+    const crusher = new AudioWorkletNode(this.context, 'bit-crusher-fixed-point', {
+      numberOfInputs: 1,
+      numberOfOutputs: 1,
+      channelCount: 2,
+      channelCountMode: 'explicit',
+      outputChannelCount: [2],
+      channelInterpretation: 'speakers'
+    });
     const bitDepthParameterKey = 'bit depth';
     const bitDepthParameter = crusher.parameters.get('bitDepth');
     const volumeControl = this.context.createGain();
@@ -683,10 +776,7 @@ export class AudioGraphService {
         ['detune', filter.detune]
       ]),
       choiceMap: new Map([
-        [
-          'filter type',
-          filterType => (filter.type = filterType as TBiquadFilterType)
-        ]
+        ['filter type', filterType => (filter.type = filterType as TBiquadFilterType)]
       ])
     });
     return new CreateModuleResult(
@@ -821,10 +911,7 @@ export class AudioGraphService {
     rectifier.connect(outputGain);
     this.graph.set(id, {
       internalNodes: [inputGain, rectifier, outputGain],
-      parameterMap: new Map([
-        ['input gain', inputGain.gain],
-        ['output gain', outputGain.gain]
-      ]),
+      parameterMap: new Map([['input gain', inputGain.gain], ['output gain', outputGain.gain]]),
       inputMap: new Map([['input', inputGain]]),
       outputMap: new Map([['output', outputGain]])
     });
@@ -931,19 +1018,11 @@ export class AudioGraphService {
       this.graph.get(destinationId).inputMap &&
       this.graph.get(destinationId).inputMap.has(destinationInputName)
     ) {
-      const sourceNode = this.graph
-        .get(sourceId)
-        .outputMap.get(sourceOutputName);
-      const destinationNode = this.graph
-        .get(destinationId)
-        .inputMap.get(destinationInputName);
+      const sourceNode = this.graph.get(sourceId).outputMap.get(sourceOutputName);
+      const destinationNode = this.graph.get(destinationId).inputMap.get(destinationInputName);
       sourceNode.connect(destinationNode);
     } else {
-      console.warn(
-        'attempted to connect modules that do not exist',
-        sourceId,
-        destinationId
-      );
+      console.warn('attempted to connect modules that do not exist', sourceId, destinationId);
     }
   }
 
@@ -961,12 +1040,8 @@ export class AudioGraphService {
       this.graph.get(destinationId).inputMap &&
       this.graph.get(destinationId).inputMap.has(destinationInputName)
     ) {
-      const sourceNode = this.graph
-        .get(sourceId)
-        .outputMap.get(sourceOutputName);
-      const destinationNode = this.graph
-        .get(destinationId)
-        .inputMap.get(destinationInputName);
+      const sourceNode = this.graph.get(sourceId).outputMap.get(sourceOutputName);
+      const destinationNode = this.graph.get(destinationId).inputMap.get(destinationInputName);
       sourceNode.disconnect(destinationNode);
     }
   }
@@ -975,22 +1050,16 @@ export class AudioGraphService {
     if (
       this.graph.has(event.sourceModuleId) &&
       this.graph.get(event.sourceModuleId).outputMap &&
-      this.graph
-        .get(event.sourceModuleId)
-        .outputMap.has(event.sourceOutputName) &&
+      this.graph.get(event.sourceModuleId).outputMap.has(event.sourceOutputName) &&
       this.graph.has(event.destinationModuleId) &&
       this.graph.get(event.destinationModuleId).parameterMap &&
-      this.graph
-        .get(event.destinationModuleId)
-        .parameterMap.has(event.destinationParameterName)
+      this.graph.get(event.destinationModuleId).parameterMap.has(event.destinationParameterName)
     ) {
       this.graph
         .get(event.sourceModuleId)
         .outputMap.get(event.sourceOutputName)
         .connect(
-          this.graph
-            .get(event.destinationModuleId)
-            .parameterMap.get(event.destinationParameterName)
+          this.graph.get(event.destinationModuleId).parameterMap.get(event.destinationParameterName)
         );
     } else {
       console.warn(
@@ -1007,22 +1076,16 @@ export class AudioGraphService {
     if (
       this.graph.has(event.sourceModuleId) &&
       this.graph.get(event.sourceModuleId).outputMap &&
-      this.graph
-        .get(event.sourceModuleId)
-        .outputMap.has(event.sourceOutputName) &&
+      this.graph.get(event.sourceModuleId).outputMap.has(event.sourceOutputName) &&
       this.graph.has(event.destinationModuleId) &&
       this.graph.get(event.destinationModuleId).parameterMap &&
-      this.graph
-        .get(event.destinationModuleId)
-        .parameterMap.has(event.destinationParameterName)
+      this.graph.get(event.destinationModuleId).parameterMap.has(event.destinationParameterName)
     ) {
       this.graph
         .get(event.sourceModuleId)
         .outputMap.get(event.sourceOutputName)
         .disconnect(
-          this.graph
-            .get(event.destinationModuleId)
-            .parameterMap.get(event.destinationParameterName)
+          this.graph.get(event.destinationModuleId).parameterMap.get(event.destinationParameterName)
         );
     }
   }
@@ -1037,11 +1100,7 @@ export class AudioGraphService {
       const param = this.graph.get(moduleId).parameterMap.get(parameterName);
       if (param && param.setTargetAtTime && !setImmediately) {
         // don't change immediately as an anti-pop precaution
-        param.setTargetAtTime(
-          value,
-          this.context.currentTime,
-          setImmediately ? 0 : 0.005
-        );
+        param.setTargetAtTime(value, this.context.currentTime, setImmediately ? 0 : 0.005);
       } else {
         param.value = value;
       }

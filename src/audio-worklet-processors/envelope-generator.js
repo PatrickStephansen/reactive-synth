@@ -53,7 +53,7 @@ registerProcessor(
     constructor(options) {
       super(options);
       this.stages = ['rest', 'attack', 'hold', 'decay', 'sustain', 'release'];
-      this.stage = stages[0];
+      this.stage = this.stages[0];
       // stageProgress advances from 0 to 1 to show progress of stage
       this.stageProgress = 0;
       this.secondsSinceStateTransition = 0;
@@ -68,6 +68,7 @@ registerProcessor(
       };
       this.sampleRate = options.sampleRate || 44100;
       this.outputValue;
+      this.valueOnRelease = undefined;
     }
 
     handleMessage(event) {
@@ -110,12 +111,14 @@ registerProcessor(
           this.state,
           this.secondsSinceStateTransition,
           this.stage,
-          inputSample
+          inputSample,
+          this.valueOnRelease
         );
         this.stage = envelopeValue.stage;
         this.stageProgress = envelopeValue.stageProgress;
         this.secondsSinceStateTransition = envelopeValue.secondsSinceStateTransition;
         this.outputValue = envelopeValue.outputValue;
+        this.valueOnRelease = envelopeValue.valueOnRelease;
 
         for (
           let channelIndex = 0;

@@ -66,4 +66,7 @@ export class AudioModuleListComponent implements OnInit {
   createRectifierModule() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.Rectifier));
   }
+  createEnvelopeGeneratorModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.EnvelopeGenerator));
+  }
 }

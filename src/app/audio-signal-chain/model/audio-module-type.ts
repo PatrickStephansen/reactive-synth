@@ -8,6 +8,7 @@ export enum AudioModuleType {
   Filter = 'filter',
   Distortion = 'distortion',
   Rectifier = 'rectifier',
+  EnvelopeGenerator = 'envelope',
   ConstantSource = 'constant',
   Output = 'output'
 }
