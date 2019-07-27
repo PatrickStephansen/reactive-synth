@@ -31,6 +31,7 @@
     "@ngrx/store-devtools": "^8.1.0",
     "bulma": "^0.7.5",
     "core-js": "^2.6.9",
+    "ng-click-outside": "^4.0.0",
     "ramda": "^0.26.1",
     "rxjs": "~6.5.2",
     "standardized-audio-context": "^19.1.1",

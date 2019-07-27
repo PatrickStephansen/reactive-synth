@@ -1,15 +1,5 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-  SimpleChanges
-} from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { path } from 'ramda';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { distinctUntilChanged , throttleTime} from 'rxjs/operators';
 
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
@@ -21,7 +11,7 @@ import { AudioModuleOutput } from '../../model/audio-module-output';
   templateUrl: './parameter.component.html',
   styleUrls: ['./parameter.component.scss']
 })
-export class ParameterComponent implements OnInit, OnChanges {
+export class ParameterComponent implements OnInit {
   @Input() parameter: Parameter;
   @Input() availableSources: AudioModuleOutput[];
 
@@ -29,34 +19,25 @@ export class ParameterComponent implements OnInit, OnChanges {
   @Output() connectSource = new EventEmitter<ConnectParameterEvent>();
   @Output() disconnectSource = new EventEmitter<ConnectParameterEvent>();
 
-  parameterForm: FormGroup;
+  addInputsId: string;
+  isSourceListOpen = false;
+  parameterChanged = new EventEmitter<number>();
+  @ViewChild('parameterValue', { static: true })
+  parameterFormValue;
 
-  constructor(private fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
-    this.parameterForm = this.fb.group({
-      parameterValue: [
-        this.parameter.value + '',
-        [
-          Validators.required,
-          Validators.max(this.parameter.maxValue),
-          Validators.min(this.parameter.minValue)
-        ]
-      ],
-      selectedSource: ['', Validators.required]
-    });
+    this.addInputsId = `add-input-${this.parameter.moduleId}-${this.parameter.name}`;
 
-    this.parameterForm.valueChanges
+    this.parameterChanged
       .pipe(
-        distinctUntilChanged(
-          (oldForm, newForm) =>
-            oldForm.parameterValue === newForm.parameterValue
-        )
+        distinctUntilChanged(),
+        throttleTime(100)
       )
-      .subscribe(({ parameterValue }) => {
+      .subscribe(parameterValue => {
         if (
-          this.parameterForm.controls.parameterValue.valid &&
-          this.parameterForm.dirty
+          this.parameterFormValue.valid
         ) {
           this.updateParameterValue.emit({
             moduleId: this.parameter.moduleId,
@@ -67,34 +48,7 @@ export class ParameterComponent implements OnInit, OnChanges {
       });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const currentValue = path(['parameter', 'currentValue', 'value'], changes);
-    const previousValue = path(
-      ['parameter', 'previousValue', 'value'],
-      changes
-    );
-    if (this.parameterForm && currentValue !== previousValue) {
-      this.parameterForm.patchValue({
-        parameterValue: changes.parameter.currentValue.value + ''
-      });
-    }
-  }
-
-  connectParameterToSource() {
-    if (this.parameterForm.valid) {
-      const formValue = this.parameterForm.value;
-
-      this.connectSource.emit({
-        sourceModuleId: formValue.selectedSource.split('~')[0],
-        sourceOutputName: formValue.selectedSource.split('~')[1],
-        destinationModuleId: this.parameter.moduleId,
-        destinationParameterName: this.parameter.name
-      });
-      this.parameterForm.patchValue({ selectedSource: '' });
-    }
-  }
-
-  disconnectParameterFromSource(source) {
+  disconnectFromSource(source) {
     this.disconnectSource.emit({
       sourceModuleId: source.moduleId,
       sourceOutputName: source.name,
@@ -103,7 +57,23 @@ export class ParameterComponent implements OnInit, OnChanges {
     });
   }
 
-  get parameterValue() {
-    return this.parameterForm.get('parameterValue');
+  toggleSourceList() {
+    this.isSourceListOpen = !this.isSourceListOpen;
+  }
+
+  closeSourceList() {
+    this.isSourceListOpen = false;
+  }
+
+  connectToSource(source: AudioModuleOutput) {
+    if (source.name && source.moduleId) {
+      this.connectSource.emit({
+        sourceModuleId: source.moduleId,
+        sourceOutputName: source.name,
+        destinationModuleId: this.parameter.moduleId,
+        destinationParameterName: this.parameter.name
+      });
+      this.toggleSourceList();
+    }
   }
 }
