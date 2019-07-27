@@ -325,7 +325,15 @@ export class AudioGraphService {
         id,
         moduleType,
         canDelete: true,
-        helpText: ``
+        helpText: `Creates an AHDSR envelope which reponds to trigger inputs.
+        When the trigger value goes above 0 the attack stage starts.
+        In the attack stage, the output value moves linearly from 0 to the attack value parameter value
+        over a period of time given by the attack time.
+        The attack value is then output for the hold time before starting the decay stage.
+        The decay stage moves the output linearly towards the sustain value for the duration of the decay time.
+        The sustain stage lasts indefinitely as long as the trigger value stays high, ouputing the sustain value.
+        When the trigger value falls to 0 or below, the output value moves linearly towards 0 over the release time
+        regardless of which phase the envelope was in.`
       },
       [
         {
@@ -352,6 +360,7 @@ export class AudioGraphService {
         },
         {
           name: 'attack time',
+          units: 'seconds',
           moduleId: id,
           sources: [],
           maxValue: this.parameterMax(attackTime),
@@ -361,6 +370,7 @@ export class AudioGraphService {
         },
         {
           name: 'hold time',
+          units: 'seconds',
           moduleId: id,
           sources: [],
           maxValue: this.parameterMax(holdTime),
@@ -370,6 +380,7 @@ export class AudioGraphService {
         },
         {
           name: 'decay time',
+          units: 'seconds',
           moduleId: id,
           sources: [],
           maxValue: this.parameterMax(decayTime),
@@ -388,6 +399,7 @@ export class AudioGraphService {
         },
         {
           name: 'release time',
+          units: 'seconds',
           moduleId: id,
           sources: [],
           maxValue: this.parameterMax(releaseTime),
