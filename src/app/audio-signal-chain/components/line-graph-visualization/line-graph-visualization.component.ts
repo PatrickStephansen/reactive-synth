@@ -26,7 +26,7 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges {
   @Output() toggleActive = new EventEmitter<ChangeVisualizationActiveEvent>();
 
   private visualizationData: Uint8Array;
-  @ViewChild('lineGraphCanvas')
+  @ViewChild('lineGraphCanvas', { static: true })
   private canvasRef: ElementRef;
   private canvas: HTMLCanvasElement;
   private drawingContext: CanvasRenderingContext2D;
