@@ -24,6 +24,10 @@ export class ParameterComponent implements OnInit {
   parameterChanged = new EventEmitter<number>();
   @ViewChild('parameterValue', { static: true })
   parameterFormValue;
+  @ViewChild('dropdown', { static: true })
+  dropdown;
+
+  isDropdownUp = false;
 
   constructor() {}
 
@@ -46,6 +50,12 @@ export class ParameterComponent implements OnInit {
       });
   }
 
+  setDropdownPlacement() {
+    this.dropdown.nativeElement.getBoundingClientRect().top / window['visualViewport'].height > 0.5
+      ? (this.isDropdownUp = true)
+      : (this.isDropdownUp = false);
+  }
+
   disconnectFromSource(source) {
     this.disconnectSource.emit({
       sourceModuleId: source.moduleId,
@@ -56,6 +66,7 @@ export class ParameterComponent implements OnInit {
   }
 
   toggleSourceList() {
+    this.setDropdownPlacement();
     this.isSourceListOpen = !this.isSourceListOpen;
   }
 

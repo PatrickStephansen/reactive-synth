@@ -22,8 +22,9 @@
         </div>
         <div class="control">
           <div
+            #dropdown
             class="dropdown is-right"
-            [ngClass]="{ 'is-active': isSourceListOpen }"
+            [ngClass]="{ 'is-active': isSourceListOpen, 'is-up': isDropdownUp }"
             (clickOutside)="closeSourceList()"
           >
             <div class="dropdown-trigger">
