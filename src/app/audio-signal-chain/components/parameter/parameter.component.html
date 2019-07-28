@@ -47,14 +47,16 @@
                   No more sources available
                 </p>
 
-                <a
-                  href="javascript:void(0)"
-                  *ngFor="let sourceModuleOutput of availableSources"
-                  class="dropdown-item"
-                  (click)="connectToSource(sourceModuleOutput)"
-                >
-                  {{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
-                </a>
+                <div class="is-scrollable">
+                  <a
+                    href="javascript:void(0)"
+                    *ngFor="let sourceModuleOutput of availableSources"
+                    class="dropdown-item"
+                    (click)="connectToSource(sourceModuleOutput)"
+                  >
+                    {{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+                  </a>
+                </div>
               </div>
             </div>
           </div>

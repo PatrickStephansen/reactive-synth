@@ -1,3 +1,8 @@
 label .parameter-name {
   text-transform: capitalize;
 }
+
+.is-scrollable {
+  max-height: 170px;
+  overflow-y: auto;
+}
