@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { distinctUntilChanged , throttleTime} from 'rxjs/operators';
+import { distinctUntilChanged, sampleTime } from 'rxjs/operators';
 
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
@@ -33,12 +33,10 @@ export class ParameterComponent implements OnInit {
     this.parameterChanged
       .pipe(
         distinctUntilChanged(),
-        throttleTime(100)
+        sampleTime(100)
       )
       .subscribe(parameterValue => {
-        if (
-          this.parameterFormValue.valid
-        ) {
+        if (this.parameterFormValue.valid) {
           this.updateParameterValue.emit({
             moduleId: this.parameter.moduleId,
             parameterName: this.parameter.name,
