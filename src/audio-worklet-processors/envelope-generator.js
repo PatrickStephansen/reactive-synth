@@ -68,7 +68,7 @@ registerProcessor(
       };
       this.sampleRate = options.sampleRate || 44100;
       this.outputValue;
-      this.valueOnRelease = undefined;
+      this.valueOnTriggerChange = undefined;
     }
 
     handleMessage(event) {
@@ -112,13 +112,13 @@ registerProcessor(
           this.secondsSinceStateTransition,
           this.stage,
           inputSample,
-          this.valueOnRelease
+          this.valueOnTriggerChange
         );
         this.stage = envelopeValue.stage;
         this.stageProgress = envelopeValue.stageProgress;
         this.secondsSinceStateTransition = envelopeValue.secondsSinceStateTransition;
         this.outputValue = envelopeValue.outputValue;
-        this.valueOnRelease = envelopeValue.valueOnRelease;
+        this.valueOnTriggerChange = envelopeValue.valueOnTriggerChange;
 
         for (
           let channelIndex = 0;

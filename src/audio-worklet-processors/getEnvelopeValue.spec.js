@@ -91,8 +91,9 @@ describe('linear envelope generator', () => {
     ],
     [10, skipAttackHoldAndDecayState, 0, 'rest', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, allStagesHaveTimeState, 0, 'attack', 1, undefined, 'attack', 0.1, 0.5, undefined, 0.5],
+    [10, allStagesHaveTimeState, 0, 'attack', 1, 0.2, 'attack', 0.1, 0.5, 0.2, 0.6],
     [10, allStagesHaveTimeState, 0.1, 'attack', 1, undefined, 'hold', 0, 0, undefined, 1],
-    [10, allStagesHaveTimeState, 0.3, 'attack', 1, undefined, 'hold', 0.2, 1 / 3, undefined, 1],
+    [10, allStagesHaveTimeState, 0.3, 'attack', 1, undefined, 'hold', 0.2, 2 / 3, undefined, 1],
     [
       10,
       allStagesHaveTimeState,
@@ -101,10 +102,10 @@ describe('linear envelope generator', () => {
       1,
       undefined,
       'decay',
-      0.3,
-      3 / 7,
+      0.1,
+      1 / 7,
       undefined,
-      1 - 3 / 14
+      1 - 1 / 14
     ],
     [
       10,
@@ -135,7 +136,7 @@ describe('linear envelope generator', () => {
       1 - 2 / 14
     ],
     [2, allStagesHaveTimeState, 0, 'attack', 1, undefined, 'decay', 0, 0, undefined, 1],
-    [5, allStagesHaveTimeState, 1, 'attack', 1, undefined, 'sustain', 0.3, 0, undefined, 0.5],
+    [5, allStagesHaveTimeState, 1, 'attack', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [0.5, allStagesHaveTimeState, 0, 'attack', 1, undefined, 'sustain', 0.8, 0, undefined, 0.5],
     [
       10,
@@ -162,7 +163,7 @@ describe('linear envelope generator', () => {
       0.1,
       1 / 12,
       1 - 2 / 14,
-      1 - 2 / 14 - 1 / (12 * (1 - 2 / 14))
+      1 - 2 / 14 - (1 - 2 / 14) / 12
     ],
     [
       10,
@@ -180,24 +181,96 @@ describe('linear envelope generator', () => {
     [10, skipDecayState, 0.2, 'attack', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
     [10, skipHoldAndDecayState, 0.2, 'attack', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipHoldAndDecayState, 0.1, 'attack', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
-    [10, skipHoldAndDecayState, 0.2, 'attack', 0, undefined, 'release', 0.1, 1 / 12, 0.5, 0.5 - 1 / 24],
+    [
+      10,
+      skipHoldAndDecayState,
+      0.2,
+      'attack',
+      0,
+      undefined,
+      'release',
+      0.1,
+      1 / 12,
+      0.5,
+      0.5 - 1 / 24
+    ],
     [10, skipHoldState, 0.2, 'attack', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
     [10, skipReleaseState, 0.1, 'attack', 0, undefined, 'rest', 0.1, 0, undefined, 0],
     [10, skipAttackState, 0.1, 'attack', 1, undefined, 'hold', 0.2, 2 / 3, undefined, 1],
     [10, skipAttackState, 0.2, 'attack', 1, undefined, 'decay', 0, 0, undefined, 1],
-    [10, skipAttackState, 0.3, 'attack', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1-1/14],
+    [10, skipAttackState, 0.3, 'attack', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1 - 1 / 14],
     [10, skipAttackState, 0.9, 'attack', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, skipAttackState, 1, 'attack', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
-    [10, skipAttackAndHoldState, 0.1, 'attack', 1, undefined, 'decay', 0.2, 2 / 7, undefined, 1-2/14],
+    [
+      10,
+      skipAttackAndHoldState,
+      0.1,
+      'attack',
+      1,
+      undefined,
+      'decay',
+      0.2,
+      2 / 7,
+      undefined,
+      1 - 2 / 14
+    ],
     [10, skipAttackAndHoldState, 0.6, 'attack', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, skipAttackAndHoldState, 0.7, 'attack', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
-    [10, skipAttackHoldAndDecayState, 1.1, 'attack', 1, undefined, 'sustain', 1.2, 0, undefined, 0.5],
+    [
+      10,
+      skipAttackHoldAndDecayState,
+      1.1,
+      'attack',
+      1,
+      undefined,
+      'sustain',
+      1.2,
+      0,
+      undefined,
+      0.5
+    ],
     [10, allStagesHaveTimeState, 0.1, 'hold', 1, undefined, 'hold', 0.2, 2 / 3, undefined, 1],
     [10, allStagesHaveTimeState, 0.2, 'hold', 1, undefined, 'decay', 0, 0, undefined, 1],
-    [10, allStagesHaveTimeState, 0.3, 'hold', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1-1/14],
-    [10, allStagesHaveTimeState, 0.8, 'hold', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [
+      10,
+      allStagesHaveTimeState,
+      0.3,
+      'hold',
+      1,
+      undefined,
+      'decay',
+      0.1,
+      1 / 7,
+      undefined,
+      1 - 1 / 14
+    ],
+    [
+      10,
+      allStagesHaveTimeState,
+      0.8,
+      'hold',
+      1,
+      undefined,
+      'decay',
+      0.6,
+      6 / 7,
+      undefined,
+      1 - 6 / 14
+    ],
     [10, allStagesHaveTimeState, 0.9, 'hold', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
-    [10, skipAttackAndHoldState, 0, 'hold', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1-1/14],
+    [
+      10,
+      skipAttackAndHoldState,
+      0,
+      'hold',
+      1,
+      undefined,
+      'decay',
+      0.1,
+      1 / 7,
+      undefined,
+      1 - 1 / 14
+    ],
     [10, skipAttackAndHoldState, 0.6, 'hold', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, skipAttackAndHoldState, 0.7, 'hold', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipAttackHoldAndDecayState, 0, 'hold', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
@@ -205,11 +278,47 @@ describe('linear envelope generator', () => {
     [10, skipAttackState, 0.2, 'hold', 1, undefined, 'decay', 0, 0, undefined, 1],
     [10, skipDecayState, 0.2, 'hold', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, skipHoldAndDecayState, 0, 'hold', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
-    [10, skipHoldState, 0, 'hold', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1-1/14],
+    [10, skipHoldState, 0, 'hold', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1 - 1 / 14],
     [10, skipHoldState, 0.7, 'hold', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
-    [2, allStagesHaveTimeState, 0, 'hold', 1, undefined, 'decay', 0.2, 2 / 7, undefined, 1-2/14],
-    [2, allStagesHaveTimeState, 0.1, 'hold', 1, undefined, 'decay', 0.3, 3 / 7, undefined, 1-3/14],
-    [2, allStagesHaveTimeState, 0.4, 'hold', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [
+      2,
+      allStagesHaveTimeState,
+      0,
+      'hold',
+      1,
+      undefined,
+      'decay',
+      0.2,
+      2 / 7,
+      undefined,
+      1 - 2 / 14
+    ],
+    [
+      2,
+      allStagesHaveTimeState,
+      0.1,
+      'hold',
+      1,
+      undefined,
+      'decay',
+      0.3,
+      3 / 7,
+      undefined,
+      1 - 3 / 14
+    ],
+    [
+      2,
+      allStagesHaveTimeState,
+      0.4,
+      'hold',
+      1,
+      undefined,
+      'decay',
+      0.6,
+      6 / 7,
+      undefined,
+      1 - 6 / 14
+    ],
     [2, allStagesHaveTimeState, 0.5, 'hold', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [1, allStagesHaveTimeState, 0, 'hold', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, allStagesHaveTimeState, 0, 'hold', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
@@ -245,26 +354,110 @@ describe('linear envelope generator', () => {
     [10, skipHoldAndDecayState, 0, 'hold', 0, undefined, 'release', 0.1, 1 / 12, 0.5, 0.5 - 1 / 24],
     [10, skipHoldState, 0, 'hold', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
     [10, skipReleaseState, 0, 'hold', 0, undefined, 'rest', 0.1, 0, undefined, 0],
-    [10, allStagesHaveTimeState, 0, 'decay', 1, undefined, 'decay', 0.1, 1 / 7, undefined, 1-1/14],
-    [10, allStagesHaveTimeState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [
+      10,
+      allStagesHaveTimeState,
+      0,
+      'decay',
+      1,
+      undefined,
+      'decay',
+      0.1,
+      1 / 7,
+      undefined,
+      1 - 1 / 14
+    ],
+    [
+      10,
+      allStagesHaveTimeState,
+      0.5,
+      'decay',
+      1,
+      undefined,
+      'decay',
+      0.6,
+      6 / 7,
+      undefined,
+      1 - 6 / 14
+    ],
     [10, allStagesHaveTimeState, 0.6, 'decay', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
-    [10, skipAttackAndHoldState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [
+      10,
+      skipAttackAndHoldState,
+      0.5,
+      'decay',
+      1,
+      undefined,
+      'decay',
+      0.6,
+      6 / 7,
+      undefined,
+      1 - 6 / 14
+    ],
     [10, skipAttackAndHoldState, 0.6, 'decay', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, skipAttackHoldAndDecayState, 0, 'decay', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
-    [10, skipAttackHoldAndDecayState, 0.6, 'decay', 1, undefined, 'sustain', 0.7, 0, undefined, 0.5],
-    [10, skipAttackHoldAndDecayState, 0.7, 'decay', 1, undefined, 'sustain', 0.8, 0, undefined, 0.5],
-    [10, skipAttackState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [
+      10,
+      skipAttackHoldAndDecayState,
+      0.6,
+      'decay',
+      1,
+      undefined,
+      'sustain',
+      0.7,
+      0,
+      undefined,
+      0.5
+    ],
+    [
+      10,
+      skipAttackHoldAndDecayState,
+      0.7,
+      'decay',
+      1,
+      undefined,
+      'sustain',
+      0.8,
+      0,
+      undefined,
+      0.5
+    ],
+    [10, skipAttackState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1 - 6 / 14],
     [10, skipAttackState, 0.6, 'decay', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [10, skipDecayState, 0.5, 'decay', 1, undefined, 'sustain', 0.6, 0, undefined, 0.5],
     [10, skipDecayState, 0.6, 'decay', 1, undefined, 'sustain', 0.7, 0, undefined, 0.5],
     [10, skipHoldAndDecayState, 0.5, 'decay', 1, undefined, 'sustain', 0.6, 0, undefined, 0.5],
     [10, skipHoldAndDecayState, 0.6, 'decay', 1, undefined, 'sustain', 0.7, 0, undefined, 0.5],
-    [10, skipHoldState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [10, skipHoldState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1 - 6 / 14],
     [10, skipHoldState, 0.6, 'decay', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
-    [10, skipReleaseState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [10, skipReleaseState, 0.5, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1 - 6 / 14],
     [10, skipReleaseState, 0.6, 'decay', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
-    [5, allStagesHaveTimeState, 0, 'decay', 1, undefined, 'decay', 0.2, 2 / 7, undefined, 1-2/14],
-    [5, allStagesHaveTimeState, 0.4, 'decay', 1, undefined, 'decay', 0.6, 6 / 7, undefined, 1-6/14],
+    [
+      5,
+      allStagesHaveTimeState,
+      0,
+      'decay',
+      1,
+      undefined,
+      'decay',
+      0.2,
+      2 / 7,
+      undefined,
+      1 - 2 / 14
+    ],
+    [
+      5,
+      allStagesHaveTimeState,
+      0.4,
+      'decay',
+      1,
+      undefined,
+      'decay',
+      0.6,
+      6 / 7,
+      undefined,
+      1 - 6 / 14
+    ],
     [5, allStagesHaveTimeState, 0.5, 'decay', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [1, allStagesHaveTimeState, 0, 'decay', 1, undefined, 'sustain', 0.3, 0, undefined, 0.5],
     [10, allStagesHaveTimeState, 0, 'decay', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
@@ -287,7 +480,19 @@ describe('linear envelope generator', () => {
     [10, skipReleaseState, 0, 'decay', 0, undefined, 'rest', 0.1, 0, undefined, 0],
     [10, allStagesHaveTimeState, 0, 'sustain', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipAttackAndHoldState, 0, 'sustain', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
-    [10, skipAttackHoldAndDecayState, 0, 'sustain', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
+    [
+      10,
+      skipAttackHoldAndDecayState,
+      0,
+      'sustain',
+      1,
+      undefined,
+      'sustain',
+      0.1,
+      0,
+      undefined,
+      0.5
+    ],
     [10, skipAttackState, 0, 'sustain', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipDecayState, 0, 'sustain', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipHoldAndDecayState, 0, 'sustain', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
@@ -319,7 +524,7 @@ describe('linear envelope generator', () => {
       0.1,
       1 / 12,
       0.75,
-      0.75 - (0.75 / 12)
+      0.75 - 0.75 / 12
     ],
     [10, allStagesHaveTimeState, 1, 'release', 0, 0.5, 'release', 1.1, 11 / 12, 0.5, 1 / 24],
     [10, allStagesHaveTimeState, 1.1, 'release', 0, 0.5, 'rest', 0, 0, undefined, 0],
@@ -328,23 +533,23 @@ describe('linear envelope generator', () => {
     [5, allStagesHaveTimeState, 1, 'release', 0, 0.5, 'rest', 0, 0, undefined, 0],
     [0.5, allStagesHaveTimeState, 0, 'release', 0, 1, 'rest', 0.8, 0, undefined, 0],
     [10, skipReleaseState, 0, 'release', 0, 0.5, 'rest', 0.1, 0, undefined, 0],
-    [10, allStagesHaveTimeState, 0, 'release', 1, 0.5, 'attack', 0.1, 0.5, undefined, 0.5],
-    [5, allStagesHaveTimeState, 0, 'release', 1, 0.5, 'hold', 0, 0, undefined, 1],
+    [10, allStagesHaveTimeState, 0, 'release', 1, 0.6, 'attack', 0.1, 0.5, 0.6, 0.8],
+    [5, allStagesHaveTimeState, 0, 'release', 1, 0.15, 'hold', 0, 0, undefined, 1],
     [0.5, allStagesHaveTimeState, 0, 'release', 1, 1, 'sustain', 0.8, 0, undefined, 0.5],
     [10, skipAttackAndHoldState, 0, 'release', 1, 0.75, 'decay', 0.1, 1 / 7, undefined, 1 - 1 / 14],
     [10, skipAttackHoldAndDecayState, 0, 'release', 1, 0.5, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipAttackState, 0, 'release', 1, 0.5, 'hold', 0.1, 1 / 3, undefined, 1],
-    [10, skipDecayState, 0, 'release', 1, 1, 'attack', 0.1, 0.5, undefined, 0.5],
-    [10, skipReleaseState, 0, 'release', 1, 0.7, 'attack', 0.1, 0.5, undefined, 0.5],
-    [10, allStagesHaveTimeState, 0.3, 'release', 1, 0.6, 'attack', 0.1, 0.5, undefined, 0.5],
+    [10, skipDecayState, 0, 'release', 1, 1, 'attack', 0.1, 0.5, 1, 1],
+    [10, skipReleaseState, 0, 'release', 1, 0.7, 'attack', 0.1, 0.5, 0, 0.5],
+    [10, allStagesHaveTimeState, 0.3, 'release', 1, 0.6, 'attack', 0.1, 0.5, 0.45, 0.725],
     [10, skipAttackAndHoldState, 0, 'release', 1, 0.5, 'decay', 0.1, 1 / 7, undefined, 1 - 1 / 14],
     [10, skipAttackAndHoldState, 2, 'release', 1, 0.5, 'decay', 0.1, 1 / 7, undefined, 1 - 1 / 14],
     [10, skipAttackHoldAndDecayState, 0, 'release', 1, 0.5, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipAttackState, 0, 'release', 1, 1, 'hold', 0.1, 1 / 3, undefined, 1],
     [2, skipAttackState, 0, 'release', 1, 1, 'decay', 0.2, 2 / 7, undefined, 1 - 2 / 14],
     [10, skipAttackState, 1, 'release', 1, 0.1, 'hold', 0.1, 1 / 3, undefined, 1],
-    [10, skipDecayState, 0, 'release', 1, 0.5, 'attack', 0.1, 0.5, undefined, 0.5],
-    [10, skipReleaseState, 0, 'release', 1, 1, 'attack', 0.1, 0.5, undefined, 0.5]
+    [10, skipDecayState, 0, 'release', 1, 0.5, 'attack', 0.1, 0.5, 0.5, 0.75],
+    [10, skipReleaseState, 0, 'release', 1, 1, 'attack', 0.1, 0.5, 0, 0.5]
   ])(
     'transitions to the correct state. sample rate: %f, start state: %j, seconds since state transition: %f, start stage: %s, trigger value: %f, value on release: %f, expected stage: %s, expected seconds since transition: %f, expected stage progress: %s, expected value on release: %f, expected output value: %f',
     (
@@ -353,11 +558,11 @@ describe('linear envelope generator', () => {
       secondsSinceStateTransition,
       stage,
       inputSample,
-      valueOnRelease,
+      valueOnTriggerChange,
       expectedStage,
       expectedSecondsSinceStateTransitions,
       expectedStageProgress,
-      expectedValueOnRelease,
+      expectedValueOnTriggerChange,
       expectedValue
     ) => {
       const result = getEnvelopeValue(
@@ -366,21 +571,21 @@ describe('linear envelope generator', () => {
         secondsSinceStateTransition,
         stage,
         inputSample,
-        valueOnRelease
+        valueOnTriggerChange
       );
       expect(result.stage).toBe(expectedStage);
       expect(result.secondsSinceStateTransition).toBeCloseTo(
         expectedSecondsSinceStateTransitions,
-        0.00000001
+        6
       );
-      expect(result.stageProgress).toBeCloseTo(expectedStageProgress, 0.00000001);
-      if (expectedValueOnRelease === undefined) {
-        expect(result.valueOnRelease).toBeUndefined();
+      expect(result.stageProgress).toBeCloseTo(expectedStageProgress, 6);
+      if (expectedValueOnTriggerChange === undefined) {
+        expect(result.valueOnTriggerChange).toBeUndefined();
       } else {
-        expect(result.valueOnRelease).toBeCloseTo(expectedValueOnRelease, 0.00000001);
+        expect(result.valueOnTriggerChange).toBeCloseTo(expectedValueOnTriggerChange, 6);
       }
 
-      expect(result.outputValue).toBeCloseTo(expectedValue, 0.00000001);
+      expect(result.outputValue).toBeCloseTo(expectedValue, 6);
     }
   );
 });
