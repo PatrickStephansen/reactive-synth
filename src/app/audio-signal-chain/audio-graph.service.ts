@@ -267,7 +267,7 @@ export class AudioGraphService {
           maxValue: this.parameterMax(nextValueTrigger),
           minValue: this.parameterMin(nextValueTrigger),
           value: nextValueTrigger.value,
-          stepSize: 1
+          stepSize: 0.01
         },
         {
           name: 'output gain',
@@ -351,7 +351,7 @@ export class AudioGraphService {
             sources: [],
             maxValue: this.parameterMax(trigger),
             minValue: this.parameterMin(trigger),
-            stepSize: 1,
+            stepSize: 0.01,
             value: trigger.defaultValue
           },
           {
