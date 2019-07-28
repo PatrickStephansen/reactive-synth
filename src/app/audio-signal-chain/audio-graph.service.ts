@@ -284,48 +284,49 @@ export class AudioGraphService {
   }
 
   createEnvelopeGeneratorModule(id?: string): CreateModuleResult {
-    const moduleType = AudioModuleType.EnvelopeGenerator;
-    id = this.createModuleId(moduleType, id);
-    const envelopeGeneratorNode = new AudioWorkletNode(this.context, 'envelope-generator', {
-      numberOfInputs: 1,
-      numberOfOutputs: 1,
-      channelCount: 1,
-      channelCountMode: 'explicit',
-      outputChannelCount: [1]
-    });
+    try {
+      const moduleType = AudioModuleType.EnvelopeGenerator;
+      id = this.createModuleId(moduleType, id);
+      const envelopeGeneratorNode = new AudioWorkletNode(this.context, 'envelope-generator', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        channelCount: 1,
+        channelCountMode: 'explicit',
+        outputChannelCount: [1]
+      });
 
-    const attackValue = envelopeGeneratorNode.parameters.get('attackValue');
-    const attackTime = envelopeGeneratorNode.parameters.get('attackTime');
-    const holdTime = envelopeGeneratorNode.parameters.get('holdTime');
-    const decayTime = envelopeGeneratorNode.parameters.get('decayTime');
-    const sustainValue = envelopeGeneratorNode.parameters.get('sustainValue');
-    const releaseTime = envelopeGeneratorNode.parameters.get('releaseTime');
+      const attackValue = envelopeGeneratorNode.parameters.get('attackValue');
+      const attackTime = envelopeGeneratorNode.parameters.get('attackTime');
+      const holdTime = envelopeGeneratorNode.parameters.get('holdTime');
+      const decayTime = envelopeGeneratorNode.parameters.get('decayTime');
+      const sustainValue = envelopeGeneratorNode.parameters.get('sustainValue');
+      const releaseTime = envelopeGeneratorNode.parameters.get('releaseTime');
 
-    const outputGain = this.context.createGain();
-    outputGain.gain.value = this.defaultGain;
-    envelopeGeneratorNode.connect(outputGain);
+      const outputGain = this.context.createGain();
+      outputGain.gain.value = this.defaultGain;
+      envelopeGeneratorNode.connect(outputGain);
 
-    this.graph.set(id, {
-      internalNodes: [envelopeGeneratorNode, outputGain],
-      outputMap: new Map([['output', outputGain]]),
-      inputMap: new Map([['trigger input', envelopeGeneratorNode]]),
-      parameterMap: new Map([
-        ['attack value', attackValue],
-        ['attack time', attackTime],
-        ['hold time', holdTime],
-        ['decay time', decayTime],
-        ['sustain value', sustainValue],
-        ['release time', releaseTime],
-        ['output gain', outputGain.gain]
-      ])
-    });
+      this.graph.set(id, {
+        internalNodes: [envelopeGeneratorNode, outputGain],
+        outputMap: new Map([['output', outputGain]]),
+        inputMap: new Map([['trigger input', envelopeGeneratorNode]]),
+        parameterMap: new Map([
+          ['attack value', attackValue],
+          ['attack time', attackTime],
+          ['hold time', holdTime],
+          ['decay time', decayTime],
+          ['sustain value', sustainValue],
+          ['release time', releaseTime],
+          ['output gain', outputGain.gain]
+        ])
+      });
 
-    return new CreateModuleResult(
-      {
-        id,
-        moduleType,
-        canDelete: true,
-        helpText: `Creates an AHDSR envelope which reponds to trigger inputs.
+      return new CreateModuleResult(
+        {
+          id,
+          moduleType,
+          canDelete: true,
+          helpText: `Creates an AHDSR envelope which reponds to trigger inputs.
         When the trigger value goes above 0 the attack stage starts.
         In the attack stage, the output value moves linearly from 0 to the attack value parameter value
         over a period of time given by the attack time.
@@ -334,91 +335,101 @@ export class AudioGraphService {
         The sustain stage lasts indefinitely as long as the trigger value stays high, ouputing the sustain value.
         When the trigger value falls to 0 or below, the output value moves linearly towards 0 over the release time
         regardless of which phase the envelope was in.`
-      },
-      [
-        {
-          name: 'trigger input',
-          moduleId: id,
-          sources: []
-        }
-      ],
-      [
-        {
-          name: 'output',
-          moduleId: id
-        }
-      ],
-      [
-        {
-          name: 'attack value',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(attackValue),
-          minValue: this.parameterMin(attackValue),
-          stepSize: 0.01,
-          value: attackValue.defaultValue
         },
-        {
-          name: 'attack time',
-          units: 'seconds',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(attackTime),
-          minValue: this.parameterMin(attackTime),
-          stepSize: 0.01,
-          value: attackTime.defaultValue
-        },
-        {
-          name: 'hold time',
-          units: 'seconds',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(holdTime),
-          minValue: this.parameterMin(holdTime),
-          stepSize: 0.01,
-          value: holdTime.defaultValue
-        },
-        {
-          name: 'decay time',
-          units: 'seconds',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(decayTime),
-          minValue: this.parameterMin(decayTime),
-          stepSize: 0.01,
-          value: decayTime.defaultValue
-        },
-        {
-          name: 'sustain value',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(sustainValue),
-          minValue: this.parameterMin(sustainValue),
-          stepSize: 0.01,
-          value: sustainValue.defaultValue
-        },
-        {
-          name: 'release time',
-          units: 'seconds',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(releaseTime),
-          minValue: this.parameterMin(releaseTime),
-          stepSize: 0.01,
-          value: releaseTime.defaultValue
-        },
-        {
-          name: 'output gain',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(outputGain.gain),
-          minValue: this.parameterMin(outputGain.gain),
-          stepSize: 0.01,
-          value: this.defaultGain
-        },
-      ],
-      []
-    );
+        [
+          {
+            name: 'trigger input',
+            moduleId: id,
+            sources: []
+          }
+        ],
+        [
+          {
+            name: 'output',
+            moduleId: id
+          }
+        ],
+        [
+          {
+            name: 'attack value',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(attackValue),
+            minValue: this.parameterMin(attackValue),
+            stepSize: 0.01,
+            value: attackValue.defaultValue
+          },
+          {
+            name: 'attack time',
+            units: 'seconds',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(attackTime),
+            minValue: this.parameterMin(attackTime),
+            stepSize: 0.01,
+            value: attackTime.defaultValue
+          },
+          {
+            name: 'hold time',
+            units: 'seconds',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(holdTime),
+            minValue: this.parameterMin(holdTime),
+            stepSize: 0.01,
+            value: holdTime.defaultValue
+          },
+          {
+            name: 'decay time',
+            units: 'seconds',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(decayTime),
+            minValue: this.parameterMin(decayTime),
+            stepSize: 0.01,
+            value: decayTime.defaultValue
+          },
+          {
+            name: 'sustain value',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(sustainValue),
+            minValue: this.parameterMin(sustainValue),
+            stepSize: 0.01,
+            value: sustainValue.defaultValue
+          },
+          {
+            name: 'release time',
+            units: 'seconds',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(releaseTime),
+            minValue: this.parameterMin(releaseTime),
+            stepSize: 0.01,
+            value: releaseTime.defaultValue
+          },
+          {
+            name: 'output gain',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(outputGain.gain),
+            minValue: this.parameterMin(outputGain.gain),
+            stepSize: 0.01,
+            value: this.defaultGain
+          }
+        ],
+        []
+      );
+    } catch (error) {
+      if (error.name === 'NotSupportedError') {
+        throw new Error(`Unable to create envelope generator module.
+        Your browser does not implement the AudioWorklet interface of the Web Audio API standard and
+        this module has too many inputs for the fallback.
+        Try a Chromium-based browser instead.`);
+      } else {
+        throw error;
+      }
+    }
   }
 
   createOscillator(id?: string): CreateModuleResult {
