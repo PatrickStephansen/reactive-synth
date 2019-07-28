@@ -26,20 +26,25 @@
           >
             <div class="dropdown-trigger">
               <button
-                class="button button-icon"
-                title="Connect input to parameter"
+                class="button button-icon has-background-white-ter"
+                title="Connect parameter to source"
                 aria-haspopup="true"
                 [attr.aria-controls]="addInputsId"
                 (click)="toggleSourceList()"
               >
-                +
+              <p class="is-size-7">
+                Connect
+              </p>
               </button>
             </div>
             <div class="dropdown-menu" [id]="addInputsId" role="menu">
               <div class="dropdown-content">
+                <p class="dropdown-item">Sources:</p>
+                <hr class="dropdown-divider" />
                 <p *ngIf="!availableSources?.length" class="dropdown-item">
-                  No more inputs available
+                  No more sources available
                 </p>
+
                 <a
                   href="javascript:void(0)"
                   *ngFor="let sourceModuleOutput of availableSources"
