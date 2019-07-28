@@ -10,6 +10,8 @@
             [step]="parameter.stepSize"
             [min]="parameter.minValue"
             [max]="parameter.maxValue"
+            [attr.min]="parameter.minValue"
+            [attr.max]="parameter.maxValue"
             type="number"
             [ngClass]="{ 'is-danger': parameterValue?.errors, input: true }"
             [ngModel]="parameter.value"
@@ -32,9 +34,9 @@
                 [attr.aria-controls]="addInputsId"
                 (click)="toggleSourceList()"
               >
-              <p class="is-size-7">
-                Connect
-              </p>
+                <p class="is-size-7">
+                  Connect
+                </p>
               </button>
             </div>
             <div class="dropdown-menu" [id]="addInputsId" role="menu">
@@ -60,7 +62,7 @@
       </div>
     </div>
     <div class="validation-errors has-text-danger" *ngIf="parameterValue.invalid">
-      must be a number between {{ parameter.minValue }} and
+      {{ parameter.name }} must be a number between {{ parameter.minValue }} and
       {{ parameter.maxValue }}
     </div>
     <div class="tags" *ngIf="parameter.sources?.length">
