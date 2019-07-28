@@ -288,13 +288,14 @@ export class AudioGraphService {
       const moduleType = AudioModuleType.EnvelopeGenerator;
       id = this.createModuleId(moduleType, id);
       const envelopeGeneratorNode = new AudioWorkletNode(this.context, 'envelope-generator', {
-        numberOfInputs: 1,
+        numberOfInputs: 0,
         numberOfOutputs: 1,
         channelCount: 1,
         channelCountMode: 'explicit',
         outputChannelCount: [1]
       });
 
+      const trigger = envelopeGeneratorNode.parameters.get('trigger');
       const attackValue = envelopeGeneratorNode.parameters.get('attackValue');
       const attackTime = envelopeGeneratorNode.parameters.get('attackTime');
       const holdTime = envelopeGeneratorNode.parameters.get('holdTime');
@@ -309,8 +310,8 @@ export class AudioGraphService {
       this.graph.set(id, {
         internalNodes: [envelopeGeneratorNode, outputGain],
         outputMap: new Map([['output', outputGain]]),
-        inputMap: new Map([['trigger input', envelopeGeneratorNode]]),
         parameterMap: new Map([
+          ['trigger', trigger],
           ['attack value', attackValue],
           ['attack time', attackTime],
           ['hold time', holdTime],
@@ -336,13 +337,7 @@ export class AudioGraphService {
         When the trigger value falls to 0 or below, the output value moves linearly towards 0 over the release time
         regardless of which phase the envelope was in.`
         },
-        [
-          {
-            name: 'trigger input',
-            moduleId: id,
-            sources: []
-          }
-        ],
+        [],
         [
           {
             name: 'output',
@@ -350,6 +345,15 @@ export class AudioGraphService {
           }
         ],
         [
+          {
+            name: 'trigger',
+            moduleId: id,
+            sources: [],
+            maxValue: this.parameterMax(trigger),
+            minValue: this.parameterMin(trigger),
+            stepSize: 1,
+            value: trigger.defaultValue
+          },
           {
             name: 'attack value',
             moduleId: id,
@@ -366,8 +370,8 @@ export class AudioGraphService {
             sources: [],
             maxValue: this.parameterMax(attackTime),
             minValue: this.parameterMin(attackTime),
-            stepSize: 0.01,
-            value: attackTime.defaultValue
+            stepSize: 0.001,
+            value: 0.001
           },
           {
             name: 'hold time',
@@ -376,7 +380,7 @@ export class AudioGraphService {
             sources: [],
             maxValue: this.parameterMax(holdTime),
             minValue: this.parameterMin(holdTime),
-            stepSize: 0.01,
+            stepSize: 0.001,
             value: holdTime.defaultValue
           },
           {
@@ -386,7 +390,7 @@ export class AudioGraphService {
             sources: [],
             maxValue: this.parameterMax(decayTime),
             minValue: this.parameterMin(decayTime),
-            stepSize: 0.01,
+            stepSize: 0.001,
             value: decayTime.defaultValue
           },
           {
@@ -405,7 +409,7 @@ export class AudioGraphService {
             sources: [],
             maxValue: this.parameterMax(releaseTime),
             minValue: this.parameterMin(releaseTime),
-            stepSize: 0.01,
+            stepSize: 0.001,
             value: releaseTime.defaultValue
           },
           {
@@ -1123,7 +1127,7 @@ export class AudioGraphService {
       const param = this.graph.get(moduleId).parameterMap.get(parameterName);
       if (param && param.setTargetAtTime && !setImmediately) {
         // don't change immediately as an anti-pop precaution
-        param.setTargetAtTime(value, this.context.currentTime, setImmediately ? 0 : 0.005);
+        param.setTargetAtTime(value, this.context.currentTime, 0.005);
       } else {
         param.value = value;
       }

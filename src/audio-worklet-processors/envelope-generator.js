@@ -7,6 +7,11 @@ registerProcessor(
     static get parameterDescriptors() {
       return [
         {
+          name: 'trigger',
+          defaultValue: 0,
+          automationRate: 'a-rate'
+        },
+        {
           name: 'attackValue',
           defaultValue: 1,
           minValue: 0,
@@ -15,7 +20,7 @@ registerProcessor(
         },
         {
           name: 'attackTime',
-          defaultValue: 0,
+          defaultValue: 0.001,
           minValue: 0,
           maxValue: 10,
           automationRate: 'a-rate'
@@ -59,7 +64,7 @@ registerProcessor(
       this.secondsSinceStateTransition = 0;
       this.port.onmessage = this.handleMessage.bind(this);
       this.state = {
-        attackTime: 0,
+        attackTime: 0.001,
         attackValue: 1,
         holdTime: 0.0625,
         decayTime: 0.125,
@@ -85,9 +90,9 @@ registerProcessor(
     }
 
     process(inputs, outputs, parameters) {
-      // Only one input and output.
-      let input = inputs[0];
+      // Only one output.
       let output = outputs[0];
+      const getTriggerValue = getParameterValue(parameters.trigger, -1e9, 1e9);
       const getAttackTime = getParameterValue(parameters.attackTime, 0, 10);
       const getAttackValue = getParameterValue(parameters.attackValue, 0, 1);
       const getHoldTime = getParameterValue(parameters.holdTime, 0, 10);
@@ -95,7 +100,7 @@ registerProcessor(
       const getSustainValue = getParameterValue(parameters.sustainValue, 0, 1);
       const getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
 
-      for (let sampleIndex = 0; sampleIndex < input[0].length; sampleIndex++) {
+      for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
         this.state = {
           attackTime: getAttackTime(sampleIndex),
           attackValue: getAttackValue(sampleIndex),
@@ -105,13 +110,13 @@ registerProcessor(
           releaseTime: getReleaseTime(sampleIndex)
         };
         // only expecting one channel, but tolerating more in case
-        const inputSample = input[0][0];
+        const triggerValue = getTriggerValue(sampleIndex);
         const envelopeValue = getEnvelopeValue(
           this.sampleRate,
           this.state,
           this.secondsSinceStateTransition,
           this.stage,
-          inputSample,
+          triggerValue,
           this.valueOnTriggerChange
         );
         this.stage = envelopeValue.stage;
@@ -120,11 +125,7 @@ registerProcessor(
         this.outputValue = envelopeValue.outputValue;
         this.valueOnTriggerChange = envelopeValue.valueOnTriggerChange;
 
-        for (
-          let channelIndex = 0;
-          channelIndex < input.length;
-          channelIndex++
-        ) {
+        for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
           const outputChannel = output[channelIndex];
 
           outputChannel[sampleIndex] = this.outputValue;
