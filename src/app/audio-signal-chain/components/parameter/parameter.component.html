@@ -1,75 +1,74 @@
-<div class="field">
-  <label class="label" for="input-{{ parameter.moduleId }}-{{ parameter.name }}">
+<label class="label" for="input-{{ parameter.moduleId }}-{{ parameter.name }}">
+  <div class="field">
     <span class="parameter-name">{{ parameter.name }}</span>
     <span class="units" *ngIf="parameter.units"> ({{ parameter.units }}) </span>
-  </label>
-  <div class="control">
-    <div class="field has-addons" id="input-{{ parameter.moduleId }}-{{ parameter.name }}">
-      <div class="control is-expanded">
-        <input
-          required
-          [step]="parameter.stepSize"
-          [min]="parameter.minValue"
-          [max]="parameter.maxValue"
-          type="number"
-          [ngClass]="{ 'is-danger': parameterValue?.errors, input: true }"
-          [ngModel]="parameter.value"
-          (ngModelChange)="parameterChanged.emit($event)"
-          #parameterValue="ngModel"
-          name="parameterValue"
-        />
-      </div>
-      <div class="control">
-        <div
-          class="dropdown is-right"
-          [ngClass]="{ 'is-active': isSourceListOpen }"
-          (clickOutside)="closeSourceList()"
-        >
-          <div class="dropdown-trigger">
-            <button
-              class="button button-icon"
-              title="Connect input to parameter"
-              aria-haspopup="true"
-              [attr.aria-controls]="addInputsId"
-              (click)="toggleSourceList()"
-            >
-              +
-            </button>
-          </div>
-          <div class="dropdown-menu" [id]="addInputsId" role="menu">
-            <div class="dropdown-content">
-              <p *ngIf="!availableSources?.length" class="dropdown-item">
-                No more inputs available
-              </p>
-              <a
-                href="javascript:void(0)"
-                *ngFor="let sourceModuleOutput of availableSources"
-                class="dropdown-item"
-                (click)="connectToSource(sourceModuleOutput)"
+    <div class="control">
+      <div class="field has-addons" id="input-{{ parameter.moduleId }}-{{ parameter.name }}">
+        <div class="control is-expanded">
+          <input
+            required
+            [step]="parameter.stepSize"
+            [min]="parameter.minValue"
+            [max]="parameter.maxValue"
+            type="number"
+            [ngClass]="{ 'is-danger': parameterValue?.errors, input: true }"
+            [ngModel]="parameter.value"
+            (ngModelChange)="parameterChanged.emit($event)"
+            #parameterValue="ngModel"
+            name="parameterValue"
+          />
+        </div>
+        <div class="control">
+          <div
+            class="dropdown is-right"
+            [ngClass]="{ 'is-active': isSourceListOpen }"
+            (clickOutside)="closeSourceList()"
+          >
+            <div class="dropdown-trigger">
+              <button
+                class="button button-icon"
+                title="Connect input to parameter"
+                aria-haspopup="true"
+                [attr.aria-controls]="addInputsId"
+                (click)="toggleSourceList()"
               >
-                {{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
-              </a>
+                +
+              </button>
+            </div>
+            <div class="dropdown-menu" [id]="addInputsId" role="menu">
+              <div class="dropdown-content">
+                <p *ngIf="!availableSources?.length" class="dropdown-item">
+                  No more inputs available
+                </p>
+                <a
+                  href="javascript:void(0)"
+                  *ngFor="let sourceModuleOutput of availableSources"
+                  class="dropdown-item"
+                  (click)="connectToSource(sourceModuleOutput)"
+                >
+                  {{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="validation-errors has-text-danger" *ngIf="parameterValue.invalid">
+      must be a number between {{ parameter.minValue }} and
+      {{ parameter.maxValue }}
+    </div>
+    <div class="tags" *ngIf="parameter.sources?.length">
+      <ng-container *ngFor="let sourceModuleOutput of parameter.sources">
+        <span class="tag"
+          >{{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+          <button
+            class="delete is-small"
+            type="button"
+            (click)="disconnectFromSource(sourceModuleOutput)"
+          ></button
+        ></span>
+      </ng-container>
+    </div>
   </div>
-  <div class="validation-errors has-text-danger" *ngIf="parameterValue.invalid">
-    must be a number between {{ parameter.minValue }} and
-    {{ parameter.maxValue }}
-  </div>
-</div>
-
-<div class="tags" *ngIf="parameter.sources?.length">
-  <ng-container *ngFor="let sourceModuleOutput of parameter.sources">
-    <span class="tag"
-      >{{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
-      <button
-        class="delete is-small"
-        type="button"
-        (click)="disconnectFromSource(sourceModuleOutput)"
-      ></button
-    ></span>
-  </ng-container>
-</div>
+</label>
