@@ -9,12 +9,7 @@ import {
   getSources
 } from '../../state/audio-signal-chain.selectors';
 import { Parameter } from '../../model/parameter';
-import {
-  ChangeParameter,
-  ChangeChoiceParameter,
-  ConnectParameter,
-  DisconnectParameter
-} from '../../state/audio-signal-chain.actions';
+import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
 import { ChoiceParameter } from '../../model/choice-parameter';
 import { ChangeChoiceEvent } from '../../model/change-choice-event';
@@ -46,24 +41,22 @@ export class ParametersShellComponent implements OnInit {
       select(getChoiceParametersForModuleState, { moduleId: this.moduleId })
     );
 
-    this.sources$ = this.store.pipe(
-      select(getSources, { moduleId: this.moduleId })
-    );
+    this.sources$ = this.store.pipe(select(getSources, { moduleId: this.moduleId }));
   }
 
-  onParameterChanged(event: ChangeParameterEvent) {
-    this.store.dispatch(new ChangeParameter(event));
+  onParameterChanged(parameter: ChangeParameterEvent) {
+    this.store.dispatch(audioSignalActions.changeParameter({ parameter }));
   }
 
-  onChoiceParameterChanged(event: ChangeChoiceEvent) {
-    this.store.dispatch(new ChangeChoiceParameter(event));
+  onChoiceParameterChanged(choice: ChangeChoiceEvent) {
+    this.store.dispatch(audioSignalActions.changeChoiceParameter({ choice }));
   }
 
-  onParameterConnected(event: ConnectParameterEvent) {
-    this.store.dispatch(new ConnectParameter(event));
+  onParameterConnected(connection: ConnectParameterEvent) {
+    this.store.dispatch(audioSignalActions.connectParameter({ connection }));
   }
 
-  onParameterDisconnected(event: ConnectParameterEvent) {
-    this.store.dispatch(new DisconnectParameter(event));
+  onParameterDisconnected(connection: ConnectParameterEvent) {
+    this.store.dispatch(audioSignalActions.disconnectParameter({ connection }));
   }
 }

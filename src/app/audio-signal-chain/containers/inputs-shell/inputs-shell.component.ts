@@ -3,13 +3,8 @@ import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
-import {
-  getInputsForModuleState, getSources,
-} from '../../state/audio-signal-chain.selectors';
-import {
-  ConnectModules,
-  DisconnectModules
-} from '../../state/audio-signal-chain.actions';
+import { getInputsForModuleState, getSources } from '../../state/audio-signal-chain.selectors';
+import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { AudioModuleInput } from '../../model/audio-module-input';
 import { AudioModuleOutput } from '../../model/audio-module-output';
@@ -30,19 +25,15 @@ export class InputsShellComponent implements OnInit {
   constructor(private store: Store<AudioSignalChainState>) {}
 
   ngOnInit() {
-    this.inputs$ = this.store.pipe(
-      select(getInputsForModuleState, { moduleId: this.moduleId })
-    );
-    this.sources$ = this.store.pipe(
-      select(getSources, { moduleId: this.moduleId })
-    );
+    this.inputs$ = this.store.pipe(select(getInputsForModuleState, { moduleId: this.moduleId }));
+    this.sources$ = this.store.pipe(select(getSources, { moduleId: this.moduleId }));
   }
 
-  onInputConnected(event: ConnectModulesEvent) {
-    this.store.dispatch(new ConnectModules(event));
+  onInputConnected(connection: ConnectModulesEvent) {
+    this.store.dispatch(audioSignalActions.connectModules({ connection }));
   }
 
-  onInputDisconnected(event: ConnectModulesEvent) {
-    this.store.dispatch(new DisconnectModules(event));
+  onInputDisconnected(connection: ConnectModulesEvent) {
+    this.store.dispatch(audioSignalActions.disconnectModules({ connection }));
   }
 }

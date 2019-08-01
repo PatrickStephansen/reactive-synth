@@ -1,15 +1,10 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-  Input
-} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
 import { Observable } from 'rxjs';
 import { Visualization } from '../../model/visualization/visualization';
 import { getVisualizationsForModuleState } from '../../state/audio-signal-chain.selectors';
-import { ToggleVisualizationActive } from '../../state/audio-signal-chain.actions';
+import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 import { ChangeVisualizationActiveEvent } from '../../model/visualization/change-visualization-active-event';
 
 @Component({
@@ -31,11 +26,7 @@ export class VisualizationsShellComponent implements OnInit {
     );
   }
 
-  toggleActive(
-    changeVisualizationVisibleEvent: ChangeVisualizationActiveEvent
-  ) {
-    this.store.dispatch(
-      new ToggleVisualizationActive(changeVisualizationVisibleEvent)
-    );
+  toggleActive(change: ChangeVisualizationActiveEvent) {
+    this.store.dispatch(audioSignalActions.toggleVisualizationActive({ change }));
   }
 }

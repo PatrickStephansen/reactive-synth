@@ -5,7 +5,7 @@ import { AudioSignalChainState } from '../../state/audio-signal-chain.state';
 import { Observable } from 'rxjs';
 import { SignalChainError } from '../../model/signal-chain-error';
 import { getSignalChainErrors } from '../../state/audio-signal-chain.selectors';
-import { ClearErrors, DismissError } from '../../state/audio-signal-chain.actions';
+import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 
 @Component({
   selector: 'app-errors-shell',
@@ -23,10 +23,10 @@ export class ErrorsShellComponent implements OnInit {
   ngOnInit() {}
 
   clearErrors() {
-    this.store.dispatch(new ClearErrors());
+    this.store.dispatch(audioSignalActions.clearErrors());
   }
 
   dismissError(errorId: string) {
-    this.store.dispatch(new DismissError(errorId));
+    this.store.dispatch(audioSignalActions.dismissError({ id: errorId }));
   }
 }

@@ -9,14 +9,7 @@ import {
   getSignalChainOutputActiveState,
   getOutputsState
 } from '../../state/audio-signal-chain.selectors';
-import {
-  ResetSignalChain,
-  ConnectModules,
-  ToggleSignalChainActive,
-  DisconnectModules,
-  DestroyModule,
-  CreateModule
-} from '../../state/audio-signal-chain.actions';
+import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { AudioModuleOutput } from '../../model/audio-module-output';
 
@@ -39,27 +32,27 @@ export class AudioSignalChainShellComponent implements OnInit {
 
   ngOnInit() {}
 
-  addModule(event) {
-    this.store.dispatch(new CreateModule(event));
+  addModule(module) {
+    this.store.dispatch(audioSignalActions.createModule({ module }));
   }
 
-  connectModules(event: ConnectModulesEvent) {
-    this.store.dispatch(new ConnectModules(event));
+  connectModules(connection: ConnectModulesEvent) {
+    this.store.dispatch(audioSignalActions.connectModules({ connection }));
   }
 
-  disconnectModules(event: ConnectModulesEvent) {
-    this.store.dispatch(new DisconnectModules(event));
+  disconnectModules(connection: ConnectModulesEvent) {
+    this.store.dispatch(audioSignalActions.disconnectModules({ connection }));
   }
 
   toggleOutputEnabled(enabled: boolean) {
-    this.store.dispatch(new ToggleSignalChainActive(enabled));
+    this.store.dispatch(audioSignalActions.toggleSignalChainActive({ isActive: enabled }));
   }
 
   deleteModule(moduleId: string) {
-    this.store.dispatch(new DestroyModule(moduleId));
+    this.store.dispatch(audioSignalActions.destroyModule({ moduleId }));
   }
 
   resetSignalChain() {
-    this.store.dispatch(new ResetSignalChain());
+    this.store.dispatch(audioSignalActions.resetSignalChain());
   }
 }

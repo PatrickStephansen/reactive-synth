@@ -1,4 +1,4 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { ConnectModulesEvent } from '../model/connect-modules-event';
 import { AudioModule } from '../model/audio-module';
 import { ChangeParameterEvent } from '../model/change-parameter-event';
@@ -46,199 +46,116 @@ export enum AudioSignalChainActionTypes {
   ToggleVisualizationActive = '[Audio Signal Chain] Toggle Visualization Active'
 }
 
-export class ResetSignalChain implements Action {
-  readonly type = AudioSignalChainActionTypes.ResetSignalChain;
-  constructor() {}
-}
-
-export class ResetSignalChainSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.ResetSignalChainSuccess;
-  constructor(public signalChain: AudioSignalChainState) {}
-}
-
-export class LoadSignalChainState implements Action {
-  readonly type = AudioSignalChainActionTypes.LoadSignalChainState;
-  constructor(public signalChain: AudioSignalChainState) {}
-}
-
-export class LoadSignalChainStateFailure implements Action {
-  readonly type = AudioSignalChainActionTypes.LoadSignalChainStateFailure;
-  constructor(public reason: string) {}
-}
-
-export class ChangeParameter implements Action {
-  readonly type = AudioSignalChainActionTypes.ChangeParameter;
-  constructor(public payload: ChangeParameterEvent) {}
-}
-
-export class ChangeParameterSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.ChangeParameterSuccess;
-  constructor(public payload: ChangeParameterEvent) {}
-}
-
-export class ChangeChoiceParameter implements Action {
-  readonly type = AudioSignalChainActionTypes.ChangeChoiceParameter;
-  constructor(public payload: ChangeChoiceEvent) {}
-}
-
-export class ChangeChoiceParameterSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.ChangeChoiceParameterSuccess;
-  constructor(public payload: ChangeChoiceEvent) {}
-}
-
-export class ConnectModules implements Action {
-  readonly type = AudioSignalChainActionTypes.ConnectModules;
-
-  constructor(public payload: ConnectModulesEvent) {}
-}
-
-export class ConnectModulesSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.ConnectModulesSuccess;
-
-  constructor(public payload: ConnectModulesEvent) {}
-}
-export class DisconnectModules implements Action {
-  readonly type = AudioSignalChainActionTypes.DisconnectModules;
-
-  constructor(public payload: ConnectModulesEvent) {}
-}
-
-export class DisconnectModulesSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.DisconnectModulesSuccess;
-
-  constructor(public payload: ConnectModulesEvent) {}
-}
-export class ConnectParameter implements Action {
-  readonly type = AudioSignalChainActionTypes.ConnectParameter;
-
-  constructor(public payload: ConnectParameterEvent) {}
-}
-
-export class ConnectParameterSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.ConnectParameterSuccess;
-
-  constructor(public payload: ConnectParameterEvent) {}
-}
-export class DisconnectParameter implements Action {
-  readonly type = AudioSignalChainActionTypes.DisconnectParameter;
-
-  constructor(public payload: ConnectParameterEvent) {}
-}
-
-export class DisconnectParameterSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.DisconnectParameterSuccess;
-
-  constructor(public payload: ConnectParameterEvent) {}
-}
-
-export class CreateModule implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateModule;
-
-  constructor(public payload: CreateModuleEvent) {}
-}
-
-export class CreateModuleSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateModuleSuccess;
-
-  constructor(public payload: AudioModule) {}
-}
-
-export class CreateParameterSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateParameterSuccess;
-
-  constructor(public payload: Parameter) {}
-}
-export class CreateInputSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateInputSuccess;
-
-  constructor(public payload: AudioModuleInput) {}
-}
-export class CreateOutputSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateOutputSuccess;
-
-  constructor(public payload: AudioModuleOutput) {}
-}
-export class CreateChoiceParameterSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.CreateChoiceParameterSuccess;
-
-  constructor(public payload: ChoiceParameter) {}
-}
-
-export class ToggleSignalChainActive implements Action {
-  readonly type = AudioSignalChainActionTypes.ToggleSignalChainActive;
-
-  constructor(public payload: boolean) {}
-}
-export class ToggleSignalChainActiveSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.ToggleSignalChainActiveSuccess;
-
-  constructor(public payload: boolean) {}
-}
-
-export class ToggleVisualizationActive implements Action {
-  readonly type = AudioSignalChainActionTypes.ToggleVisualizationActive;
-
-  constructor(public payload: ChangeVisualizationActiveEvent) {}
-}
-
-export class DestroyModule implements Action {
-  readonly type = AudioSignalChainActionTypes.DestroyModule;
-
-  constructor(public moduleId: string) {}
-}
-
-export class DestroyModuleSuccess implements Action {
-  readonly type = AudioSignalChainActionTypes.DestroyModuleSuccess;
-
-  constructor(public moduleId: string) {}
-}
-
-export class AddError implements Action {
-  readonly type = AudioSignalChainActionTypes.AddError;
-
-  constructor(public error: SignalChainError) {}
-}
-
-export class DismissError implements Action {
-  readonly type = AudioSignalChainActionTypes.DismissError;
-
-  constructor(public id: string) {}
-}
-
-export class ClearErrors implements Action {
-  readonly type = AudioSignalChainActionTypes.ClearErrors;
-
-  constructor() {}
-}
-
-export type AudioSignalChainAction =
-  | ResetSignalChain
-  | ResetSignalChainSuccess
-  | LoadSignalChainState
-  | LoadSignalChainStateFailure
-  | ChangeParameter
-  | ChangeParameterSuccess
-  | ChangeChoiceParameter
-  | ChangeChoiceParameterSuccess
-  | ConnectModules
-  | ConnectModulesSuccess
-  | DisconnectModules
-  | DisconnectModulesSuccess
-  | ConnectParameter
-  | ConnectParameterSuccess
-  | DisconnectParameter
-  | DisconnectParameterSuccess
-  | CreateModule
-  | CreateModuleSuccess
-  | CreateParameterSuccess
-  | CreateInputSuccess
-  | CreateOutputSuccess
-  | CreateChoiceParameterSuccess
-  | ToggleSignalChainActive
-  | ToggleSignalChainActiveSuccess
-  | ToggleVisualizationActive
-  | DestroyModule
-  | DestroyModuleSuccess
-  | AddError
-  | DismissError
-  | ClearErrors;
+export const audioSignalActions = {
+  resetSignalChain: createAction(AudioSignalChainActionTypes.ResetSignalChain),
+  resetSignalChainSuccess: createAction(
+    AudioSignalChainActionTypes.ResetSignalChainSuccess,
+    props<{ signalChain: AudioSignalChainState }>()
+  ),
+  loadSignalChainState: createAction(
+    AudioSignalChainActionTypes.LoadSignalChainState,
+    props<{ signalChain: AudioSignalChainState }>()
+  ),
+  loadSignalChainStateFailure: createAction(
+    AudioSignalChainActionTypes.LoadSignalChainStateFailure,
+    props<{ reason: string }>()
+  ),
+  changeParameter: createAction(
+    AudioSignalChainActionTypes.ChangeParameter,
+    props<{ parameter: ChangeParameterEvent }>()
+  ),
+  changeParameterSuccess: createAction(
+    AudioSignalChainActionTypes.ChangeParameterSuccess,
+    props<{ parameter: ChangeParameterEvent }>()
+  ),
+  changeChoiceParameter: createAction(
+    AudioSignalChainActionTypes.ChangeChoiceParameter,
+    props<{ choice: ChangeChoiceEvent }>()
+  ),
+  changeChoiceParameterSuccess: createAction(
+    AudioSignalChainActionTypes.ChangeChoiceParameterSuccess,
+    props<{ choice: ChangeChoiceEvent }>()
+  ),
+  connectModules: createAction(
+    AudioSignalChainActionTypes.ConnectModules,
+    props<{ connection: ConnectModulesEvent }>()
+  ),
+  connectModulesSuccess: createAction(
+    AudioSignalChainActionTypes.ConnectModulesSuccess,
+    props<{ connection: ConnectModulesEvent }>()
+  ),
+  disconnectModules: createAction(
+    AudioSignalChainActionTypes.DisconnectModules,
+    props<{ connection: ConnectModulesEvent }>()
+  ),
+  disconnectModulesSuccess: createAction(
+    AudioSignalChainActionTypes.DisconnectModulesSuccess,
+    props<{ connection: ConnectModulesEvent }>()
+  ),
+  connectParameter: createAction(
+    AudioSignalChainActionTypes.ConnectParameter,
+    props<{ connection: ConnectParameterEvent }>()
+  ),
+  connectParameterSuccess: createAction(
+    AudioSignalChainActionTypes.ConnectParameterSuccess,
+    props<{ connection: ConnectParameterEvent }>()
+  ),
+  disconnectParameter: createAction(
+    AudioSignalChainActionTypes.DisconnectParameter,
+    props<{ connection: ConnectParameterEvent }>()
+  ),
+  disconnectParameterSuccess: createAction(
+    AudioSignalChainActionTypes.DisconnectParameterSuccess,
+    props<{ connection: ConnectParameterEvent }>()
+  ),
+  createModule: createAction(
+    AudioSignalChainActionTypes.CreateModule,
+    props<{ module: CreateModuleEvent }>()
+  ),
+  createModuleSuccess: createAction(
+    AudioSignalChainActionTypes.CreateModuleSuccess,
+    props<{ module: AudioModule }>()
+  ),
+  createParameterSuccess: createAction(
+    AudioSignalChainActionTypes.CreateParameterSuccess,
+    props<{ parameter: Parameter }>()
+  ),
+  createInputSuccess: createAction(
+    AudioSignalChainActionTypes.CreateInputSuccess,
+    props<{ input: AudioModuleInput }>()
+  ),
+  createOutputSuccess: createAction(
+    AudioSignalChainActionTypes.CreateOutputSuccess,
+    props<{ output: AudioModuleOutput }>()
+  ),
+  createChoiceParameterSuccess: createAction(
+    AudioSignalChainActionTypes.CreateChoiceParameterSuccess,
+    props<{ choice: ChoiceParameter }>()
+  ),
+  toggleSignalChainActive: createAction(
+    AudioSignalChainActionTypes.ToggleSignalChainActive,
+    props<{ isActive: boolean }>()
+  ),
+  toggleSignalChainActiveSuccess: createAction(
+    AudioSignalChainActionTypes.ToggleSignalChainActiveSuccess,
+    props<{ isActive: boolean }>()
+  ),
+  toggleVisualizationActive: createAction(
+    AudioSignalChainActionTypes.ToggleVisualizationActive,
+    props<{ change: ChangeVisualizationActiveEvent }>()
+  ),
+  destroyModule: createAction(
+    AudioSignalChainActionTypes.DestroyModule,
+    props<{ moduleId: string }>()
+  ),
+  destroyModuleSuccess: createAction(
+    AudioSignalChainActionTypes.DestroyModuleSuccess,
+    props<{ moduleId: string }>()
+  ),
+  addError: createAction(
+    AudioSignalChainActionTypes.AddError,
+    props<{ error: SignalChainError }>()
+  ),
+  dismissError: createAction(AudioSignalChainActionTypes.DismissError, props<{ id: string }>()),
+  clearErrors: createAction(AudioSignalChainActionTypes.ClearErrors)
+};

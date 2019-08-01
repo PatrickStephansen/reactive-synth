@@ -1,10 +1,10 @@
-import { AudioSignalChainState } from './audio-signal-chain.state';
-import {
-  AudioSignalChainActionTypes,
-  AudioSignalChainAction
-} from './audio-signal-chain.actions';
+import { createReducer, on } from '@ngrx/store';
 
-const initialState = {
+import { audioSignalActions } from './audio-signal-chain.actions';
+import { AudioSignalChainState } from './audio-signal-chain.state';
+import { setSignalChainSuccess } from './reducer-functions/set-signal-chain-state';
+
+const initialState: AudioSignalChainState = {
   modules: [],
   inputs: [],
   outputs: [],
@@ -15,97 +15,92 @@ const initialState = {
   errors: []
 };
 
-export function reducer(
-  state: AudioSignalChainState = initialState,
-  action: AudioSignalChainAction
-) {
-  switch (action.type) {
-    case AudioSignalChainActionTypes.ResetSignalChainSuccess: {
-      return { ...action.signalChain };
-    }
-    case AudioSignalChainActionTypes.ChangeParameterSuccess: {
-      const updatedParameters = state.parameters.map(p =>
-        p.moduleId === action.payload.moduleId &&
-        p.name === action.payload.parameterName
-          ? { ...p, value: action.payload.value }
-          : p
-      );
-      return { ...state, parameters: updatedParameters };
-    }
-    case AudioSignalChainActionTypes.ChangeChoiceParameterSuccess: {
+export const reducer = createReducer(
+  initialState,
+  on(audioSignalActions.resetSignalChainSuccess, setSignalChainSuccess),
+  on(audioSignalActions.changeParameterSuccess, (state: AudioSignalChainState, { parameter }) => {
+    const updatedParameters = state.parameters.map(p =>
+      p.moduleId === parameter.moduleId && p.name === parameter.parameterName
+        ? { ...p, value: parameter.value }
+        : p
+    );
+    return { ...state, parameters: updatedParameters };
+  }),
+  on(
+    audioSignalActions.changeChoiceParameterSuccess,
+    (state: AudioSignalChainState, { choice }) => {
       const updatedParameters = state.choiceParameters.map(c =>
-        c.moduleId === action.payload.moduleId &&
-        c.name === action.payload.parameterName
-          ? { ...c, selection: action.payload.value }
+        c.moduleId === choice.moduleId && c.name === choice.parameterName
+          ? { ...c, selection: choice.value }
           : c
       );
       return { ...state, choiceParameters: updatedParameters };
     }
-    case AudioSignalChainActionTypes.ConnectModulesSuccess: {
+  ),
+  on(audioSignalActions.connectModulesSuccess, (state: AudioSignalChainState, { connection }) => {
+    const updatedInputs = state.inputs.map(i =>
+      i.moduleId === connection.destinationId && i.name === connection.destinationInputName
+        ? {
+            ...i,
+            sources: [
+              ...i.sources,
+              {
+                moduleId: connection.sourceId,
+                name: connection.sourceOutputName
+              }
+            ]
+          }
+        : i
+    );
+    return { ...state, inputs: updatedInputs };
+  }),
+  on(
+    audioSignalActions.disconnectModulesSuccess,
+    (state: AudioSignalChainState, { connection }) => {
       const updatedInputs = state.inputs.map(i =>
-        i.moduleId === action.payload.destinationId &&
-        i.name === action.payload.destinationInputName
-          ? {
-              ...i,
-              sources: [
-                ...i.sources,
-                {
-                  moduleId: action.payload.sourceId,
-                  name: action.payload.sourceOutputName
-                }
-              ]
-            }
-          : i
-      );
-      return { ...state, inputs: updatedInputs };
-    }
-    case AudioSignalChainActionTypes.DisconnectModulesSuccess: {
-      const updatedInputs = state.inputs.map(i =>
-        i.moduleId === action.payload.destinationId &&
-        i.name === action.payload.destinationInputName
+        i.moduleId === connection.destinationId && i.name === connection.destinationInputName
           ? {
               ...i,
               sources: i.sources.filter(
-                s =>
-                  !(
-                    s.moduleId === action.payload.sourceId &&
-                    s.name === action.payload.sourceOutputName
-                  )
+                s => !(s.moduleId === connection.sourceId && s.name === connection.sourceOutputName)
               )
             }
           : i
       );
       return { ...state, inputs: updatedInputs };
     }
-    case AudioSignalChainActionTypes.ConnectParameterSuccess: {
+  ),
+  on(audioSignalActions.connectParameterSuccess, (state: AudioSignalChainState, { connection }) => {
+    const updatedParameters = state.parameters.map(p =>
+      p.moduleId === connection.destinationModuleId &&
+      p.name === connection.destinationParameterName
+        ? {
+            ...p,
+            sources: [
+              ...p.sources,
+              {
+                moduleId: connection.sourceModuleId,
+                name: connection.sourceOutputName
+              }
+            ]
+          }
+        : p
+    );
+    return { ...state, parameters: updatedParameters };
+  }),
+  on(
+    audioSignalActions.disconnectParameterSuccess,
+    (state: AudioSignalChainState, { connection }) => {
       const updatedParameters = state.parameters.map(p =>
-        p.moduleId === action.payload.destinationModuleId &&
-        p.name === action.payload.destinationParameterName
-          ? {
-              ...p,
-              sources: [
-                ...p.sources,
-                {
-                  moduleId: action.payload.sourceModuleId,
-                  name: action.payload.sourceOutputName
-                }
-              ]
-            }
-          : p
-      );
-      return { ...state, parameters: updatedParameters };
-    }
-    case AudioSignalChainActionTypes.DisconnectParameterSuccess: {
-      const updatedParameters = state.parameters.map(p =>
-        p.moduleId === action.payload.destinationModuleId &&
-        p.name === action.payload.destinationParameterName
+        p.moduleId === connection.destinationModuleId &&
+        p.name === connection.destinationParameterName
           ? {
               ...p,
               sources: p.sources.filter(
                 s =>
                   !(
-                    action.payload.sourceModuleId === s.moduleId &&
-                    action.payload.sourceOutputName === s.name
+                    connection.sourceModuleId === s.moduleId &&
+                    connection.sourceOutputName === s.name
                   )
               )
             }
@@ -113,84 +108,73 @@ export function reducer(
       );
       return { ...state, parameters: updatedParameters };
     }
-    case AudioSignalChainActionTypes.CreateModuleSuccess: {
-      return { ...state, modules: [...state.modules, action.payload] };
-    }
-    case AudioSignalChainActionTypes.CreateParameterSuccess: {
-      return { ...state, parameters: [...state.parameters, action.payload] };
-    }
-    case AudioSignalChainActionTypes.CreateChoiceParameterSuccess: {
-      return {
-        ...state,
-        choiceParameters: [...state.choiceParameters, action.payload]
-      };
-    }
-    case AudioSignalChainActionTypes.CreateInputSuccess: {
-      return {
-        ...state,
-        inputs: [...state.inputs, action.payload]
-      };
-    }
-    case AudioSignalChainActionTypes.CreateOutputSuccess: {
-      return {
-        ...state,
-        outputs: [...state.outputs, action.payload]
-      };
-    }
-    case AudioSignalChainActionTypes.ToggleSignalChainActiveSuccess: {
-      return { ...state, muted: !action.payload };
-    }
-    case AudioSignalChainActionTypes.DestroyModuleSuccess: {
-      const remainingModules = state.modules.filter(
-        m => m.id !== action.moduleId
-      );
-      const remainingOutputs = state.outputs.filter(
-        o => o.moduleId !== action.moduleId
-      );
-      const remainingInputs = state.inputs
-        .filter(i => i.moduleId !== action.moduleId)
-        .map(i => ({
-          ...i,
-          sources: i.sources.filter(s => s.moduleId !== action.moduleId)
-        }));
-      const remainingParameters = state.parameters
-        .filter(p => p.moduleId !== action.moduleId)
-        .map(p => ({
-          ...p,
-          sources: p.sources.filter(s => s.moduleId !== action.moduleId)
-        }));
-      const remainingChoiceParameters = state.choiceParameters.filter(
-        p => p.moduleId !== action.moduleId
-      );
+  ),
+  on(audioSignalActions.createModuleSuccess, (state: AudioSignalChainState, action) => ({
+    ...state,
+    modules: [...state.modules, action.module]
+  })),
+  on(audioSignalActions.createParameterSuccess, (state: AudioSignalChainState, action) => ({
+    ...state,
+    parameters: [...state.parameters, action.parameter]
+  })),
+  on(audioSignalActions.createChoiceParameterSuccess, (state: AudioSignalChainState, action) => ({
+    ...state,
+    choiceParameters: [...state.choiceParameters, action.choice]
+  })),
+  on(audioSignalActions.createInputSuccess, (state: AudioSignalChainState, action) => ({
+    ...state,
+    inputs: [...state.inputs, action.input]
+  })),
+  on(audioSignalActions.createOutputSuccess, (state: AudioSignalChainState, action) => ({
+    ...state,
+    outputs: [...state.outputs, action.output]
+  })),
+  on(audioSignalActions.toggleSignalChainActiveSuccess, (state: AudioSignalChainState, action) => ({
+    ...state,
+    muted: !action.isActive
+  })),
+  on(audioSignalActions.destroyModuleSuccess, (state: AudioSignalChainState, { moduleId }) => {
+    const remainingModules = state.modules.filter(m => m.id !== moduleId);
+    const remainingOutputs = state.outputs.filter(o => o.moduleId !== moduleId);
+    const remainingInputs = state.inputs
+      .filter(i => i.moduleId !== moduleId)
+      .map(i => ({
+        ...i,
+        sources: i.sources.filter(s => s.moduleId !== moduleId)
+      }));
+    const remainingParameters = state.parameters
+      .filter(p => p.moduleId !== moduleId)
+      .map(p => ({
+        ...p,
+        sources: p.sources.filter(s => s.moduleId !== moduleId)
+      }));
+    const remainingChoiceParameters = state.choiceParameters.filter(p => p.moduleId !== moduleId);
 
-      return {
-        ...state,
-        modules: remainingModules,
-        inputs: remainingInputs,
-        outputs: remainingOutputs,
-        parameters: remainingParameters,
-        choiceParameters: remainingChoiceParameters
-      };
-    }
-    case AudioSignalChainActionTypes.ClearErrors: {
-      return { ...state, errors: [] };
-    }
-    case AudioSignalChainActionTypes.AddError: {
-      return { ...state, errors: [...state.errors, action.error] };
-    }
-    case AudioSignalChainActionTypes.DismissError: {
-      const remainingErrors = state.errors.filter(e => e.id !== action.id);
-      return { ...state, errors: remainingErrors };
-    }
-    case AudioSignalChainActionTypes.ToggleVisualizationActive: {
-      const visualizations = state.visualizations.map(v =>
-        v.moduleId === action.payload.moduleId && v.name === action.payload.name
-          ? { ...v, isActive: action.payload.show }
-          : v
-      );
-      return { ...state, visualizations };
-    }
-    default:
-      return state;
-  }
-}
+    return {
+      ...state,
+      modules: remainingModules,
+      inputs: remainingInputs,
+      outputs: remainingOutputs,
+      parameters: remainingParameters,
+      choiceParameters: remainingChoiceParameters
+    };
+  }),
+  on(audioSignalActions.clearErrors, (state: AudioSignalChainState) => ({
+    ...state,
+    errors: []
+  })),
+  on(audioSignalActions.addError, (state: AudioSignalChainState, { error }) => ({
+    ...state,
+    errors: [...state.errors, error]
+  })),
+  on(audioSignalActions.dismissError, (state: AudioSignalChainState, action) => {
+    const remainingErrors = state.errors.filter(e => e.id !== action.id);
+    return { ...state, errors: remainingErrors };
+  }),
+  on(audioSignalActions.toggleVisualizationActive, (state: AudioSignalChainState, { change }) => {
+    const visualizations = state.visualizations.map(v =>
+      v.moduleId === change.moduleId && v.name === change.name ? { ...v, isActive: change.show } : v
+    );
+    return { ...state, visualizations };
+  })
+);

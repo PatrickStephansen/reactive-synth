@@ -1,48 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
-import { Store, select } from '@ngrx/store';
+import { Store, select, Action } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction } from 'rxjs';
 import { mergeMap, map, catchError, tap, filter, debounceTime } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
-import {
-  AudioSignalChainActionTypes,
-  CreateModuleSuccess,
-  AudioSignalChainAction,
-  ResetSignalChainSuccess,
-  ConnectModulesSuccess,
-  ConnectModules,
-  ChangeParameterSuccess,
-  ChangeParameter,
-  CreateParameterSuccess,
-  ToggleSignalChainActive,
-  ToggleSignalChainActiveSuccess,
-  DisconnectModulesSuccess,
-  DestroyModule,
-  DestroyModuleSuccess,
-  CreateChoiceParameterSuccess,
-  ChangeChoiceParameter,
-  ChangeChoiceParameterSuccess,
-  ConnectParameter,
-  ConnectParameterSuccess,
-  DisconnectParameterSuccess,
-  AddError,
-  CreateModule,
-  LoadSignalChainState,
-  ResetSignalChain,
-  LoadSignalChainStateFailure,
-  DisconnectModules,
-  CreateInputSuccess,
-  CreateOutputSuccess
-} from './audio-signal-chain.actions';
+import { audioSignalActions, AudioSignalChainActionTypes } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioSignalChainState } from './audio-signal-chain.state';
 import { getSignalChainStateForSave } from './audio-signal-chain.selectors';
 import { CreateModuleEvent } from '../model/create-module-event';
 import { AudioModule } from '../model/audio-module';
 import { upgradeAudioChainStateVersion } from './upgrade-audio-signal-chain-version';
+import { ConnectParameterEvent } from '../model/connect-parameter-event';
+import { ChangeParameterEvent } from '../model/change-parameter-event';
+import { ChangeChoiceEvent } from '../model/change-choice-event';
+import { ConnectModulesEvent } from '../model/connect-modules-event';
 
 let errorId = 0;
 
@@ -57,40 +32,42 @@ export class AudioSignalChainEffects implements OnInitEffects {
     private locationService: Location
   ) {}
 
-  private handleSignalChainChangeError: OperatorFunction<any, AudioSignalChainAction> = catchError(
-    error => {
-      const errorMessage = error.message || error;
-      return of(
-        new AddError({
+  private handleSignalChainChangeError: OperatorFunction<any, Action> = catchError(error => {
+    const errorMessage = error.message || error;
+    return of(
+      audioSignalActions.addError({
+        error: {
           id: `signal-chain-error-${errorId++}`,
           errorMessage
-        })
-      );
-    }
-  );
+        }
+      })
+    );
+  });
 
   @Effect()
-  resetSignalChain$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  resetSignalChain$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ResetSignalChain),
     mergeMap(() => {
       this.locationService.go(this.locationService.path(false));
       return from(this.graphService.resetGraph()).pipe(
-        map(signalChain => new ResetSignalChainSuccess(signalChain)),
+        map(signalChain => audioSignalActions.resetSignalChainSuccess({ signalChain })),
         this.handleSignalChainChangeError
       );
     })
   );
 
   @Effect()
-  loadSignalChainStateFailure$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  loadSignalChainStateFailure$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.LoadSignalChainStateFailure),
-    mergeMap(({ reason }: LoadSignalChainStateFailure) =>
+    mergeMap(({ reason }) =>
       from(this.graphService.resetGraph()).pipe(
         mergeMap(signalChain => [
-          new ResetSignalChainSuccess(signalChain),
-          new AddError({
-            id: `signal-chain-error-${errorId++}`,
-            errorMessage: reason
+          audioSignalActions.resetSignalChainSuccess({ signalChain }),
+          audioSignalActions.addError({
+            error: {
+              id: `signal-chain-error-${errorId++}`,
+              errorMessage: reason
+            }
           })
         ]),
         this.handleSignalChainChangeError
@@ -99,63 +76,68 @@ export class AudioSignalChainEffects implements OnInitEffects {
   );
 
   @Effect()
-  loadSignalChainState$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  loadSignalChainState$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.LoadSignalChainState),
-    mergeMap(({ signalChain }: LoadSignalChainState) =>
+    mergeMap(({ signalChain }: { signalChain: AudioSignalChainState }) =>
       from(this.graphService.resetGraph()).pipe(
-        map(newState => new ResetSignalChainSuccess(newState)),
+        map(newState => audioSignalActions.resetSignalChainSuccess({ signalChain: newState })),
         mergeMap(resetSuccess => {
           const events = [
-            new ToggleSignalChainActive(false),
+            audioSignalActions.toggleSignalChainActive({ isActive: false }),
             resetSuccess,
-            ...signalChain.modules.map(
-              (audioModule: AudioModule) =>
-                new CreateModule(new CreateModuleEvent(audioModule.moduleType, audioModule.id))
+            ...signalChain.modules.map((audioModule: AudioModule) =>
+              audioSignalActions.createModule({
+                module: new CreateModuleEvent(audioModule.moduleType, audioModule.id)
+              })
             ),
             ...flatten(
               signalChain.inputs.map(input =>
-                input.sources.map(
-                  source =>
-                    new ConnectModules({
+                input.sources.map(source =>
+                  audioSignalActions.connectModules({
+                    connection: {
                       sourceId: source.moduleId,
                       sourceOutputName: source.name,
                       destinationId: input.moduleId,
                       destinationInputName: input.name
-                    })
+                    }
+                  })
                 )
               )
             ),
             ...flatten(
               signalChain.parameters.map(parameter =>
-                parameter.sources.map(
-                  source =>
-                    new ConnectParameter({
+                parameter.sources.map(source =>
+                  audioSignalActions.connectParameter({
+                    connection: {
                       sourceModuleId: source.moduleId,
                       sourceOutputName: source.name,
                       destinationModuleId: parameter.moduleId,
                       destinationParameterName: parameter.name
-                    })
+                    }
+                  })
                 )
               )
             ),
-            ...signalChain.parameters.map(
-              parameter =>
-                new ChangeParameter({
+            ...signalChain.parameters.map(parameter =>
+              audioSignalActions.changeParameter({
+                parameter: {
                   moduleId: parameter.moduleId,
                   parameterName: parameter.name,
                   value: parameter.value,
                   setImmediately: true
-                })
+                }
+              })
             ),
-            ...signalChain.choiceParameters.map(
-              parameter =>
-                new ChangeChoiceParameter({
+            ...signalChain.choiceParameters.map(parameter =>
+              audioSignalActions.changeChoiceParameter({
+                choice: {
                   moduleId: parameter.moduleId,
                   parameterName: parameter.name,
                   value: parameter.selection
-                })
+                }
+              })
             ),
-            new ToggleSignalChainActive(true)
+            audioSignalActions.toggleSignalChainActive({ isActive: true })
           ];
           return from(events);
         }),
@@ -165,10 +147,10 @@ export class AudioSignalChainEffects implements OnInitEffects {
   );
 
   @Effect()
-  CreateModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  CreateModule$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateModule),
-    mergeMap(({ payload }: CreateModule) =>
-      of(() => this.graphService.createModule(payload.moduleType, payload.id)).pipe(
+    mergeMap(({ module }: { module: CreateModuleEvent }) =>
+      of(() => this.graphService.createModule(module.moduleType, module.id)).pipe(
         map(serviceMethod => serviceMethod()),
         filter(
           compose(
@@ -178,11 +160,15 @@ export class AudioSignalChainEffects implements OnInitEffects {
         ),
         mergeMap((result: CreateModuleResult) =>
           from([
-            new CreateModuleSuccess(result.module),
-            ...result.inputs.map(i => new CreateInputSuccess(i)),
-            ...result.outputs.map(i => new CreateOutputSuccess(i)),
-            ...result.parameters.map(p => new CreateParameterSuccess(p)),
-            ...result.choiceParameters.map(p => new CreateChoiceParameterSuccess(p))
+            audioSignalActions.createModuleSuccess({ module: result.module }),
+            ...result.inputs.map(input => audioSignalActions.createInputSuccess({ input })),
+            ...result.outputs.map(output => audioSignalActions.createOutputSuccess({ output })),
+            ...result.parameters.map(parameter =>
+              audioSignalActions.createParameterSuccess({ parameter })
+            ),
+            ...result.choiceParameters.map(choice =>
+              audioSignalActions.createChoiceParameterSuccess({ choice })
+            )
           ])
         ),
         this.handleSignalChainChangeError
@@ -191,104 +177,106 @@ export class AudioSignalChainEffects implements OnInitEffects {
   );
 
   @Effect()
-  connectModules$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  connectModules$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ConnectModules),
-    mergeMap(({ payload: event }: ConnectModules) =>
-      of(() => this.graphService.connectModules(event)).pipe(
+    mergeMap(({ connection }: { connection: ConnectModulesEvent }) =>
+      of(() => this.graphService.connectModules(connection)).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new ConnectModulesSuccess(event)),
+        map(() => audioSignalActions.connectModulesSuccess({ connection })),
         this.handleSignalChainChangeError
       )
     )
   );
 
   @Effect()
-  disconnectModules$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  disconnectModules$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.DisconnectModules),
-    mergeMap(({ payload: event }: DisconnectModules) =>
-      of(() => this.graphService.disconnectModules(event)).pipe(
+    mergeMap(({ connection }: { connection: ConnectModulesEvent }) =>
+      of(() => this.graphService.disconnectModules(connection)).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new DisconnectModulesSuccess(event)),
+        map(() => audioSignalActions.disconnectModulesSuccess({ connection })),
         this.handleSignalChainChangeError
       )
     )
   );
 
   @Effect()
-  connectParameter$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  connectParameter$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ConnectParameter),
-    mergeMap(({ payload: event }: ConnectParameter) =>
-      of(() => this.graphService.connectParameter(event)).pipe(
+    mergeMap(({ connection }: { connection: ConnectParameterEvent }) =>
+      of(() => this.graphService.connectParameter(connection)).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new ConnectParameterSuccess(event)),
+        map(() => audioSignalActions.connectParameterSuccess({ connection })),
         this.handleSignalChainChangeError
       )
     )
   );
 
   @Effect()
-  disconnectParameter$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  disconnectParameter$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.DisconnectParameter),
-    mergeMap(({ payload: event }: ConnectParameter) =>
-      of(() => this.graphService.disconnectParameter(event)).pipe(
+    mergeMap(({ connection }: { connection: ConnectParameterEvent }) =>
+      of(() => this.graphService.disconnectParameter(connection)).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new DisconnectParameterSuccess(event)),
+        map(() => audioSignalActions.disconnectParameterSuccess({ connection })),
         this.handleSignalChainChangeError
       )
     )
   );
 
   @Effect()
-  changeParameter$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  changeParameter$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ChangeParameter),
-    mergeMap(({ payload: event }: ChangeParameter) =>
+    mergeMap(({ parameter }: { parameter: ChangeParameterEvent }) =>
       of(() =>
         this.graphService.changeParameterValue(
-          event.moduleId,
-          event.parameterName,
-          event.value,
-          event.setImmediately
+          parameter.moduleId,
+          parameter.parameterName,
+          parameter.value,
+          parameter.setImmediately
         )
       ).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new ChangeParameterSuccess(event)),
+        map(() => audioSignalActions.changeParameterSuccess({ parameter })),
         this.handleSignalChainChangeError
       )
     )
   );
 
   @Effect()
-  changeChoiceParameter$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  changeChoiceParameter$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ChangeChoiceParameter),
-    mergeMap(({ payload: event }: ChangeChoiceParameter) =>
-      of(() => this.graphService.makeChoice(event.moduleId, event.parameterName, event.value)).pipe(
+    mergeMap(({ choice }: { choice: ChangeChoiceEvent }) =>
+      of(() =>
+        this.graphService.makeChoice(choice.moduleId, choice.parameterName, choice.value)
+      ).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new ChangeChoiceParameterSuccess(event)),
+        map(() => audioSignalActions.changeChoiceParameterSuccess({ choice })),
         this.handleSignalChainChangeError
       )
     )
   );
 
   @Effect()
-  toggleSignalChainActive$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  toggleSignalChainActive$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ToggleSignalChainActive),
-    mergeMap(({ payload: activate }: ToggleSignalChainActive) => {
-      const servicePromise = activate ? this.graphService.unmute() : this.graphService.mute();
+    mergeMap(({ isActive }) => {
+      const servicePromise = isActive ? this.graphService.unmute() : this.graphService.mute();
 
       return from(servicePromise).pipe(
-        map(() => new ToggleSignalChainActiveSuccess(activate)),
+        map(() => audioSignalActions.toggleSignalChainActiveSuccess(isActive)),
         this.handleSignalChainChangeError
       );
     })
   );
 
   @Effect()
-  destroyModule$: Observable<AudioSignalChainAction> = this.actions$.pipe(
+  destroyModule$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.DestroyModule),
-    mergeMap(({ moduleId }: DestroyModule) =>
+    mergeMap(({ moduleId }) =>
       of(() => this.graphService.destroyModule(moduleId)).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => new DestroyModuleSuccess(moduleId)),
+        map(() => audioSignalActions.destroyModuleSuccess(moduleId)),
         this.handleSignalChainChangeError
       )
     )
@@ -307,20 +295,21 @@ export class AudioSignalChainEffects implements OnInitEffects {
     )
   );
 
-  private tryLoadState(unparsedState: string): AudioSignalChainAction {
+  private tryLoadState(unparsedState: string): Action {
     try {
       const state = JSON.parse(decodeURIComponent(unparsedState));
-      return new LoadSignalChainState(
-        upgradeAudioChainStateVersion(state, state.stateVersion || 1)
-      );
+      return audioSignalActions.loadSignalChainState({
+        signalChain: upgradeAudioChainStateVersion(state, state.stateVersion || 1)
+      });
     } catch (error) {
-      return new LoadSignalChainStateFailure(
-        `Error restoring state. Defaulting to new patch. ${error.message || error}`
-      );
+      return audioSignalActions.loadSignalChainStateFailure({
+        reason: `Error restoring state. Defaulting to audioSignalActions.patch. ${error.message ||
+          error}`
+      });
     }
   }
 
-  ngrxOnInitEffects(): AudioSignalChainAction {
+  ngrxOnInitEffects(): Action {
     this.locationService.subscribe((stateEvent: PopStateEvent) => {
       if (stateEvent.type === 'popstate' && this.locationService.path(true).includes('#')) {
         this.store$.dispatch(this.tryLoadState(last(this.locationService.path(true).split('#'))));
@@ -329,6 +318,6 @@ export class AudioSignalChainEffects implements OnInitEffects {
     if (this.locationService.path(true).includes('#')) {
       return this.tryLoadState(last(this.locationService.path(true).split('#')));
     }
-    return new ResetSignalChain();
+    return audioSignalActions.resetSignalChain();
   }
 }
