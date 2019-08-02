@@ -26,6 +26,7 @@ export const getEnvelopeValue = (
         stageOutput = 'attack';
         secondsSinceStateTransitionOutput = sampleTime;
         stageProgressOutput = secondsSinceStateTransitionOutput / attackTime;
+        valueOnTriggerChangeOutput = 0;
         valueOutput = getValueAtTime(
           0,
           0,
@@ -286,7 +287,7 @@ export const getEnvelopeValue = (
         stageOutput = 'attack';
         secondsSinceStateTransitionOutput = sampleTime;
         stageProgressOutput = secondsSinceStateTransitionOutput / attackTime;
-        valueOnTriggerChangeOutput = getValueAtTime(valueOnTriggerChange, 0, 0, releaseTime, secondsSinceStateTransition);
+        valueOnTriggerChangeOutput = getValueAtTime(valueOnTriggerChange || 0, 0, 0, releaseTime, secondsSinceStateTransition);
         valueOutput = getValueAtTime(
           valueOnTriggerChangeOutput,
           0,
