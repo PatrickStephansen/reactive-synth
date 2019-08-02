@@ -64,7 +64,7 @@ export const getEnvelopeValue = (
         stageProgressOutput = secondsSinceStateTransitionOutput / releaseTime;
         if (secondsSinceStateTransition < attackTime) {
           valueOnTriggerChangeOutput = getValueAtTime(
-            0,
+            valueOnTriggerChange || 0,
             0,
             attackValue,
             attackTime,

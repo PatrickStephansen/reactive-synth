@@ -151,6 +151,20 @@ describe('linear envelope generator', () => {
       1,
       1 - 1 / 12
     ],
+    [10, allStagesHaveTimeState, 0.2, 'attack', 0, 0.11, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
+    [
+      10,
+      allStagesHaveTimeState,
+      0.1,
+      'attack',
+      0,
+      0.11,
+      'release',
+      0.1,
+      1 / 12,
+      0.11 + (1 - 0.11) / 2,
+      0.11 + (1 - 0.11) / 2 - (0.11 + (1 - 0.11) / 2) / 12
+    ],
     [10, skipAttackState, 0.2, 'attack', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
     [
       10,
@@ -179,6 +193,21 @@ describe('linear envelope generator', () => {
       0.5 - 1 / 24
     ],
     [10, skipDecayState, 0.2, 'attack', 0, undefined, 'release', 0.1, 1 / 12, 1, 1 - 1 / 12],
+    [10, skipDecayState, 0.1, 'attack', 0, undefined, 'release', 0.1, 1 / 12, 0.5, 0.5 - 0.5 / 12],
+    [10, skipDecayState, 0.1, 'attack', 0, 0, 'release', 0.1, 1 / 12, 0.5, 0.5 - 0.5 / 12],
+    [
+      10,
+      skipDecayState,
+      0.1,
+      'attack',
+      0,
+      0.4,
+      'release',
+      0.1,
+      1 / 12,
+      0.4 + (1 - 0.4) / 2,
+      0.4 + (1 - 0.4) / 2 - (0.4 + (1 - 0.4) / 2) / 12
+    ],
     [10, skipHoldAndDecayState, 0.2, 'attack', 1, undefined, 'sustain', 0.1, 0, undefined, 0.5],
     [10, skipHoldAndDecayState, 0.1, 'attack', 1, undefined, 'sustain', 0, 0, undefined, 0.5],
     [
