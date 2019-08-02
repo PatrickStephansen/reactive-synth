@@ -4,7 +4,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import { AppState } from 'src/app/state/app.state';
 import { showHelpSelector } from 'src/app/state/app.selectors';
-import { ToggleHelp } from 'src/app/state/app.actions';
+import { appActions } from 'src/app/state/app.actions';
 
 @Component({
   selector: 'app-help-message',
@@ -30,6 +30,6 @@ export class HelpMessageComponent implements OnInit, OnDestroy {
   }
 
   hideHelp() {
-    this.store.dispatch(new ToggleHelp(false));
+    this.store.dispatch(appActions.toggleHelp({ showHelp: false }));
   }
 }

@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppState } from 'src/app/state/app.state';
 import { Store, select } from '@ngrx/store';
-import { Observable } from 'rxjs';
 import { showHelpSelector } from 'src/app/state/app.selectors';
-import { ToggleHelp } from 'src/app/state/app.actions';
+import { appActions } from 'src/app/state/app.actions';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
@@ -30,6 +29,6 @@ export class ToggleHelpComponent implements OnInit, OnDestroy {
   }
 
   toggleHelp() {
-    this.store.dispatch(new ToggleHelp(!this.isShowingHelp));
+    this.store.dispatch(appActions.toggleHelp({ showHelp: !this.isShowingHelp }));
   }
 }

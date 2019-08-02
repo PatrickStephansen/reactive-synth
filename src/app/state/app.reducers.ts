@@ -1,15 +1,10 @@
-import { AppState } from './app.state';
-
-import { AppAction, AppActionTypes } from './app.actions';
+import { appActions } from './app.actions';
+import { createReducer, on } from '@ngrx/store';
 
 const initialState = { showHelp: false };
 
-export function reducer(state: AppState = initialState, action: AppAction) {
-  switch (action.type) {
-    case AppActionTypes.ToggleHelp:
-      return { ...state, showHelp: action.showHelp };
-
-    default:
-      return state;
-  }
-}
+const setHelpVisibility = (state, action) => ({ ...state, showHelp: action.showHelp });
+export const reducer = createReducer(
+  initialState,
+  on(appActions.toggleHelp, setHelpVisibility)
+);
