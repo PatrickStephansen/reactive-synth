@@ -1,4 +1,4 @@
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, on, Action } from '@ngrx/store';
 
 import { audioSignalActions } from './audio-signal-chain.actions';
 import { AudioSignalChainState } from './audio-signal-chain.state';
@@ -32,7 +32,7 @@ const initialState: AudioSignalChainState = {
   errors: []
 };
 
-export const reducer = createReducer(
+export const realReducer = createReducer(
   initialState,
   on(audioSignalActions.resetSignalChainSuccess, setSignalChainSuccess),
   on(audioSignalActions.changeParameterSuccess, updateParameter),
@@ -53,3 +53,7 @@ export const reducer = createReducer(
   on(audioSignalActions.dismissError, removeError),
   on(audioSignalActions.toggleVisualizationActive, setVisualizationActive)
 );
+
+export function reducer(state: AudioSignalChainState, action: Action) {
+  return realReducer(state, action);
+}
