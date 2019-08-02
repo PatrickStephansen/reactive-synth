@@ -264,7 +264,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
       const servicePromise = isActive ? this.graphService.unmute() : this.graphService.mute();
 
       return from(servicePromise).pipe(
-        map(() => audioSignalActions.toggleSignalChainActiveSuccess({isActive})),
+        map(() => audioSignalActions.toggleSignalChainActiveSuccess({ isActive })),
         this.handleSignalChainChangeError
       );
     })
@@ -276,7 +276,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
     mergeMap(({ moduleId }) =>
       of(() => this.graphService.destroyModule(moduleId)).pipe(
         map(serviceMethod => serviceMethod()),
-        map(() => audioSignalActions.destroyModuleSuccess(moduleId)),
+        map(() => audioSignalActions.destroyModuleSuccess({ moduleId })),
         this.handleSignalChainChangeError
       )
     )
