@@ -1,11 +1,12 @@
-<label class="label" for="input-{{ parameter.moduleId }}-{{ parameter.name }}">
+<label class="label" for="input-{{ parameter.moduleId }}-{{ parameter.name | stripSpaces }}">
   <div class="field">
     <span class="parameter-name">{{ parameter.name }}</span>
     <span class="units" *ngIf="parameter.units"> ({{ parameter.units }}) </span>
     <div class="control">
-      <div class="field has-addons" id="input-{{ parameter.moduleId }}-{{ parameter.name }}">
+      <div class="field has-addons">
         <div class="control is-expanded">
           <input
+            id="input-{{ parameter.moduleId }}-{{ parameter.name | stripSpaces }}"
             required
             [step]="parameter.stepSize"
             [min]="parameter.minValue"

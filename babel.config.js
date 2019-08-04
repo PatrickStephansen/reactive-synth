@@ -6,6 +6,7 @@ module.exports = api => {
   if (isTest) {
     return {
       presets: [
+        '@babel/typescript',
         [
           'env',
           {
@@ -20,7 +21,15 @@ module.exports = api => {
       env: {
         test: {
           // since jest runs in node, it only understands commonjs modules
-          plugins: ['transform-es2015-modules-commonjs']
+          plugins: [
+            'transform-es2015-modules-commonjs',
+            [
+              '@babel/plugin-proposal-decorators',
+              {
+                legacy: true
+              }
+            ]
+          ]
         }
       }
     };

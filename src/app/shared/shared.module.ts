@@ -9,13 +9,15 @@ import { ToggleHelpComponent } from './toggle-help/toggle-help.component';
 import { reducer } from '../state/app.reducers';
 import { MaxValidatorDirective } from './validators/max-validator';
 import { MinValidatorDirective } from './validators/min-validator';
+import { StripSpacesPipe } from './pipes/strip-spaces.pipe';
 
 @NgModule({
   declarations: [
     MaxValidatorDirective,
     MinValidatorDirective,
     HelpMessageComponent,
-    ToggleHelpComponent
+    ToggleHelpComponent,
+    StripSpacesPipe
   ],
   imports: [
     ClickOutsideModule,
@@ -32,7 +34,8 @@ import { MinValidatorDirective } from './validators/min-validator';
     HelpMessageComponent,
     ToggleHelpComponent,
     MaxValidatorDirective,
-    MinValidatorDirective
+    MinValidatorDirective,
+    StripSpacesPipe
   ]
 })
 export class SharedModule {}
