@@ -1,4 +1,5 @@
 import { AudioModuleOutput } from './audio-module-output';
+import { ParameterExtension } from './parameter-extension';
 
 export interface Parameter {
   name: string;
@@ -9,4 +10,5 @@ export interface Parameter {
   maxValue: number;
   stepSize: number;
   sources: AudioModuleOutput[];
+  extensions?: ParameterExtension[];
 }

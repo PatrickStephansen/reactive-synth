@@ -8,13 +8,9 @@ const getNextValue = (previousValue, stepMin, stepMax) => {
   const stepSize = Math.random() * (stepMax - stepMin) + stepMin;
   const preferUp = Math.random() > 0.5;
   if (preferUp) {
-    return previousValue + stepSize > 1
-      ? previousValue - stepSize
-      : previousValue + stepSize;
+    return previousValue + stepSize > 1 ? previousValue - stepSize : previousValue + stepSize;
   } else {
-    return previousValue - stepSize < -1
-      ? previousValue + stepSize
-      : previousValue - stepSize;
+    return previousValue - stepSize < -1 ? previousValue + stepSize : previousValue - stepSize;
   }
 };
 
@@ -51,6 +47,7 @@ registerProcessor(
         }
       ];
     }
+
     constructor() {
       super();
       // initializing to zero means max and min of 1 behaves differently on initial load
@@ -58,22 +55,25 @@ registerProcessor(
       this.previousValue = 0.1;
       this.samplesHeld = 0;
       this.isTriggerValueHigh = false;
+      this.port.onmessage = this.handleMessage.bind(this);
+      this.manualTriggerOn = false;
     }
+
+    handleMessage(event) {
+      if (event.data && event.data.type === 'manual-trigger') {
+        this.manualTriggerOn = event.data.value;
+      }
+    }
+
     process(inputs, outputs, parameters) {
       // Get the first output.
       let output = outputs[0];
       let stepMin = parameters.stepMin;
       let stepMinLength = stepMin.length;
-      let getStepMin =
-        stepMinLength > 1
-          ? i => clampStep(stepMin[i])
-          : () => clampStep(stepMin[0]);
+      let getStepMin = stepMinLength > 1 ? i => clampStep(stepMin[i]) : () => clampStep(stepMin[0]);
       let stepMax = parameters.stepMax;
       let stepMaxLength = stepMax.length;
-      let getStepMax =
-        stepMaxLength > 1
-          ? i => clampStep(stepMax[i])
-          : () => clampStep(stepMax[0]);
+      let getStepMax = stepMaxLength > 1 ? i => clampStep(stepMax[i]) : () => clampStep(stepMax[0]);
       let sampleHold = parameters.sampleHold;
       let sampleHoldLength = sampleHold.length;
       let getSampleHold =
@@ -82,10 +82,11 @@ registerProcessor(
           : () => clampSampleHold(sampleHold[0]);
       let nextValueTrigger = parameters.nextValueTrigger;
       let nextValueTriggerLength = nextValueTrigger.length;
-      let getNextValueTrigger =
-        nextValueTriggerLength > 1
-          ? i => clampTrigger(nextValueTrigger[i])
-          : () => clampTrigger(nextValueTrigger[0]);
+      let getNextValueTrigger = this.manualTriggerOn
+        ? () => 1e9
+        : nextValueTriggerLength > 1
+        ? i => clampTrigger(nextValueTrigger[i])
+        : () => clampTrigger(nextValueTrigger[0]);
 
       for (let i = 0; i < output[0].length; ++i, ++this.samplesHeld) {
         // recover from overflow
@@ -98,20 +99,16 @@ registerProcessor(
         // keep playing previous sample forever if sampleHold < 1
         if (sampleHold >= 1 && this.samplesHeld >= sampleHold) {
           this.samplesHeld -= sampleHold;
-          this.previousValue = getNextValue(
-            this.previousValue,
-            getStepMin(i),
-            getStepMax(i)
-          );
+          this.previousValue = getNextValue(this.previousValue, getStepMin(i), getStepMax(i));
         }
-        if (!this.isTriggerValueHigh && getNextValueTrigger(i) > 0) {
-          this.previousValue = getNextValue(
-            this.previousValue,
-            getStepMin(i),
-            getStepMax(i)
-          );
+        const triggerValue = getNextValueTrigger(i);
+        if (this.isTriggerValueHigh != triggerValue > 0) {
+          this.port.postMessage({ type: 'trigger-change', value: triggerValue > 0 });
         }
-        this.isTriggerValueHigh = getNextValueTrigger(i) > 0;
+        if (!this.isTriggerValueHigh && triggerValue > 0) {
+          this.previousValue = getNextValue(this.previousValue, getStepMin(i), getStepMax(i));
+        }
+        this.isTriggerValueHigh = triggerValue > 0;
         for (let channel = 0; channel < output.length; ++channel) {
           output[channel][i] = this.previousValue;
         }

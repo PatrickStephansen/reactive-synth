@@ -1,0 +1,13 @@
+<button
+  class="button has-background-white-ter"
+  (pointerdown)="manualTriggerOn()"
+  (pointerup)="manualTriggerOff()"
+  (keydown)="eventForClickEquivalentKey($event, manualTriggerOn)"
+  (keyup)="eventForClickEquivalentKey($event, manualTriggerOff)"
+>
+  <span class="is-size-7">Trigger</span>
+  <span
+    class="indicator"
+    [ngClass]="{ 'is-on': (triggerChange | async)?.value }"
+  ></span>
+</button>

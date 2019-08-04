@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Location } from '@angular/common';
 import { isNil, last } from 'ramda';
 import {
@@ -21,6 +21,11 @@ import {
 import { AudioModuleType } from './model/audio-module-type';
 import { CreateModuleResult } from './model/create-module-result';
 import { ConnectModulesEvent } from './model/connect-modules-event';
+import { TriggerExtension } from './model/trigger-extension';
+import { fromEventPattern, Subscription } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
+import { ExtensionEvent } from './model/extension-event';
+import { observableFromMessagePort } from './observable-from-message-port';
 
 let incrementingId = 0;
 
@@ -42,6 +47,7 @@ export class AudioGraphService {
   private defaultGain = 0.1;
 
   private createModuleMap: Map<AudioModuleType, (id: string) => CreateModuleResult>;
+  private subscriptions: Subscription[] = [];
 
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
@@ -91,90 +97,100 @@ export class AudioGraphService {
     return this.context ? this.context.suspend() : Promise.reject('No audio context to suspend');
   }
 
+  endSubscriptions(): void {
+    while (this.subscriptions.length) {
+      const sub = this.subscriptions.pop();
+      sub.unsubscribe();
+    }
+  }
+
   resetGraph(): Promise<AudioSignalChainState> {
-    return this.destroyContext().then(() => {
-      if (typeof AudioContext !== 'function') {
-        throw new Error(
-          `Your browser is not supported because it does not implement the Web Audio API.
+    const subscriptionsPromise = new Promise(resolve => resolve(this.endSubscriptions()));
+    return subscriptionsPromise
+      .then(() => this.destroyContext())
+      .then(() => {
+        if (typeof AudioContext !== 'function') {
+          throw new Error(
+            `Your browser is not supported because it does not implement the Web Audio API.
           Try reloading the page in a newer browser.
           If you're using iOS, none of them will work due to Apple store policy restrictions.`
-        );
-      }
-      this.context = new AudioContext();
-      incrementingId = 0;
+          );
+        }
+        this.context = new AudioContext();
+        incrementingId = 0;
 
-      const visualizer = this.context.createAnalyser();
-      visualizer.connect(this.context.destination);
-      this.graph = new Map([
-        [
-          'Output to Speakers',
-          {
-            internalNodes: [visualizer, this.context.destination],
-            inputMap: new Map([['audio to play', visualizer]])
-          }
-        ]
-      ]);
-      return this.context.audioWorklet
-        .addModule(
-          this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/worklets.js')
-        )
-        .then(() => ({
-          modules: [
+        const visualizer = this.context.createAnalyser();
+        visualizer.connect(this.context.destination);
+        this.graph = new Map([
+          [
+            'Output to Speakers',
             {
-              id: 'Output to Speakers',
-              moduleType: AudioModuleType.Output,
-              canDelete: false,
-              helpText: `Signals must be connected to this module to be audible.
+              internalNodes: [visualizer, this.context.destination],
+              inputMap: new Map([['audio to play', visualizer]])
+            }
+          ]
+        ]);
+        return this.context.audioWorklet
+          .addModule(
+            this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/worklets.js')
+          )
+          .then(() => ({
+            modules: [
+              {
+                id: 'Output to Speakers',
+                moduleType: AudioModuleType.Output,
+                canDelete: false,
+                helpText: `Signals must be connected to this module to be audible.
               Incoming signals are summed and clamped to the range [-1, 1].
               Click the visualizations to pause them. Click their headings to hide them to save space.`
-            }
-          ],
-          inputs: [
-            {
-              moduleId: 'Output to Speakers',
-              name: 'audio to play',
-              sources: []
-            }
-          ],
-          outputs: [],
-          parameters: [],
-          choiceParameters: [],
-          visualizations: [
-            {
-              moduleId: 'Output to Speakers',
-              name: 'waveform',
-              dataLength: visualizer.fftSize,
-              visualizationType: 'line-graph',
-              visualizationStage: ModuleSignalStage.input,
-              renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
-              isActive: true,
-              getVisualizationData: data => visualizer.getByteTimeDomainData(data)
-            },
-            {
-              moduleId: 'Output to Speakers',
-              name: 'spectrum - log',
-              dataLength: visualizer.frequencyBinCount,
-              visualizationType: 'line-graph',
-              visualizationStage: ModuleSignalStage.input,
-              renderingStrategyPerAxis: [logarithmicScalingStrategy, linearScalingStrategy],
-              isActive: false,
-              getVisualizationData: data => visualizer.getByteFrequencyData(data)
-            },
-            {
-              moduleId: 'Output to Speakers',
-              name: 'spectrum - linear',
-              dataLength: visualizer.frequencyBinCount,
-              visualizationType: 'line-graph',
-              visualizationStage: ModuleSignalStage.input,
-              renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
-              isActive: false,
-              getVisualizationData: data => visualizer.getByteFrequencyData(data)
-            }
-          ],
-          muted: this.context.state && this.context.state === 'suspended',
-          errors: []
-        }));
-    });
+              }
+            ],
+            inputs: [
+              {
+                moduleId: 'Output to Speakers',
+                name: 'audio to play',
+                sources: []
+              }
+            ],
+            outputs: [],
+            parameters: [],
+            choiceParameters: [],
+            visualizations: [
+              {
+                moduleId: 'Output to Speakers',
+                name: 'waveform',
+                dataLength: visualizer.fftSize,
+                visualizationType: 'line-graph',
+                visualizationStage: ModuleSignalStage.input,
+                renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
+                isActive: true,
+                getVisualizationData: data => visualizer.getByteTimeDomainData(data)
+              },
+              {
+                moduleId: 'Output to Speakers',
+                name: 'spectrum - log',
+                dataLength: visualizer.frequencyBinCount,
+                visualizationType: 'line-graph',
+                visualizationStage: ModuleSignalStage.input,
+                renderingStrategyPerAxis: [logarithmicScalingStrategy, linearScalingStrategy],
+                isActive: false,
+                getVisualizationData: data => visualizer.getByteFrequencyData(data)
+              },
+              {
+                moduleId: 'Output to Speakers',
+                name: 'spectrum - linear',
+                dataLength: visualizer.frequencyBinCount,
+                visualizationType: 'line-graph',
+                visualizationStage: ModuleSignalStage.input,
+                renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
+                isActive: false,
+                getVisualizationData: data => visualizer.getByteFrequencyData(data)
+              }
+            ],
+            muted: this.context.state && this.context.state === 'suspended',
+            errors: []
+          }));
+      });
   }
 
   createModule(moduleType: AudioModuleType, id?: string): CreateModuleResult {
@@ -209,6 +225,18 @@ export class AudioGraphService {
         ['output gain', volumeControl.gain]
       ])
     });
+
+    const nextSampleTriggerChanged = observableFromMessagePort(noiseGeneratorNode.port);
+    noiseGeneratorNode.port.start();
+
+    const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
+
+    this.subscriptions.push(
+      manualTriggerEventEmitter.subscribe((next: ExtensionEvent) =>
+        noiseGeneratorNode.port.postMessage(next)
+      )
+    );
+
     return new CreateModuleResult(
       {
         id,
@@ -267,7 +295,13 @@ export class AudioGraphService {
           maxValue: this.parameterMax(nextValueTrigger),
           minValue: this.parameterMin(nextValueTrigger),
           value: nextValueTrigger.value,
-          stepSize: 0.01
+          stepSize: 0.01,
+          extensions: [
+            new TriggerExtension(
+              new Map([['trigger-change', nextSampleTriggerChanged]]),
+              new Map([['manual-trigger', manualTriggerEventEmitter]])
+            )
+          ]
         },
         {
           name: 'output gain',

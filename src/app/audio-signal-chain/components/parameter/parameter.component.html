@@ -4,6 +4,15 @@
     <span class="units" *ngIf="parameter.units"> ({{ parameter.units }}) </span>
     <div class="control">
       <div class="field has-addons">
+        <ng-container *ngIf="parameter.extensions">
+          <ng-container *ngFor="let extension of parameter.extensions">
+            <app-trigger-parameter-extension
+              class="control"
+              *ngIf="extension.type === 'trigger'"
+              [extension]="extension"
+            ></app-trigger-parameter-extension>
+          </ng-container>
+        </ng-container>
         <div class="control is-expanded">
           <input
             id="input-{{ parameter.moduleId }}-{{ parameter.name | stripSpaces }}"

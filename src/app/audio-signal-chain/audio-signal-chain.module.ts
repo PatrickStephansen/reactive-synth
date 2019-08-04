@@ -26,6 +26,7 @@ import { LineGraphVisualizationComponent } from './components/line-graph-visuali
 import { VisualizationsShellComponent } from './containers/visualizations-shell/visualizations-shell.component';
 import { InputListComponent } from './components/input-list/input-list.component';
 import { InputComponent } from './components/input/input.component';
+import { TriggerParameterExtensionComponent } from './components/trigger-parameter-extension/trigger-parameter-extension.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { InputComponent } from './components/input/input.component';
     ErrorListComponent,
     VisualizationListComponent,
     LineGraphVisualizationComponent,
-    VisualizationsShellComponent
+    VisualizationsShellComponent,
+    TriggerParameterExtensionComponent
   ],
   imports: [
     StoreModule.forFeature('signalChain', reducer),
