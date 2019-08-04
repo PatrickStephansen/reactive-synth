@@ -1,7 +1,7 @@
 <button
   class="button has-background-white-ter"
-  (pointerdown)="manualTriggerOn()"
-  (pointerup)="manualTriggerOff()"
+  (pointerdown)="capturePointerEvent($event, manualTriggerOn)"
+  (pointerup)="capturePointerEvent($event, manualTriggerOff)"
   (keydown)="eventForClickEquivalentKey($event, manualTriggerOn)"
   (keyup)="eventForClickEquivalentKey($event, manualTriggerOff)"
 >

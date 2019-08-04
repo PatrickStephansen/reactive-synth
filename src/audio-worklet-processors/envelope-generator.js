@@ -74,6 +74,7 @@ registerProcessor(
       this.sampleRate = options.sampleRate || 44100;
       this.outputValue;
       this.valueOnTriggerChange = undefined;
+      this.manualTriggerOn = false;
     }
 
     handleMessage(event) {
@@ -87,18 +88,24 @@ registerProcessor(
           }
         });
       }
+      if (event.data && event.data.type === 'manual-trigger') {
+        this.manualTriggerOn = event.data.value;
+      }
     }
 
     process(inputs, outputs, parameters) {
       // Only one output.
       let output = outputs[0];
-      const getTriggerValue = getParameterValue(parameters.trigger, -1e9, 1e9);
+      const getTriggerValue = this.manualTriggerOn
+        ? () => 1e9
+        : getParameterValue(parameters.trigger, -1e9, 1e9);
       const getAttackTime = getParameterValue(parameters.attackTime, 0, 10);
       const getAttackValue = getParameterValue(parameters.attackValue, 0, 1);
       const getHoldTime = getParameterValue(parameters.holdTime, 0, 10);
       const getDecayTime = getParameterValue(parameters.decayTime, 0, 10);
       const getSustainValue = getParameterValue(parameters.sustainValue, 0, 1);
       const getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
+      let previousTriggerValue = 0;
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
         this.state = {
@@ -109,8 +116,12 @@ registerProcessor(
           sustainValue: getSustainValue(sampleIndex),
           releaseTime: getReleaseTime(sampleIndex)
         };
-        // only expecting one channel, but tolerating more in case
         const triggerValue = getTriggerValue(sampleIndex);
+
+        if (triggerValue > 0 != previousTriggerValue > 0) {
+          this.port.postMessage({ type: 'trigger-change', value: triggerValue > 0 });
+        }
+
         const envelopeValue = getEnvelopeValue(
           this.sampleRate,
           this.state,
@@ -124,7 +135,9 @@ registerProcessor(
         this.secondsSinceStateTransition = envelopeValue.secondsSinceStateTransition;
         this.outputValue = envelopeValue.outputValue;
         this.valueOnTriggerChange = envelopeValue.valueOnTriggerChange;
+        previousTriggerValue = triggerValue;
 
+        // only expecting one channel, but tolerating more in case
         for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
           const outputChannel = output[channelIndex];
 

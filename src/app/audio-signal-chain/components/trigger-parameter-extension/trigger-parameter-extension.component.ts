@@ -34,4 +34,14 @@ export class TriggerParameterExtensionComponent implements OnInit {
       handler.bind(this)();
     }
   }
+
+  capturePointerEvent(event, handler) {
+    handler.bind(this)();
+    if (event.type === 'pointerdown') {
+      event.target.setPointerCapture(event.pointerId);
+    }
+    if (event.type === 'pointerup') {
+      event.target.releasePointerCapture(event.pointerId);
+    }
+  }
 }

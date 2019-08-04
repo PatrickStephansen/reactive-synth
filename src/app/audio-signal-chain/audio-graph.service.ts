@@ -22,8 +22,7 @@ import { AudioModuleType } from './model/audio-module-type';
 import { CreateModuleResult } from './model/create-module-result';
 import { ConnectModulesEvent } from './model/connect-modules-event';
 import { TriggerExtension } from './model/trigger-extension';
-import { fromEventPattern, Subscription } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { ExtensionEvent } from './model/extension-event';
 import { observableFromMessagePort } from './observable-from-message-port';
 
@@ -226,7 +225,7 @@ export class AudioGraphService {
       ])
     });
 
-    const nextSampleTriggerChanged = observableFromMessagePort(noiseGeneratorNode.port);
+    const nextSampleTriggerChanged = observableFromMessagePort(noiseGeneratorNode.port, 'trigger-change')
     noiseGeneratorNode.port.start();
 
     const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
@@ -356,6 +355,17 @@ export class AudioGraphService {
         ])
       });
 
+      const envelopeTriggered = observableFromMessagePort(envelopeGeneratorNode.port, 'trigger-change');
+      envelopeGeneratorNode.port.start();
+
+      const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
+
+      this.subscriptions.push(
+        manualTriggerEventEmitter.subscribe((next: ExtensionEvent) =>
+          envelopeGeneratorNode.port.postMessage(next)
+        )
+      );
+
       return new CreateModuleResult(
         {
           id,
@@ -386,7 +396,13 @@ export class AudioGraphService {
             maxValue: this.parameterMax(trigger),
             minValue: this.parameterMin(trigger),
             stepSize: 0.01,
-            value: trigger.defaultValue
+            value: trigger.defaultValue,
+            extensions: [
+              new TriggerExtension(
+                new Map([['trigger-change', envelopeTriggered]]),
+                new Map([['manual-trigger', manualTriggerEventEmitter]])
+              )
+            ]
           },
           {
             name: 'attack value',
