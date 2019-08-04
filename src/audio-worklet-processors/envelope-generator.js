@@ -75,6 +75,7 @@ registerProcessor(
       this.outputValue;
       this.valueOnTriggerChange = undefined;
       this.manualTriggerOn = false;
+      this.previousTriggerValue = 0;
     }
 
     handleMessage(event) {
@@ -105,7 +106,6 @@ registerProcessor(
       const getDecayTime = getParameterValue(parameters.decayTime, 0, 10);
       const getSustainValue = getParameterValue(parameters.sustainValue, 0, 1);
       const getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
-      let previousTriggerValue = 0;
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
         this.state = {
@@ -118,7 +118,7 @@ registerProcessor(
         };
         const triggerValue = getTriggerValue(sampleIndex);
 
-        if (triggerValue > 0 != previousTriggerValue > 0) {
+        if (triggerValue > 0 != this.previousTriggerValue > 0) {
           this.port.postMessage({ type: 'trigger-change', value: triggerValue > 0 });
         }
 
@@ -135,7 +135,7 @@ registerProcessor(
         this.secondsSinceStateTransition = envelopeValue.secondsSinceStateTransition;
         this.outputValue = envelopeValue.outputValue;
         this.valueOnTriggerChange = envelopeValue.valueOnTriggerChange;
-        previousTriggerValue = triggerValue;
+        this.previousTriggerValue = triggerValue;
 
         // only expecting one channel, but tolerating more in case
         for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
