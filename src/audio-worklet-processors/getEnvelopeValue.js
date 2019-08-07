@@ -1,8 +1,7 @@
-import { getValueAtTime } from './linear-change';
-
 // ASSUMPTION: this will be called every sample, so it's safe to always advance time by one sample
 // returns the value at end of the sample, so if attack time is 0, attack value will be returned on the sample of the recieved trigger
 export const getEnvelopeValue = (
+  getValueAtTime,
   sampleRate,
   { attackTime, attackValue, holdTime, decayTime, sustainValue, releaseTime },
   secondsSinceStateTransition,

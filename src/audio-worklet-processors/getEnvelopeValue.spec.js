@@ -1,4 +1,5 @@
 import { getEnvelopeValue } from './getEnvelopeValue';
+import { getValueAtTime } from './linear-change';
 
 const allStagesHaveTimeState = {
   attackTime: 0.2,
@@ -596,6 +597,7 @@ describe('linear envelope generator', () => {
       expectedValue
     ) => {
       const result = getEnvelopeValue(
+        getValueAtTime,
         sampleRate,
         state,
         secondsSinceStateTransition,

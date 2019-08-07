@@ -1,5 +1,6 @@
 import { getParameterValue } from './getParameterValue';
 import { getEnvelopeValue } from './getEnvelopeValue';
+import { getValueAtTime } from './linear-change';
 
 registerProcessor(
   'envelope-generator',
@@ -123,6 +124,7 @@ registerProcessor(
         }
 
         const envelopeValue = getEnvelopeValue(
+          getValueAtTime,
           this.sampleRate,
           this.state,
           this.secondsSinceStateTransition,
