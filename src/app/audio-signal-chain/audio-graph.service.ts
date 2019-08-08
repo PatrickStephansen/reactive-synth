@@ -25,8 +25,10 @@ import { TriggerExtension } from './model/trigger-extension';
 import { Subscription } from 'rxjs';
 import { ExtensionEvent } from './model/extension-event';
 import { observableFromMessagePort } from './observable-from-message-port';
+import { sampleTime } from 'rxjs/operators';
 
 let incrementingId = 0;
+const frameRateLimit = sampleTime<ExtensionEvent>(1000 / 144);
 
 interface ModuleImplementation {
   internalNodes: IAudioNode[];
@@ -225,7 +227,10 @@ export class AudioGraphService {
       ])
     });
 
-    const nextSampleTriggerChanged = observableFromMessagePort(noiseGeneratorNode.port, 'trigger-change')
+    const nextSampleTriggerChanged = observableFromMessagePort(
+      noiseGeneratorNode.port,
+      'trigger-change'
+    ).pipe(frameRateLimit);
     noiseGeneratorNode.port.start();
 
     const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
@@ -355,7 +360,10 @@ export class AudioGraphService {
         ])
       });
 
-      const envelopeTriggered = observableFromMessagePort(envelopeGeneratorNode.port, 'trigger-change');
+      const envelopeTriggered = observableFromMessagePort(
+        envelopeGeneratorNode.port,
+        'trigger-change'
+      ).pipe(frameRateLimit);
       envelopeGeneratorNode.port.start();
 
       const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
