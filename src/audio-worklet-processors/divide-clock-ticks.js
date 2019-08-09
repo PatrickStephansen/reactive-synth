@@ -1,27 +1,47 @@
-// tick = low to high (attack)
-// tock = high to low (release)
+export const clockInTriggerStages = {
+  attack: 1,
+  high: 2,
+  release: 3,
+  low: 4
+};
+
+export const clockStages = {
+  tick: 1,
+  tock: 0
+};
+
+export const resetTriggerStages = {
+  reset: 1,
+  keepGoing: 0
+};
+
 export function divideClockTicks(
-  isTriggerHigh,
-  wasTriggerHigh,
-  attackDivisor,
-  releaseDivisor,
-  ticksPast,
-  tocksPast
+  { stage, ticksPast, tocksPast },
+  { attackAfterTicks, releaseAfterTocks },
+  clockInStage,
+  resetTriggerStage
 ) {
-  const tick = 1;
-  const tock = 0;
-  let clockOutput = undefined;
-  if (attackDivisor === 0 && previousOutput === tock) {
-    clockOutput = tick;
-    ticksPast = 0;
+  if (
+    clockInStage === clockInTriggerStages.attack &&
+    stage === clockStages.tock &&
+    ticksPast + 1 >= attackAfterTicks
+  ) {
+    return {
+      stage: clockStages.tick,
+      ticksPast: ticksPast + 1 - attackAfterTicks,
+      tocksPast: tocksPast
+    };
   }
-  if (releaseDivisor === 0 && previousOutput === tick) {
-    clockOutput = tock;
-    tocksPast = 0;
+  if (
+    clockInStage === clockInTriggerStages.release &&
+    stage === clockStages.tick &&
+    tocksPast + 1 >= releaseAfterTocks
+  ) {
+    return {
+      stage: clockStages.tock,
+      ticksPast: ticksPast,
+      tocksPast: tocksPast + 1 - releaseAfterTocks
+    };
   }
-  return {
-    clockOutput,
-    ticksPast,
-    tocksPast
-  };
+  return { stage, ticksPast, tocksPast };
 }
