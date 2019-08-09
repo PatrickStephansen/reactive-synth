@@ -23,6 +23,11 @@ export function divideClockTicks(
   clockInStage,
   resetTriggerStage
 ) {
+  if (resetTriggerStage === resetTriggerStages.reset) {
+    stage = clockStages.tock;
+    tocksPast = 0;
+    ticksPast = attackAfterTicks - 1;
+  }
   if (clockInStage === clockInTriggerStages.attack && stage === clockStages.tock) {
     ticksPast++;
     if (ticksPast >= attackAfterTicks) {
@@ -30,10 +35,7 @@ export function divideClockTicks(
       ticksPast -= attackAfterTicks;
     }
   }
-  if (
-    clockInStage === clockInTriggerStages.release &&
-    stage === clockStages.tick
-  ) {
+  if (clockInStage === clockInTriggerStages.release && stage === clockStages.tick) {
     tocksPast++;
     if (tocksPast >= releaseAfterTocks) {
       stage = clockStages.tock;
