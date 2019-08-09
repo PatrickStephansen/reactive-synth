@@ -1,3 +1,5 @@
+import { compose } from 'ramda';
+
 export const clockInTriggerStages = {
   attack: 1,
   high: 2,
@@ -21,27 +23,22 @@ export function divideClockTicks(
   clockInStage,
   resetTriggerStage
 ) {
-  if (
-    clockInStage === clockInTriggerStages.attack &&
-    stage === clockStages.tock &&
-    ticksPast + 1 >= attackAfterTicks
-  ) {
-    return {
-      stage: clockStages.tick,
-      ticksPast: ticksPast + 1 - attackAfterTicks,
-      tocksPast: tocksPast
-    };
+  if (clockInStage === clockInTriggerStages.attack && stage === clockStages.tock) {
+    ticksPast++;
+    if (ticksPast >= attackAfterTicks) {
+      stage = clockStages.tick;
+      ticksPast -= attackAfterTicks;
+    }
   }
   if (
     clockInStage === clockInTriggerStages.release &&
-    stage === clockStages.tick &&
-    tocksPast + 1 >= releaseAfterTocks
+    stage === clockStages.tick
   ) {
-    return {
-      stage: clockStages.tock,
-      ticksPast: ticksPast,
-      tocksPast: tocksPast + 1 - releaseAfterTocks
-    };
+    tocksPast++;
+    if (tocksPast >= releaseAfterTocks) {
+      stage = clockStages.tock;
+      tocksPast -= releaseAfterTocks;
+    }
   }
   return { stage, ticksPast, tocksPast };
 }

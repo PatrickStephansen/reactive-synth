@@ -88,4 +88,109 @@ describe('divide clock ticks', () => {
       expect(result.tocksPast).toBeCloseToVerbose(expectedOutput.tocksPast, 1e-5, description);
     }
   );
+  test.each([
+    [
+      { stage: clockStages.tock, ticksPast: 0, tocksPast: 0 },
+      clockInTriggerStages.low,
+      { stage: clockStages.tock, ticksPast: 0, tocksPast: 0 },
+      'at rest'
+    ],
+    [
+      { stage: clockStages.tock, ticksPast: 0, tocksPast: 0 },
+      clockInTriggerStages.attack,
+      { stage: clockStages.tock, ticksPast: 1, tocksPast: 0 },
+      'increment ticks on attack'
+    ],
+    [
+      { stage: clockStages.tock, ticksPast: 1, tocksPast: 0 },
+      clockInTriggerStages.high,
+      { stage: clockStages.tock, ticksPast: 1, tocksPast: 0 },
+      'clock in stays high after tick'
+    ],
+    [
+      { stage: clockStages.tock, ticksPast: 1, tocksPast: 0 },
+      clockInTriggerStages.release,
+      { stage: clockStages.tock, ticksPast: 1, tocksPast: 0 },
+      'clock in releases after first after tick'
+    ],
+    [
+      { stage: clockStages.tock, ticksPast: 1, tocksPast: 0 },
+      clockInTriggerStages.attack,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 0 },
+      'second tick in'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 0 },
+      clockInTriggerStages.high,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 0 },
+      'clock in high after second tick'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 0 },
+      clockInTriggerStages.release,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      'increment tocks on release from high'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      clockInTriggerStages.low,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      'clock in low after first tock'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      clockInTriggerStages.attack,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      'ignore ticks while awaiting tocks'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      clockInTriggerStages.high,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      'clock in still high after ignored tick'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 1 },
+      clockInTriggerStages.release,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      'second tock'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      clockInTriggerStages.low,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      'low after second tock'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      clockInTriggerStages.attack,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      'ignore ticks while awaiting tocks again'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      clockInTriggerStages.high,
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      'high after ignored tick again'
+    ],
+    [
+      { stage: clockStages.tick, ticksPast: 0, tocksPast: 2 },
+      clockInTriggerStages.release,
+      { stage: clockStages.tock, ticksPast: 0, tocksPast: 0 },
+      'release on awaited tock'
+    ]
+  ])(
+    'it should work with uneven params. start state %j, clock in stage %f, expected output %j',
+    (startState, clockInStage, expectedOutput, description) => {
+      const result = divideClockTicks(
+        startState,
+        unevenParams,
+        clockInStage,
+        resetTriggerStages.keepGoing
+      );
+      expect(result.stage).toBeVerbose(expectedOutput.stage, description);
+      expect(result.ticksPast).toBeCloseToVerbose(expectedOutput.ticksPast, 1e-5, description);
+      expect(result.tocksPast).toBeCloseToVerbose(expectedOutput.tocksPast, 1e-5, description);
+    }
+  );
 });
