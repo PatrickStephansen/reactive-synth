@@ -330,7 +330,8 @@ export class AudioGraphService {
         numberOfOutputs: 1,
         channelCount: 1,
         channelCountMode: 'explicit',
-        outputChannelCount: [1]
+        outputChannelCount: [1],
+        processorOptions: { sampleRate: this.context.sampleRate }
       });
 
       const trigger = envelopeGeneratorNode.parameters.get('trigger');
