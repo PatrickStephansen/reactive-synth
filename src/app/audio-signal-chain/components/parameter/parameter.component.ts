@@ -85,4 +85,8 @@ export class ParameterComponent implements OnInit {
       this.toggleSourceList();
     }
   }
+
+  getExtensionType(index, extension) {
+    return extension.type;
+  }
 }

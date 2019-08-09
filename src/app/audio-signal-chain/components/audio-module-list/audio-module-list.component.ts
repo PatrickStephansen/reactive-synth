@@ -69,4 +69,7 @@ export class AudioModuleListComponent implements OnInit {
   createEnvelopeGeneratorModule() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.EnvelopeGenerator));
   }
+  createClockDividerModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.ClockDivider));
+  }
 }

@@ -9,6 +9,7 @@ export enum AudioModuleType {
   Distortion = 'distortion',
   Rectifier = 'rectifier',
   EnvelopeGenerator = 'envelope',
+  ClockDivider = 'clock-divider',
   ConstantSource = 'constant',
   Output = 'output'
 }

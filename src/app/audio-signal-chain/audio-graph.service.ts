@@ -25,7 +25,7 @@ import { TriggerExtension } from './model/trigger-extension';
 import { Subscription } from 'rxjs';
 import { ExtensionEvent } from './model/extension-event';
 import { observableFromMessagePort } from './observable-from-message-port';
-import { sampleTime } from 'rxjs/operators';
+import { sampleTime, map } from 'rxjs/operators';
 
 let incrementingId = 0;
 const frameRateLimit = sampleTime<ExtensionEvent>(1000 / 144);
@@ -71,6 +71,7 @@ export class AudioGraphService {
       [AudioModuleType.NoiseGenerator, id => this.createNoiseGenerator(id)],
       [AudioModuleType.Rectifier, id => this.createRectifierModule(id)],
       [AudioModuleType.EnvelopeGenerator, id => this.createEnvelopeGeneratorModule(id)],
+      [AudioModuleType.ClockDivider, id => this.createClockDividerModule(id)],
       [AudioModuleType.Output, id => null]
     ]);
   }
@@ -321,6 +322,149 @@ export class AudioGraphService {
     );
   }
 
+  createClockDividerModule(id?: string): CreateModuleResult {
+    const moduleType = AudioModuleType.ClockDivider;
+    id = this.createModuleId(moduleType, id);
+    const clockDividerNode = new AudioWorkletNode(this.context, 'clock-divider', {
+      numberOfInputs: 0,
+      numberOfOutputs: 1,
+      channelCount: 1,
+      channelCountMode: 'explicit',
+      outputChannelCount: [1]
+    });
+
+    const clockTrigger = clockDividerNode.parameters.get('clockTrigger');
+    const resetTrigger = clockDividerNode.parameters.get('resetTrigger');
+    const attackAfterTicks = clockDividerNode.parameters.get('attackAfterTicks');
+    const releaseAfterTocks = clockDividerNode.parameters.get('releaseAfterTocks');
+
+    const outputGain = this.context.createGain();
+    outputGain.gain.value = this.defaultGain;
+    clockDividerNode.connect(outputGain);
+
+    this.graph.set(id, {
+      internalNodes: [clockDividerNode, outputGain],
+      outputMap: new Map([['output', outputGain]]),
+      parameterMap: new Map([
+        ['clock trigger', clockTrigger],
+        ['reset trigger', resetTrigger],
+        ['attack after ticks', attackAfterTicks],
+        ['release after tocks', releaseAfterTocks],
+        ['output gain', outputGain.gain]
+      ])
+    });
+
+    const clockTriggered = observableFromMessagePort(
+      clockDividerNode.port,
+      'clock-trigger-change'
+    ).pipe(frameRateLimit);
+    clockDividerNode.port.start();
+
+    const manualClockTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
+
+    this.subscriptions.push(
+      manualClockTriggerEventEmitter
+        .pipe(map((event: ExtensionEvent) => ({ ...event, type: 'manual-clock-trigger' })))
+        .subscribe((next: ExtensionEvent) => clockDividerNode.port.postMessage(next))
+    );
+    const resetTriggered = observableFromMessagePort(
+      clockDividerNode.port,
+      'reset-trigger-change'
+    ).pipe(frameRateLimit);
+    clockDividerNode.port.start();
+
+    const manualResetTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
+
+    this.subscriptions.push(
+      manualResetTriggerEventEmitter
+        .pipe(map((event: ExtensionEvent) => ({ ...event, type: 'manual-reset-trigger' })))
+        .subscribe((next: ExtensionEvent) => clockDividerNode.port.postMessage(next))
+    );
+
+    return new CreateModuleResult(
+      {
+        id,
+        moduleType,
+        canDelete: true,
+        helpText: `Interprets the incoming Clock Trigger parameter as a clock signal and outputs clock pulses of equal or slower tempo.
+          The signal is interpretted as being a tick when sample value is greater than 0 and
+          as a tock when the sample value is 0 or less.
+          The Attack After Ticks and Release After Ticks parameters control the ratio between incoming and output clock pulses.
+          Higher values mean more incoming pulses per output pulse.
+          The Reset Trigger puts the module back in a state where it will output a tick on the next tick received.
+          It can be used to synchronize with other modules.
+        `
+      },
+      [],
+      [
+        {
+          moduleId: id,
+          name: 'output'
+        }
+      ],
+      [
+        {
+          moduleId: id,
+          name: 'clock trigger',
+          sources: [],
+          stepSize: 0.01,
+          maxValue: this.parameterMax(clockTrigger),
+          minValue: this.parameterMin(clockTrigger),
+          value: clockTrigger.defaultValue,
+          extensions: [
+            new TriggerExtension(
+              new Map([['trigger-change', clockTriggered]]),
+              new Map([['manual-trigger', manualClockTriggerEventEmitter]])
+            )
+          ]
+        },
+        {
+          moduleId: id,
+          name: 'reset trigger',
+          sources: [],
+          stepSize: 0.01,
+          maxValue: this.parameterMax(resetTrigger),
+          minValue: this.parameterMin(resetTrigger),
+          value: resetTrigger.defaultValue,
+          extensions: [
+            new TriggerExtension(
+              new Map([['trigger-change', resetTriggered]]),
+              new Map([['manual-trigger', manualResetTriggerEventEmitter]])
+            )
+          ]
+        },
+        {
+          moduleId: id,
+          name: 'attack after ticks',
+          sources: [],
+          stepSize: 0.25,
+          maxValue: this.parameterMax(attackAfterTicks),
+          minValue: this.parameterMin(attackAfterTicks),
+          value: attackAfterTicks.defaultValue
+        },
+        {
+          moduleId: id,
+          name: 'release after tocks',
+          sources: [],
+          stepSize: 0.25,
+          maxValue: this.parameterMax(releaseAfterTocks),
+          minValue: this.parameterMin(releaseAfterTocks),
+          value: releaseAfterTocks.defaultValue
+        },
+        {
+          moduleId: id,
+          name: 'output gain',
+          sources: [],
+          stepSize: 0.01,
+          maxValue: this.parameterMax(outputGain.gain),
+          minValue: this.parameterMin(outputGain.gain),
+          value: this.defaultGain
+        }
+      ],
+      []
+    );
+  }
+
   createEnvelopeGeneratorModule(id?: string): CreateModuleResult {
     try {
       const moduleType = AudioModuleType.EnvelopeGenerator;
@@ -381,14 +525,14 @@ export class AudioGraphService {
           moduleType,
           canDelete: true,
           helpText: `Creates an AHDSR envelope which reponds to trigger inputs.
-        When the trigger value goes above 0 the attack stage starts.
-        In the attack stage, the output value moves linearly from 0 to the attack value parameter value
-        over a period of time given by the attack time.
-        The attack value is then output for the hold time before starting the decay stage.
-        The decay stage moves the output linearly towards the sustain value for the duration of the decay time.
-        The sustain stage lasts indefinitely as long as the trigger value stays high, ouputing the sustain value.
-        When the trigger value falls to 0 or below, the output value moves linearly towards 0 over the release time
-        regardless of which phase the envelope was in.`
+            When the trigger value goes above 0 the attack stage starts.
+            In the attack stage, the output value moves linearly from 0 to the attack value parameter value
+            over a period of time given by the attack time.
+            The attack value is then output for the hold time before starting the decay stage.
+            The decay stage moves the output linearly towards the sustain value for the duration of the decay time.
+            The sustain stage lasts indefinitely as long as the trigger value stays high, ouputing the sustain value.
+            When the trigger value falls to 0 or below, the output value moves linearly towards 0 over the release time
+            regardless of which phase the envelope was in.`
         },
         [],
         [

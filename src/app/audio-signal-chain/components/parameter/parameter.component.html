@@ -5,7 +5,7 @@
     <div class="control">
       <div class="field has-addons">
         <ng-container *ngIf="parameter.extensions">
-          <ng-container *ngFor="let extension of parameter.extensions">
+          <ng-container *ngFor="let extension of parameter.extensions; trackBy: getExtensionType">
             <app-trigger-parameter-extension
               class="control"
               *ngIf="extension.type === 'trigger'"
