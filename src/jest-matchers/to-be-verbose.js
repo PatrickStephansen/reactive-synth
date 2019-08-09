@@ -10,6 +10,15 @@ export function extend(expect) {
         ${failureMessage}`
       };
     },
+    toBeCloseToVerbose(actual, expected, errorMargin, failureMessage) {
+      const matches = Math.abs(actual - expected) <= errorMargin;
+
+      return {
+        pass: matches,
+        message: () => `expected ${expected} but got ${actual}
+        ${failureMessage}`
+      };
+    },
     toBeLessThanOrEqualVerbose(actual, expected, failureMessage) {
       const matches = actual <= expected;
 
