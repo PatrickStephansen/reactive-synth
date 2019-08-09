@@ -1,21 +1,21 @@
-// high trigger value is tick, low is tock
+// tick = low to high (attack)
+// tock = high to low (release)
 export function divideClockTicks(
   isTriggerHigh,
   wasTriggerHigh,
-  tickDivisor,
-  tockDivisor,
+  attackDivisor,
+  releaseDivisor,
   ticksPast,
-  tocksPast,
-  previousOutput
+  tocksPast
 ) {
   const tick = 1;
   const tock = 0;
   let clockOutput = undefined;
-  if (tickDivisor === 0 && previousOutput === tock) {
+  if (attackDivisor === 0 && previousOutput === tock) {
     clockOutput = tick;
     ticksPast = 0;
   }
-  if (tockDivisor === 0 && previousOutput === tick) {
+  if (releaseDivisor === 0 && previousOutput === tick) {
     clockOutput = tock;
     tocksPast = 0;
   }
