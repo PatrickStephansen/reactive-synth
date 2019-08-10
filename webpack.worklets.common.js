@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: 'production',
+  devtool: 'source-map',
   entry: {
     worklets: [
       './src/audio-worklet-processors/noise.js',

@@ -40,4 +40,4 @@ testem.log
 Thumbs.db
 
 # build hack
-src/app/cache-hack/cache.ts
+src/app/cache-hack/cache.prod.ts
