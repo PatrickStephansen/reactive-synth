@@ -3,5 +3,7 @@ const { promisify } = require('util');
 
 const readdirAsync = promisify(readdir);
 readdirAsync('./src/assets/audio-worklet-processors').then(files => {
-  console.log(`export const workletUrl = '/assets/audio-worklet-processors/${files[0]}';`);
+  // ensure we don't try read the map file
+  const sourceFiles = files.filter(f => /worklets.*\.js$/.test(f));
+  console.log(`export const workletUrl = '/assets/audio-worklet-processors/${sourceFiles[0]}';`);
 }, console.error);
