@@ -26,6 +26,7 @@ import { Subscription } from 'rxjs';
 import { ExtensionEvent } from './model/extension-event';
 import { observableFromMessagePort } from './observable-from-message-port';
 import { sampleTime, map } from 'rxjs/operators';
+import { workletUrl } from '../cache-hack/cache';
 
 let incrementingId = 0;
 const frameRateLimit = sampleTime<ExtensionEvent>(1000 / 144);
@@ -133,9 +134,7 @@ export class AudioGraphService {
           ]
         ]);
         return this.context.audioWorklet
-          .addModule(
-            this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/worklets.js')
-          )
+          .addModule(this.locationService.prepareExternalUrl(workletUrl))
           .then(() => ({
             modules: [
               {
