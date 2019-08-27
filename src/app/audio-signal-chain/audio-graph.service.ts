@@ -48,7 +48,7 @@ export class AudioGraphService {
 
   private defaultGain = 0.1;
 
-  private createModuleMap: Map<AudioModuleType, (id: string) => CreateModuleResult>;
+  private createModuleMap: Map<AudioModuleType, (id: string, name: string) => CreateModuleResult>;
   private subscriptions: Subscription[] = [];
 
   private parameterMax(parameter: IAudioParam) {
@@ -61,19 +61,22 @@ export class AudioGraphService {
 
   constructor(private locationService: Location) {
     this.createModuleMap = new Map([
-      [AudioModuleType.Oscillator, id => this.createOscillator(id)],
-      [AudioModuleType.BitCrusher, id => this.createBitCrusherFixedPointModule(id)],
-      [AudioModuleType.ConstantSource, id => this.createConstantSource(id)],
-      [AudioModuleType.Delay, id => this.createDelayModule(id)],
-      [AudioModuleType.Distortion, id => this.createDistortionModule(id)],
-      [AudioModuleType.Filter, id => this.createFilterModule(id)],
-      [AudioModuleType.Gain, id => this.createGainModule(id)],
-      [AudioModuleType.InverseGain, id => this.createInverseGainModule(id)],
-      [AudioModuleType.NoiseGenerator, id => this.createNoiseGenerator(id)],
-      [AudioModuleType.Rectifier, id => this.createRectifierModule(id)],
-      [AudioModuleType.EnvelopeGenerator, id => this.createEnvelopeGeneratorModule(id)],
-      [AudioModuleType.ClockDivider, id => this.createClockDividerModule(id)],
-      [AudioModuleType.Output, id => null]
+      [AudioModuleType.Oscillator, (id, name) => this.createOscillator(id, name)],
+      [AudioModuleType.BitCrusher, (id, name) => this.createBitCrusherFixedPointModule(id, name)],
+      [AudioModuleType.ConstantSource, (id, name) => this.createConstantSource(id, name)],
+      [AudioModuleType.Delay, (id, name) => this.createDelayModule(id, name)],
+      [AudioModuleType.Distortion, (id, name) => this.createDistortionModule(id, name)],
+      [AudioModuleType.Filter, (id, name) => this.createFilterModule(id, name)],
+      [AudioModuleType.Gain, (id, name) => this.createGainModule(id, name)],
+      [AudioModuleType.InverseGain, (id, name) => this.createInverseGainModule(id, name)],
+      [AudioModuleType.NoiseGenerator, (id, name) => this.createNoiseGenerator(id, name)],
+      [AudioModuleType.Rectifier, (id, name) => this.createRectifierModule(id, name)],
+      [
+        AudioModuleType.EnvelopeGenerator,
+        (id, name) => this.createEnvelopeGeneratorModule(id, name)
+      ],
+      [AudioModuleType.ClockDivider, (id, name) => this.createClockDividerModule(id, name)],
+      [AudioModuleType.Output, (id, name) => null]
     ]);
   }
 
@@ -194,11 +197,11 @@ export class AudioGraphService {
       });
   }
 
-  createModule(moduleType: AudioModuleType, id?: string): CreateModuleResult {
-    return this.createModuleMap.get(moduleType)(id);
+  createModule(moduleType: AudioModuleType, id?: string, name?: string): CreateModuleResult {
+    return this.createModuleMap.get(moduleType)(id, name);
   }
 
-  createNoiseGenerator(id?: string): CreateModuleResult {
+  createNoiseGenerator(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.NoiseGenerator;
     id = this.createModuleId(moduleType, id);
     const noiseGeneratorNode = new AudioWorkletNode(this.context, 'noise', {
@@ -244,6 +247,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `A noise generator that generates each sample based on the previous sample.
@@ -321,7 +325,7 @@ export class AudioGraphService {
     );
   }
 
-  createClockDividerModule(id?: string): CreateModuleResult {
+  createClockDividerModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.ClockDivider;
     id = this.createModuleId(moduleType, id);
     const clockDividerNode = new AudioWorkletNode(this.context, 'clock-divider', {
@@ -383,6 +387,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Interprets the incoming Clock Trigger parameter as a clock signal and outputs clock pulses of equal or slower tempo.
@@ -464,7 +469,7 @@ export class AudioGraphService {
     );
   }
 
-  createEnvelopeGeneratorModule(id?: string): CreateModuleResult {
+  createEnvelopeGeneratorModule(id?: string, name?: string): CreateModuleResult {
     try {
       const moduleType = AudioModuleType.EnvelopeGenerator;
       id = this.createModuleId(moduleType, id);
@@ -521,6 +526,7 @@ export class AudioGraphService {
       return new CreateModuleResult(
         {
           id,
+          name,
           moduleType,
           canDelete: true,
           helpText: `Creates an AHDSR envelope which reponds to trigger inputs.
@@ -638,7 +644,7 @@ export class AudioGraphService {
     }
   }
 
-  createOscillator(id?: string): CreateModuleResult {
+  createOscillator(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Oscillator;
     id = this.createModuleId(moduleType, id);
     const oscillator = this.context.createOscillator();
@@ -660,6 +666,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `A source that emits a periodic wave.
@@ -720,7 +727,7 @@ export class AudioGraphService {
     );
   }
 
-  createGainModule(id?: string): CreateModuleResult {
+  createGainModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Gain;
     id = this.createModuleId(moduleType, id);
     const gain = this.context.createGain();
@@ -737,6 +744,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Multiplies each sample of the incoming signal by a factor to boost or attenuate it.
@@ -771,7 +779,7 @@ export class AudioGraphService {
     );
   }
 
-  createInverseGainModule(id?: string): CreateModuleResult {
+  createInverseGainModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.InverseGain;
     id = this.createModuleId(moduleType, id);
     const inverseGain = new AudioWorkletNode(this.context, 'inverse-gain', {
@@ -799,6 +807,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Divides each sample of the incoming signal by the given divisor.
@@ -841,7 +850,7 @@ export class AudioGraphService {
     );
   }
 
-  createBitCrusherFixedPointModule(id?: string): CreateModuleResult {
+  createBitCrusherFixedPointModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.BitCrusher;
     id = this.createModuleId(moduleType, id);
     const crusher = new AudioWorkletNode(this.context, 'bit-crusher-fixed-point', {
@@ -881,6 +890,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Maps each sample to a less precise representation imitating an integer with a given number of bits.
@@ -938,7 +948,7 @@ export class AudioGraphService {
     );
   }
 
-  createDelayModule(id?: string): CreateModuleResult {
+  createDelayModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Delay;
     id = this.createModuleId(moduleType, id);
     const delay = this.context.createDelay(60);
@@ -954,6 +964,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Emits the incoming signal unchanged after the set delay time.
@@ -991,7 +1002,7 @@ export class AudioGraphService {
     );
   }
 
-  createFilterModule(id?: string): CreateModuleResult {
+  createFilterModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Filter;
     id = this.createModuleId(moduleType, id);
     const filter = this.context.createBiquadFilter();
@@ -1011,6 +1022,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Shapes the frequency response of the incoming signal.
@@ -1074,7 +1086,7 @@ export class AudioGraphService {
     );
   }
 
-  createDistortionModule(id?: string): CreateModuleResult {
+  createDistortionModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Distortion;
     id = this.createModuleId(moduleType, id);
     const distortion = this.context.createWaveShaper();
@@ -1091,6 +1103,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `A simple wave shaping distortion that adds more harmonic content to boring waveforms.
@@ -1128,7 +1141,7 @@ export class AudioGraphService {
     );
   }
 
-  createRectifierModule(id?: string): CreateModuleResult {
+  createRectifierModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.Rectifier;
     id = this.createModuleId(moduleType, id);
     const rectifier = this.context.createWaveShaper();
@@ -1147,6 +1160,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Clips incoming samples to the range [0, 1]. Values between 0 and 1 are untouched.
@@ -1190,7 +1204,7 @@ export class AudioGraphService {
     );
   }
 
-  createConstantSource(id?: string): CreateModuleResult {
+  createConstantSource(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.ConstantSource;
     id = this.createModuleId(moduleType, id);
     const constant = this.context.createConstantSource();
@@ -1203,6 +1217,7 @@ export class AudioGraphService {
     return new CreateModuleResult(
       {
         id,
+        name,
         moduleType,
         canDelete: true,
         helpText: `Emits a "constant" stream of samples with the value of the Output Value parameter.

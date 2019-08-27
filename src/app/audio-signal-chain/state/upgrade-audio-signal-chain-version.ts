@@ -6,14 +6,14 @@ export const upgradeAudioChainStateVersion = (
 ): AudioSignalChainState => {
   switch (version) {
     case 1:
-      const getModuleById = id => state.modules.find(m => m.id === id);
       const upgradedState = {
         errors: [],
         muted: true,
         visualizations: [],
         modules: state.modules.map(m => ({
           id: m.id,
-          moduleType: m.moduleType
+          moduleType: m.moduleType,
+          name: m.name
         })),
         choiceParameters: state.choiceParameters,
         outputs: state.modules

@@ -87,7 +87,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
             resetSuccess,
             ...signalChain.modules.map((audioModule: AudioModule) =>
               audioSignalActions.createModule({
-                module: new CreateModuleEvent(audioModule.moduleType, audioModule.id)
+                module: new CreateModuleEvent(audioModule.moduleType, audioModule.id, audioModule.name)
               })
             ),
             ...flatten(
@@ -150,7 +150,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   CreateModule$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateModule),
     mergeMap(({ module }: { module: CreateModuleEvent }) =>
-      of(() => this.graphService.createModule(module.moduleType, module.id)).pipe(
+      of(() => this.graphService.createModule(module.moduleType, module.id, module.name)).pipe(
         map(serviceMethod => serviceMethod()),
         filter(
           compose(
