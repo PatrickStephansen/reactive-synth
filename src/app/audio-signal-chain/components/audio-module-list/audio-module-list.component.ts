@@ -3,9 +3,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { AudioModule } from '../../model/audio-module';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { CreateModuleEvent } from '../../model/create-module-event';
-import { thisExpression } from '@babel/types';
 import { AudioModuleType } from '../../model/audio-module-type';
 import { AudioModuleOutput } from '../../model/audio-module-output';
+import { ReorderModulesEvent } from '../../model/reorder-modules-event';
 
 @Component({
   selector: 'app-audio-module-list',
@@ -23,6 +23,7 @@ export class AudioModuleListComponent implements OnInit {
   @Output() toggleAudioOutputEnabled = new EventEmitter<boolean>();
   @Output() deleteModule = new EventEmitter<string>();
   @Output() resetSignalChain = new EventEmitter<void>();
+  @Output() reorderModules = new EventEmitter<ReorderModulesEvent>();
 
   constructor() {}
 
@@ -36,14 +37,10 @@ export class AudioModuleListComponent implements OnInit {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.Oscillator));
   }
   createNoiseGenerator() {
-    this.createModule.emit(
-      new CreateModuleEvent(AudioModuleType.NoiseGenerator)
-    );
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.NoiseGenerator));
   }
   createConstantSource() {
-    this.createModule.emit(
-      new CreateModuleEvent(AudioModuleType.ConstantSource)
-    );
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.ConstantSource));
   }
   createGainModule() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.Gain));

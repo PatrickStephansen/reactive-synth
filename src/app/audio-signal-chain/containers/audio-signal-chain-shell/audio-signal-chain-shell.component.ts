@@ -12,6 +12,7 @@ import {
 import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { AudioModuleOutput } from '../../model/audio-module-output';
+import { ReorderModulesEvent } from '../../model/reorder-modules-event';
 
 @Component({
   selector: 'app-audio-signal-chain-shell',
@@ -54,5 +55,9 @@ export class AudioSignalChainShellComponent implements OnInit {
 
   resetSignalChain() {
     this.store.dispatch(audioSignalActions.resetSignalChain());
+  }
+
+  reorderModules(event: ReorderModulesEvent) {
+    this.store.dispatch(audioSignalActions.reorderModules({ orderChange: event }));
   }
 }
