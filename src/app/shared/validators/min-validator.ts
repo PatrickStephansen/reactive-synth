@@ -8,11 +8,11 @@ function minValidator(minValue: number): ValidatorFn {
 }
 
 @Directive({
-  selector: '[min]',
+  selector: '[appMin]',
   providers: [{ provide: NG_VALIDATORS, useExisting: MinValidatorDirective, multi: true }]
 })
 export class MinValidatorDirective implements Validator {
-  @Input('min') minValue: number;
+  @Input('appMin') minValue: number;
 
   validate(control: AbstractControl): { [key: string]: any } | null {
     return minValidator(this.minValue)(control);

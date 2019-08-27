@@ -8,11 +8,11 @@ function maxValidator(maxValue: number): ValidatorFn {
 }
 
 @Directive({
-  selector: '[max]',
+  selector: '[appMax]',
   providers: [{ provide: NG_VALIDATORS, useExisting: MaxValidatorDirective, multi: true }]
 })
 export class MaxValidatorDirective implements Validator {
-  @Input('max') maxValue: number;
+  @Input('appMax') maxValue: number;
 
   validate(control: AbstractControl): { [key: string]: any } | null {
     return this.maxValue
