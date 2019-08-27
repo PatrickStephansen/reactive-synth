@@ -7,16 +7,15 @@ import { Visualization } from '../model/visualization/visualization';
 import { always, applySpec, compose, map, omit, pick, prop } from 'ramda';
 import { AudioModuleInput } from '../model/audio-module-input';
 
-const getSignalChainsFeatureState = createFeatureSelector<
-  AudioSignalChainState
->('signalChain');
+const getSignalChainsFeatureState = createFeatureSelector<AudioSignalChainState>('signalChain');
 export const getSignalChainOutputActiveState = createSelector(
   getSignalChainsFeatureState,
   signalChain => !signalChain.muted
 );
 export const getModulesState = createSelector(
   getSignalChainsFeatureState,
-  signalChain => signalChain.modules
+  signalChain =>
+    signalChain.modules.map(m => ({ ...m, name: m.name === undefined ? m.id : m.name }))
 );
 export const getOutputsState = createSelector(
   getSignalChainsFeatureState,
@@ -24,8 +23,7 @@ export const getOutputsState = createSelector(
 );
 export const getSources = createSelector(
   getOutputsState,
-  (outputs, { moduleId }: { moduleId: string }) =>
-    outputs.filter(o => o.moduleId !== moduleId)
+  (outputs, { moduleId }: { moduleId: string }) => outputs.filter(o => o.moduleId !== moduleId)
 );
 
 const getParametersState = createSelector(
@@ -83,7 +81,7 @@ export const getSignalChainStateForSave = createSelector(
   applySpec({
     stateVersion: always(2),
     modules: compose(
-      map(pick(['id', 'moduleType'])),
+      map(pick(['id', 'moduleType', 'name'])),
       prop('modules')
     ),
     inputs: prop('inputs'),

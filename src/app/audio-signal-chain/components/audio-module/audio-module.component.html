@@ -8,14 +8,14 @@
         (keyup)="editName(true)"
         tabindex="0"
       >
-        {{ module.name || module.id }}
+        {{ module.name }}
       </label>
       <input
         #nameInput
         type="text"
         class="input"
         [ngClass]="{ 'is-hidden': !isEditingName }"
-        [ngModel]="module.name || module.id"
+        [ngModel]="module.name"
         (ngModelChange)="onNameChange.emit($event)"
         (blur)="editName(false)"
       />
