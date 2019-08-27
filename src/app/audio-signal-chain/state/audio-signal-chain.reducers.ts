@@ -18,7 +18,8 @@ import {
   connectModules,
   disconnectModules,
   addModule,
-  removeModule
+  removeModule,
+  changeModuleName
 } from './reducer-functions/modules';
 
 const initialState: AudioSignalChainState = {
@@ -39,6 +40,7 @@ export const realReducer = createReducer(
   on(audioSignalActions.changeChoiceParameterSuccess, updateChoice),
   on(audioSignalActions.connectModulesSuccess, connectModules),
   on(audioSignalActions.disconnectModulesSuccess, disconnectModules),
+  on(audioSignalActions.changeModuleName, changeModuleName),
   on(audioSignalActions.connectParameterSuccess, connectParameter),
   on(audioSignalActions.disconnectParameterSuccess, disconnectParameter),
   on(audioSignalActions.createModuleSuccess, addModule),

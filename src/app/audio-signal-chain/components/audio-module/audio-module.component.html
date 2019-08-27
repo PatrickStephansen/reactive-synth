@@ -1,19 +1,33 @@
 <div class="box is-fullheight">
-  <div class="level">
-    <div class="level-left">
-      <label class="label is-medium level-item">
-        {{ module.id }}
+  <div class="field is-grouped">
+    <div class="control is-expanded">
+      <label
+        class="label is-medium"
+        [ngClass]="{ 'is-hidden': isEditingName }"
+        (click)="editName(true)"
+        (keyup)="editName(true)"
+        tabindex="0"
+      >
+        {{ module.name || module.id }}
       </label>
+      <input
+        #nameInput
+        type="text"
+        class="input"
+        [ngClass]="{ 'is-hidden': !isEditingName }"
+        [ngModel]="module.name || module.id"
+        (ngModelChange)="onNameChange.emit($event)"
+        (blur)="editName(false)"
+      />
     </div>
-    <div class="level-right">
+    <div class="control">
       <button
         *ngIf="module.canDelete"
         type="button"
-        class="delete level-item"
+        class="delete"
         (click)="deleteModule.emit(module.id)"
       ></button>
     </div>
-
   </div>
 
   <app-help-message *ngIf="module.helpText"> {{ module.helpText }} </app-help-message>

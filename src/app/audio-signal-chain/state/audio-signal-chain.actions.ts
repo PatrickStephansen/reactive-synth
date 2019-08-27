@@ -13,6 +13,7 @@ import { CreateModuleEvent } from '../model/create-module-event';
 import { AudioModuleInput } from '../model/audio-module-input';
 import { AudioModuleOutput } from '../model/audio-module-output';
 import { ReorderModulesEvent } from '../model/reorder-modules-event';
+import { ChangeModuleNameEvent } from '../model/change-module-name-event';
 
 export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
@@ -27,6 +28,7 @@ export enum AudioSignalChainActionTypes {
   ConnectModulesSuccess = '[Audio Signal Chain] Connect Modules Success',
   DisconnectModules = '[Audio Signal Chain] Disconnect Modules',
   DisconnectModulesSuccess = '[Audio Signal Chain] Disconnect Modules Success',
+  ChangeModuleName = '[Audio Signal Chain] Change Module Name',
   ConnectParameter = '[Audio Signal Chain] Connect Parameter',
   ConnectParameterSuccess = '[Audio Signal Chain] Connect Parameter Success',
   DisconnectParameter = '[Audio Signal Chain] Disconnect Parameter',
@@ -97,6 +99,10 @@ export const audioSignalActions = {
   reorderModules: createAction(
     AudioSignalChainActionTypes.ReorderModules,
     props<{ orderChange: ReorderModulesEvent }>()
+  ),
+  changeModuleName: createAction(
+    AudioSignalChainActionTypes.ChangeModuleName,
+    props<{ nameChange: ChangeModuleNameEvent }>()
   ),
   connectParameter: createAction(
     AudioSignalChainActionTypes.ConnectParameter,

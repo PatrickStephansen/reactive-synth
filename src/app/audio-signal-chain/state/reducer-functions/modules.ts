@@ -1,4 +1,6 @@
 import { AudioSignalChainState } from '../audio-signal-chain.state';
+import { statement } from '@babel/template';
+import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
 
 export const connectModules = (state: AudioSignalChainState, { connection }) => {
   const updatedInputs = state.inputs.map(i =>
@@ -61,4 +63,11 @@ export const removeModule = (state: AudioSignalChainState, { moduleId }) => {
     parameters: remainingParameters,
     choiceParameters: remainingChoiceParameters
   };
+};
+
+export const changeModuleName = (
+  state: AudioSignalChainState,
+  { nameChange: { moduleId, name } }
+) => {
+  return { ...state, modules: state.modules.map(m => (m.id === moduleId ? { ...m, name } : m)) };
 };

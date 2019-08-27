@@ -6,6 +6,7 @@ import { CreateModuleEvent } from '../../model/create-module-event';
 import { AudioModuleType } from '../../model/audio-module-type';
 import { AudioModuleOutput } from '../../model/audio-module-output';
 import { ReorderModulesEvent } from '../../model/reorder-modules-event';
+import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
 
 @Component({
   selector: 'app-audio-module-list',
@@ -24,6 +25,7 @@ export class AudioModuleListComponent implements OnInit {
   @Output() deleteModule = new EventEmitter<string>();
   @Output() resetSignalChain = new EventEmitter<void>();
   @Output() reorderModules = new EventEmitter<ReorderModulesEvent>();
+  @Output() changeModuleName = new EventEmitter<ChangeModuleNameEvent>();
 
   constructor() {}
 
