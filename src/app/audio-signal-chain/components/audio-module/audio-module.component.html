@@ -1,6 +1,6 @@
 <div class="box is-fullheight">
   <div class="field is-grouped">
-    <div class="control is-expanded">
+    <div class="control is-expanded is-clipped">
       <label
         class="label is-medium"
         [ngClass]="{ 'is-hidden': isEditingName }"
@@ -18,6 +18,7 @@
         [ngModel]="module.name"
         (ngModelChange)="onNameChange.emit($event)"
         (blur)="editName(false)"
+        maxlength="20"
       />
     </div>
     <div class="control">
