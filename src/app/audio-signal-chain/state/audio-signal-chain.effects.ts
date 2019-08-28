@@ -79,7 +79,11 @@ export class AudioSignalChainEffects implements OnInitEffects {
   loadSignalChainState$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.LoadSignalChainState),
     mergeMap(({ signalChain }: { signalChain: AudioSignalChainState }) =>
-      from(this.graphService.resetGraph()).pipe(
+      from(
+        this.graphService.resetGraph(
+          signalChain.modules.find(module => module.id === 'Output to Speakers').name
+        )
+      ).pipe(
         map(newState => audioSignalActions.resetSignalChainSuccess({ signalChain: newState })),
         mergeMap(resetSuccess => {
           const events = [
@@ -87,7 +91,11 @@ export class AudioSignalChainEffects implements OnInitEffects {
             resetSuccess,
             ...signalChain.modules.map((audioModule: AudioModule) =>
               audioSignalActions.createModule({
-                module: new CreateModuleEvent(audioModule.moduleType, audioModule.id, audioModule.name)
+                module: new CreateModuleEvent(
+                  audioModule.moduleType,
+                  audioModule.id,
+                  audioModule.name
+                )
               })
             ),
             ...flatten(

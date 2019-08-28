@@ -110,7 +110,7 @@ export class AudioGraphService {
     }
   }
 
-  resetGraph(): Promise<AudioSignalChainState> {
+  resetGraph(outputModuleName?: string): Promise<AudioSignalChainState> {
     const subscriptionsPromise = new Promise(resolve => resolve(this.endSubscriptions()));
     return subscriptionsPromise
       .then(() => this.destroyContext())
@@ -142,6 +142,7 @@ export class AudioGraphService {
             modules: [
               {
                 id: 'Output to Speakers',
+                name: outputModuleName,
                 moduleType: AudioModuleType.Output,
                 canDelete: false,
                 helpText: `Signals must be connected to this module to be audible.

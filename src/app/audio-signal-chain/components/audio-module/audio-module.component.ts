@@ -13,7 +13,6 @@ import {
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { AudioModule } from '../../model/audio-module';
-import { ChangeChoiceEvent } from '../../model/change-choice-event';
 import { distinctUntilChanged, debounceTime, takeWhile } from 'rxjs/operators';
 import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
 
