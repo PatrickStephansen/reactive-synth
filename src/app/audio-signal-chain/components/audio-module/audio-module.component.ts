@@ -52,7 +52,12 @@ export class AudioModuleComponent implements OnInit, OnChanges, OnDestroy {
         distinctUntilChanged(),
         takeWhile(() => this.isActive)
       )
-      .subscribe(name => this.changeModuleName.emit({ name, moduleId: this.module.id }));
+      .subscribe(name =>
+        this.changeModuleName.emit({
+          name: name === this.module.id ? undefined : name,
+          moduleId: this.module.id
+        })
+      );
   }
 
   ngOnDestroy() {

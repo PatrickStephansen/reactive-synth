@@ -28,7 +28,7 @@ export class ParametersShellComponent implements OnInit {
 
   parameters$: Observable<Parameter[]>;
   choiceParameters$: Observable<ChoiceParameter[]>;
-  sources$: Observable<AudioModuleOutput>;
+  sources$: Observable<AudioModuleOutput[]>;
 
   constructor(private store: Store<AudioSignalChainState>) {}
 
