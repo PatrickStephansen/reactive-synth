@@ -83,4 +83,10 @@ export class AudioModuleComponent implements OnInit, OnChanges, OnDestroy {
       });
     }
   }
+
+  unfocusOnSubmitName(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      this.nameInputElement.nativeElement.blur();
+    }
+  }
 }

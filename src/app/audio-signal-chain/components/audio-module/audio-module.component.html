@@ -18,6 +18,7 @@
         [ngModel]="module.name"
         (ngModelChange)="onNameChange.emit($event)"
         (blur)="editName(false)"
+        (keyup)="unfocusOnSubmitName($event)"
         maxlength="20"
       />
     </div>
