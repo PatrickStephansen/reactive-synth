@@ -82,10 +82,12 @@
     </div>
     <div class="tags" *ngIf="parameter.sources?.length">
       <ng-container *ngFor="let sourceModuleOutput of parameter.sources">
-        <span class="tag"
-          >{{ sourceModuleOutput.moduleName || sourceModuleOutput.moduleId }}-{{
-            sourceModuleOutput.name
-          }}
+        <span class="tag is-clipped"
+          ><span class="is-clipped">
+            {{ sourceModuleOutput.moduleName || sourceModuleOutput.moduleId }}-{{
+              sourceModuleOutput.name
+            }}
+          </span>
           <button
             class="delete is-small"
             type="button"
