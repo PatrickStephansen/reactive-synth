@@ -65,7 +65,9 @@
                     class="dropdown-item"
                     (click)="connectToSource(sourceModuleOutput)"
                   >
-                    {{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+                    {{ sourceModuleOutput.moduleName || sourceModuleOutput.moduleId }}-{{
+                      sourceModuleOutput.name
+                    }}
                   </a>
                 </div>
               </div>
@@ -81,7 +83,9 @@
     <div class="tags" *ngIf="parameter.sources?.length">
       <ng-container *ngFor="let sourceModuleOutput of parameter.sources">
         <span class="tag"
-          >{{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+          >{{ sourceModuleOutput.moduleName || sourceModuleOutput.moduleId }}-{{
+            sourceModuleOutput.name
+          }}
           <button
             class="delete is-small"
             type="button"

@@ -20,7 +20,7 @@
               *ngFor="let sourceModule of availableSources"
               value="{{ sourceModule.moduleId }}~{{ sourceModule.name }}"
             >
-              {{ sourceModule.moduleId }}-{{ sourceModule.name }}
+              {{ sourceModule.moduleName || sourceModule.moduleId }}-{{ sourceModule.name }}
             </option>
           </select>
         </div>
@@ -29,7 +29,7 @@
     <div class="tags" *ngIf="input.sources?.length">
       <ng-container *ngFor="let sourceModuleOutput of input.sources">
         <span class="tag"
-          >{{ sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
+          >{{ sourceModuleOutput.moduleName || sourceModuleOutput.moduleId }}-{{ sourceModuleOutput.name }}
           <button
             class="delete is-small"
             type="button"

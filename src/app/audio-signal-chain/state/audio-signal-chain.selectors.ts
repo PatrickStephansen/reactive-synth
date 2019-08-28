@@ -6,6 +6,7 @@ import { Visualization } from '../model/visualization/visualization';
 
 import { always, applySpec, compose, map, omit, pick, prop } from 'ramda';
 import { AudioModuleInput } from '../model/audio-module-input';
+import { AudioModuleOutput } from '../model/audio-module-output';
 
 const getSignalChainsFeatureState = createFeatureSelector<AudioSignalChainState>('signalChain');
 export const getSignalChainOutputActiveState = createSelector(
@@ -19,16 +20,28 @@ export const getModulesState = createSelector(
 );
 export const getOutputsState = createSelector(
   getSignalChainsFeatureState,
-  signalChain => signalChain.outputs
+  signalChain =>
+    signalChain.outputs.map(o => ({
+      ...o,
+      moduleName: signalChain.modules.find(m => m.id === o.moduleId).name
+    }))
 );
 export const getSources = createSelector(
   getOutputsState,
-  (outputs, { moduleId }: { moduleId: string }) => outputs.filter(o => o.moduleId !== moduleId)
+  (outputs: AudioModuleOutput[], { moduleId }: { moduleId: string }) =>
+    outputs.filter(o => o.moduleId !== moduleId)
 );
 
 const getParametersState = createSelector(
   getSignalChainsFeatureState,
-  signalChain => signalChain.parameters
+  (signalChain: AudioSignalChainState) =>
+    signalChain.parameters.map(p => ({
+      ...p,
+      sources: p.sources.map(s => ({
+        ...s,
+        moduleName: signalChain.modules.find(m => m.id === s.moduleId).name
+      } as AudioModuleOutput))
+    }))
 );
 
 const getChoiceParametersState = createSelector(
@@ -43,7 +56,14 @@ const getVisualizationsState = createSelector(
 
 const getInputs = createSelector(
   getSignalChainsFeatureState,
-  signalChain => signalChain.inputs
+  signalChain =>
+    signalChain.inputs.map(input => ({
+      ...input,
+      sources: input.sources.map(source => ({
+        ...source,
+        moduleName: signalChain.modules.find(module => module.id === source.moduleId).name
+      }))
+    }))
 );
 
 // This will crash if given bad arguments
