@@ -311,7 +311,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
       });
     } catch (error) {
       return audioSignalActions.loadSignalChainStateFailure({
-        reason: `Error restoring state. Defaulting to audioSignalActions.patch. ${error.message ||
+        reason: `Error restoring state. Defaulting to new patch. ${error.message ||
           error}`
       });
     }
