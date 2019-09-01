@@ -21,7 +21,7 @@ import { ConnectModulesEvent } from '../model/connect-modules-event';
 
 let errorId = 0;
 
-const hasSignificantState = path(['modules', 'length']);
+const hasSignificantState = path(['signalChain', 'modules', 'length']);
 
 @Injectable()
 export class AudioSignalChainEffects implements OnInitEffects {
@@ -292,9 +292,9 @@ export class AudioSignalChainEffects implements OnInitEffects {
 
   @Effect({ dispatch: false })
   stateToQueryString$: Observable<AudioSignalChainState> = this.store$.pipe(
-    select(getSignalChainStateForSave),
     debounceTime(1000),
     filter(hasSignificantState),
+    select(getSignalChainStateForSave),
     tap((state: AudioSignalChainState) =>
       this.locationService.replaceState(
         head(this.locationService.path(true).split('#')),
@@ -311,8 +311,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
       });
     } catch (error) {
       return audioSignalActions.loadSignalChainStateFailure({
-        reason: `Error restoring state. Defaulting to new patch. ${error.message ||
-          error}`
+        reason: `Error restoring state. Defaulting to new patch. ${error.message || error}`
       });
     }
   }
