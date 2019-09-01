@@ -31,6 +31,12 @@
       ></button>
     </div>
   </div>
+  <div class="field">
+    <label class="label">
+      Module Type
+    </label>
+    <p class="control">{{ module.moduleType }}</p>
+  </div>
 
   <app-help-message *ngIf="module.helpText"> {{ module.helpText }} </app-help-message>
   <app-visualizations-shell [moduleId]="module.id"></app-visualizations-shell>
