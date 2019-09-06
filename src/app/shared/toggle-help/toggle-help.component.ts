@@ -1,34 +1,27 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { AppState } from 'src/app/state/app.state';
 import { Store, select } from '@ngrx/store';
 import { showHelpSelector } from 'src/app/state/app.selectors';
 import { appActions } from 'src/app/state/app.actions';
-import { takeWhile } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-toggle-help',
   templateUrl: './toggle-help.component.html',
-  styleUrls: ['./toggle-help.component.scss']
+  styleUrls: ['./toggle-help.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ToggleHelpComponent implements OnInit, OnDestroy {
-  public isShowingHelp: boolean;
-  private isComponentActive = true;
+export class ToggleHelpComponent {
+  public isShowingHelp$: Observable<boolean>;
 
   constructor(private store: Store<AppState>) {
-    this.store
+    this.isShowingHelp$ = this.store
       .pipe(
-        select(showHelpSelector),
-        takeWhile(() => this.isComponentActive)
+        select(showHelpSelector)
       )
-      .subscribe(isShowingHelp => (this.isShowingHelp = isShowingHelp));
   }
 
-  ngOnInit() {}
-  ngOnDestroy(): void {
-    this.isComponentActive = false;
-  }
-
-  toggleHelp() {
-    this.store.dispatch(appActions.toggleHelp({ showHelp: !this.isShowingHelp }));
+  toggleHelp(showHelp) {
+    this.store.dispatch(appActions.toggleHelp({ showHelp }));
   }
 }

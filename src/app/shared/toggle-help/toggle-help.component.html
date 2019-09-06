@@ -1,7 +1,7 @@
-<button
-  type="button"
-  [ngClass]="{ button: true, 'is-info': isShowingHelp }"
-  (click)="toggleHelp()"
->
-  Show Help
-</button>
+<ng-container *ngIf="isShowingHelp$ | async as isShowingHelp; then component else component">
+</ng-container>
+<ng-template #component let-isShowingHelp>
+  <button type="button" [ngClass]="{ button: true, 'is-info': isShowingHelp }" (click)="toggleHelp(!isShowingHelp)">
+    Show Help
+  </button>
+</ng-template>
