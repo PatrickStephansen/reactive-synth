@@ -7,7 +7,8 @@ import {
   OnChanges,
   SimpleChanges,
   Output,
-  EventEmitter
+  EventEmitter,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { curry, flip } from 'ramda';
 
@@ -17,7 +18,8 @@ import { ChangeVisualizationActiveEvent } from '../../model/visualization/change
 @Component({
   selector: 'app-line-graph-visualization',
   templateUrl: './line-graph-visualization.component.html',
-  styleUrls: ['./line-graph-visualization.component.scss']
+  styleUrls: ['./line-graph-visualization.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LineGraphVisualizationComponent implements OnInit, OnChanges {
   @Input()

@@ -4,7 +4,7 @@ import {
   Input,
   Output,
   EventEmitter,
-  ElementRef
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { AudioModuleInput } from '../../model/audio-module-input';
 import { AudioModuleOutput } from '../../model/audio-module-output';
@@ -13,7 +13,8 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 @Component({
   selector: 'app-input',
   templateUrl: './input.component.html',
-  styleUrls: ['./input.component.scss']
+  styleUrls: ['./input.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InputComponent implements OnInit {
   @Input() input: AudioModuleInput;

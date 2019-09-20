@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { distinctUntilChanged, sampleTime } from 'rxjs/operators';
 
 import { Parameter } from '../../model/parameter';
@@ -9,7 +9,8 @@ import { AudioModuleOutput } from '../../model/audio-module-output';
 @Component({
   selector: 'app-parameter',
   templateUrl: './parameter.component.html',
-  styleUrls: ['./parameter.component.scss']
+  styleUrls: ['./parameter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ParameterComponent implements OnInit {
   @Input() parameter: Parameter;

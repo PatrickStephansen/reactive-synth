@@ -1,11 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Visualization } from '../../model/visualization/visualization';
 import { ChangeVisualizationActiveEvent } from '../../model/visualization/change-visualization-active-event';
 
 @Component({
   selector: 'app-visualization-list',
   templateUrl: './visualization-list.component.html',
-  styleUrls: ['./visualization-list.component.scss']
+  styleUrls: ['./visualization-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VisualizationListComponent implements OnInit {
   @Input() visualizations: Visualization[];

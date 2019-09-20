@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AudioModuleOutput } from '../../model/audio-module-output';
 import { AudioModuleInput } from '../../model/audio-module-input';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
@@ -6,7 +6,8 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 @Component({
   selector: 'app-input-list',
   templateUrl: './input-list.component.html',
-  styleUrls: ['./input-list.component.scss']
+  styleUrls: ['./input-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InputListComponent implements OnInit {
   @Input() sources: AudioModuleOutput[];

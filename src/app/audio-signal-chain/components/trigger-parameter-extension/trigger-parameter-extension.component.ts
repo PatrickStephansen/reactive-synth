@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { ParameterExtension } from '../../model/parameter-extension';
 import { Observable } from 'rxjs';
 import { ExtensionEvent } from '../../model/extension-event';
@@ -6,7 +6,8 @@ import { ExtensionEvent } from '../../model/extension-event';
 @Component({
   selector: 'app-trigger-parameter-extension',
   templateUrl: './trigger-parameter-extension.component.html',
-  styleUrls: ['./trigger-parameter-extension.component.scss']
+  styleUrls: ['./trigger-parameter-extension.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TriggerParameterExtensionComponent implements OnInit {
   @Input() extension: ParameterExtension;

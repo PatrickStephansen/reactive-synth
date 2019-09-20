@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { SignalChainError } from '../../model/signal-chain-error';
 
 @Component({
   selector: 'app-error-list',
   templateUrl: './error-list.component.html',
-  styleUrls: ['./error-list.component.scss']
+  styleUrls: ['./error-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ErrorListComponent implements OnInit {
   @Input() errors: SignalChainError[];

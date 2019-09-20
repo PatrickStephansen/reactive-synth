@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 import { Parameter } from '../../model/parameter';
 import { ChangeParameterEvent } from '../../model/change-parameter-event';
@@ -10,7 +10,8 @@ import { AudioModuleOutput } from '../../model/audio-module-output';
 @Component({
   selector: 'app-parameter-list',
   templateUrl: './parameter-list.component.html',
-  styleUrls: ['./parameter-list.component.scss']
+  styleUrls: ['./parameter-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ParameterListComponent implements OnInit {
   @Input() parameters: Parameter[];
