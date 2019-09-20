@@ -8,7 +8,8 @@ import {
   SimpleChanges,
   OnDestroy,
   ViewChild,
-  ElementRef
+  ElementRef,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
@@ -19,7 +20,8 @@ import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
 @Component({
   selector: 'app-audio-module',
   templateUrl: './audio-module.component.html',
-  styleUrls: ['./audio-module.component.scss']
+  styleUrls: ['./audio-module.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AudioModuleComponent implements OnInit, OnChanges, OnDestroy {
   @Input() module: AudioModule;
