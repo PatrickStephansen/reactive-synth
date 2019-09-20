@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 import { ChoiceParameter } from '../../model/choice-parameter';
 import { ChangeChoiceEvent } from '../../model/change-choice-event';
@@ -6,7 +6,8 @@ import { ChangeChoiceEvent } from '../../model/change-choice-event';
 @Component({
   selector: 'app-choice-parameter',
   templateUrl: './choice-parameter.component.html',
-  styleUrls: ['./choice-parameter.component.scss']
+  styleUrls: ['./choice-parameter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChoiceParameterComponent implements OnInit {
   @Input() parameter: ChoiceParameter;
