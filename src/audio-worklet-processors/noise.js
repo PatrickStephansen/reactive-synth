@@ -1,8 +1,4 @@
-import { clamp } from 'ramda';
-
-const clampStep = clamp(0, 1);
-const clampSampleHold = clamp(0, 1000000);
-const clampTrigger = clamp(0, 1);
+import { getParameterValue } from './getParameterValue';
 
 const getNextValue = (previousValue, stepMin, stepMax) => {
   const stepSize = Math.random() * (stepMax - stepMin) + stepMin;
@@ -68,25 +64,13 @@ registerProcessor(
     process(inputs, outputs, parameters) {
       // Get the first output.
       let output = outputs[0];
-      let stepMin = parameters.stepMin;
-      let stepMinLength = stepMin.length;
-      let getStepMin = stepMinLength > 1 ? i => clampStep(stepMin[i]) : () => clampStep(stepMin[0]);
-      let stepMax = parameters.stepMax;
-      let stepMaxLength = stepMax.length;
-      let getStepMax = stepMaxLength > 1 ? i => clampStep(stepMax[i]) : () => clampStep(stepMax[0]);
-      let sampleHold = parameters.sampleHold;
-      let sampleHoldLength = sampleHold.length;
-      let getSampleHold =
-        sampleHoldLength > 1
-          ? i => clampSampleHold(sampleHold[i])
-          : () => clampSampleHold(sampleHold[0]);
-      let nextValueTrigger = parameters.nextValueTrigger;
-      let nextValueTriggerLength = nextValueTrigger.length;
+      let getStepMin = getParameterValue(parameters.stepMin, 0, 1);
+      let getStepMax = getParameterValue(parameters.stepMax, 0, 1);
+      let getSampleHold = getParameterValue(parameters.sampleHold, 0, 1000000);
+
       let getNextValueTrigger = this.manualTriggerOn
         ? () => 1e9
-        : nextValueTriggerLength > 1
-        ? i => clampTrigger(nextValueTrigger[i])
-        : () => clampTrigger(nextValueTrigger[0]);
+        : getParameterValue(parameters.nextValueTrigger, 0, 1);
 
       for (let i = 0; i < output[0].length; ++i, ++this.samplesHeld) {
         // recover from overflow
