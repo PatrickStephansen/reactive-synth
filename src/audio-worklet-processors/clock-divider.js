@@ -45,6 +45,7 @@ registerProcessor(
         ticksPast: 0,
         tocksPast: 0
       };
+      this.userParams = { attackAfterTicks: 0, releaseAfterTocks: 0 };
       this.initialReset = true;
       this.port.onmessage = this.handleMessage.bind(this);
       this.manualClockTriggerOn = false;
@@ -109,12 +110,13 @@ registerProcessor(
         }
         this.resetTriggerOn = resetTriggerValue > 0;
 
-        this.state = divideClockTicks(
+        this.userParams.attackAfterTicks = getAttackAfterTicks(sampleIndex);
+        this.userParams.releaseAfterTocks = getReleaseAfterTocks(sampleIndex);
+
+        // mutates this.state
+        divideClockTicks(
           this.state,
-          {
-            attackAfterTicks: getAttackAfterTicks(sampleIndex),
-            releaseAfterTocks: getReleaseAfterTocks(sampleIndex)
-          },
+          this.userParams,
           clockTriggerStage,
           resetTriggerStage
         );

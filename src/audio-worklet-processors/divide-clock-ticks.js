@@ -18,29 +18,29 @@ export const resetTriggerStages = {
 };
 
 export function divideClockTicks(
-  { stage, ticksPast, tocksPast },
+  state, // { stage, ticksPast, tocksPast },
   { attackAfterTicks, releaseAfterTocks },
   clockInStage,
   resetTriggerStage
 ) {
   if (resetTriggerStage === resetTriggerStages.reset) {
-    stage = clockStages.tock;
-    tocksPast = 0;
-    ticksPast = attackAfterTicks - 1;
+    state.stage = clockStages.tock;
+    state.tocksPast = 0;
+    state.ticksPast = attackAfterTicks - 1;
   }
-  if (clockInStage === clockInTriggerStages.attack && stage === clockStages.tock) {
-    ticksPast++;
-    if (ticksPast >= attackAfterTicks) {
-      stage = clockStages.tick;
-      ticksPast -= attackAfterTicks;
+  if (clockInStage === clockInTriggerStages.attack && state.stage === clockStages.tock) {
+    state.ticksPast++;
+    if (state.ticksPast >= attackAfterTicks) {
+      state.stage = clockStages.tick;
+      state.ticksPast -= attackAfterTicks;
     }
   }
-  if (clockInStage === clockInTriggerStages.release && stage === clockStages.tick) {
-    tocksPast++;
-    if (tocksPast >= releaseAfterTocks) {
-      stage = clockStages.tock;
-      tocksPast -= releaseAfterTocks;
+  if (clockInStage === clockInTriggerStages.release && state.stage === clockStages.tick) {
+    state.tocksPast++;
+    if (state.tocksPast >= releaseAfterTocks) {
+      state.stage = clockStages.tock;
+      state.tocksPast -= releaseAfterTocks;
     }
   }
-  return { stage, ticksPast, tocksPast };
+  return state;
 }
