@@ -109,14 +109,12 @@ registerProcessor(
       const getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
-        this.state = {
-          attackTime: getAttackTime(sampleIndex),
-          attackValue: getAttackValue(sampleIndex),
-          holdTime: getHoldTime(sampleIndex),
-          decayTime: getDecayTime(sampleIndex),
-          sustainValue: getSustainValue(sampleIndex),
-          releaseTime: getReleaseTime(sampleIndex)
-        };
+        this.state.attackTime = getAttackTime(sampleIndex);
+        this.state.attackValue = getAttackValue(sampleIndex);
+        this.state.holdTime = getHoldTime(sampleIndex);
+        this.state.decayTime = getDecayTime(sampleIndex);
+        this.state.sustainValue = getSustainValue(sampleIndex);
+        this.state.releaseTime = getReleaseTime(sampleIndex);
         const triggerValue = getTriggerValue(sampleIndex);
 
         if (triggerValue > 0 != this.previousTriggerValue > 0) {

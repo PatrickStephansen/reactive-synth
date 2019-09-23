@@ -1,5 +1,3 @@
-import { compose } from 'ramda';
-
 export const clockInTriggerStages = {
   attack: 1,
   high: 2,
