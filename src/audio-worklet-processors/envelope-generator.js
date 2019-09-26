@@ -2,6 +2,8 @@ import { getParameterValue } from './getParameterValue';
 import { getEnvelopeValue } from './getEnvelopeValue';
 import { getValueAtTime } from './linear-change';
 
+const getParamValue = getParameterValue;
+
 registerProcessor(
   'envelope-generator',
   class EnvelopeGenerator extends AudioWorkletProcessor {
@@ -105,13 +107,13 @@ registerProcessor(
       let output = outputs[0];
       this.getTriggerValue = this.manualTriggerOn
         ? () => 1e9
-        : getParameterValue(parameters.trigger, -1e9, 1e9);
-      this.getAttackTime = getParameterValue(parameters.attackTime, 0, 10);
-      this.getAttackValue = getParameterValue(parameters.attackValue, 0, 1);
-      this.getHoldTime = getParameterValue(parameters.holdTime, 0, 10);
-      this.getDecayTime = getParameterValue(parameters.decayTime, 0, 10);
-      this.getSustainValue = getParameterValue(parameters.sustainValue, 0, 1);
-      this.getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
+        : getParamValue(parameters.trigger, -1e9, 1e9);
+      this.getAttackTime = getParamValue(parameters.attackTime, 0, 10);
+      this.getAttackValue = getParamValue(parameters.attackValue, 0, 1);
+      this.getHoldTime = getParamValue(parameters.holdTime, 0, 10);
+      this.getDecayTime = getParamValue(parameters.decayTime, 0, 10);
+      this.getSustainValue = getParamValue(parameters.sustainValue, 0, 1);
+      this.getReleaseTime = getParamValue(parameters.releaseTime, 0, 10);
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
         this.state.attackTime = this.getAttackTime(sampleIndex);

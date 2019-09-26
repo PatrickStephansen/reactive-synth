@@ -1,5 +1,7 @@
 import { getParameterValue } from './getParameterValue';
 
+const getParamValue = getParameterValue;
+
 const getNextValue = (previousValue, stepMin, stepMax) => {
   const stepSize = Math.random() * (stepMax - stepMin) + stepMin;
   const preferUp = Math.random() > 0.5;
@@ -65,13 +67,13 @@ registerProcessor(
     process(inputs, outputs, parameters) {
       // Get the first output.
       let output = outputs[0];
-      this.getStepMin = getParameterValue(parameters.stepMin, 0, 1);
-      this.getStepMax = getParameterValue(parameters.stepMax, 0, 1);
-      this.getSampleHold = getParameterValue(parameters.sampleHold, 0, 1000000);
+      this.getStepMin = getParamValue(parameters.stepMin, 0, 1);
+      this.getStepMax = getParamValue(parameters.stepMax, 0, 1);
+      this.getSampleHold = getParamValue(parameters.sampleHold, 0, 1000000);
 
       this.getNextValueTrigger = this.manualTriggerOn
         ? () => 1e9
-        : getParameterValue(parameters.nextValueTrigger, 0, 1);
+        : getParamValue(parameters.nextValueTrigger, 0, 1);
 
       for (let i = 0; i < output[0].length; ++i, ++this.samplesHeld) {
         // recover from overflow

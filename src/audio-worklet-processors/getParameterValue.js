@@ -1,4 +1,5 @@
-import { clamp } from "./clamp";
+const clamp = (minValue, maxValue) => input =>
+  input < minValue ? minValue : input > maxValue ? maxValue : input;
 
 export const getParameterValue = (parameter, minValue, maxValue) => sampleNumber => {
   const clampValue = clamp(minValue, maxValue);

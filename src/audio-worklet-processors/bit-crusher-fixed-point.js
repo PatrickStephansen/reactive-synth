@@ -1,6 +1,8 @@
 import { crush } from './crush-bit-fixed-point';
 import { getParameterValue } from './getParameterValue';
 
+const getParamValue = getParameterValue;
+
 registerProcessor(
   'bit-crusher-fixed-point',
   class Noise extends AudioWorkletProcessor {
@@ -32,7 +34,7 @@ registerProcessor(
       // Only one input and output.
       let input = inputs[0];
       let output = outputs[0];
-      this.getBitDepth = getParameterValue(parameters.bitDepth, 1, 32);
+      this.getBitDepth = getParamValue(parameters.bitDepth, 1, 32);
 
       for (let channelIndex = 0; channelIndex < input.length; channelIndex++) {
         const inputChannel = input[channelIndex];

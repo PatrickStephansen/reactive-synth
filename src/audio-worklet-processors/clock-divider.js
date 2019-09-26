@@ -6,6 +6,10 @@ import {
 } from './divide-clock-ticks';
 import { getParameterValue } from './getParameterValue';
 
+// Webpack turns function imports into object constructor calls
+// local assignment prevents many object constructor calls
+const getParamValue = getParameterValue;
+
 registerProcessor(
   'clock-divider',
   class ClockDivider extends AudioWorkletProcessor {
@@ -70,16 +74,16 @@ registerProcessor(
 
       this.getClockTriggerValue = this.manualClockTriggerOn
         ? () => 1e9
-        : getParameterValue(parameters.clockTrigger, -1e9, 1e9);
+        : getParamValue(parameters.clockTrigger, -1e9, 1e9);
       this.getResetTriggerValue =
         this.manualResetTriggerOn || this.initialReset
           ? () => {
               this.initialReset = false;
               return 1e9;
             }
-          : getParameterValue(parameters.resetTrigger, -1e9, 1e9);
-      this.getAttackAfterTicks = getParameterValue(parameters.attackAfterTicks, 1, 1e9);
-      this.getReleaseAfterTocks = getParameterValue(parameters.releaseAfterTocks, 1, 1e9);
+          : getParamValue(parameters.resetTrigger, -1e9, 1e9);
+      this.getAttackAfterTicks = getParamValue(parameters.attackAfterTicks, 1, 1e9);
+      this.getReleaseAfterTocks = getParamValue(parameters.releaseAfterTocks, 1, 1e9);
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
         const clockTriggerValue = this.getClockTriggerValue(sampleIndex);
