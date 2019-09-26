@@ -52,6 +52,8 @@ registerProcessor(
       this.manualResetTriggerOn = false;
       this.clockTriggerOn = false;
       this.resetTriggerOn = false;
+      this.clockTriggerChangeMessage = { type: 'clock-trigger-change', value: false };
+      this.resetTriggerChangeMessage = { type: 'reset-trigger-change', value: false };
     }
 
     handleMessage(event) {
@@ -66,35 +68,37 @@ registerProcessor(
     process(inputs, outputs, parameters) {
       const output = outputs[0];
 
-      const getClockTriggerValue = this.manualClockTriggerOn
+      this.getClockTriggerValue = this.manualClockTriggerOn
         ? () => 1e9
         : getParameterValue(parameters.clockTrigger, -1e9, 1e9);
-      const getResetTriggerValue =
+      this.getResetTriggerValue =
         this.manualResetTriggerOn || this.initialReset
           ? () => {
               this.initialReset = false;
               return 1e9;
             }
           : getParameterValue(parameters.resetTrigger, -1e9, 1e9);
-      const getAttackAfterTicks = getParameterValue(parameters.attackAfterTicks, 1, 1e9);
-      const getReleaseAfterTocks = getParameterValue(parameters.releaseAfterTocks, 1, 1e9);
+      this.getAttackAfterTicks = getParameterValue(parameters.attackAfterTicks, 1, 1e9);
+      this.getReleaseAfterTocks = getParameterValue(parameters.releaseAfterTocks, 1, 1e9);
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
-        const clockTriggerValue = getClockTriggerValue(sampleIndex);
-        const resetTriggerValue = getResetTriggerValue(sampleIndex);
+        const clockTriggerValue = this.getClockTriggerValue(sampleIndex);
+        const resetTriggerValue = this.getResetTriggerValue(sampleIndex);
         let clockTriggerStage;
         if (clockTriggerValue > 0) {
           if (this.clockTriggerOn) {
             clockTriggerStage = clockInTriggerStages.high;
           } else {
             clockTriggerStage = clockInTriggerStages.attack;
-            this.port.postMessage({ type: 'clock-trigger-change', value: true });
+            this.clockTriggerChangeMessage.value = true;
+            this.port.postMessage(this.clockTriggerChangeMessage);
           }
           this.clockTriggerOn = true;
         } else {
           if (this.clockTriggerOn) {
             clockTriggerStage = clockInTriggerStages.release;
-            this.port.postMessage({ type: 'clock-trigger-change', value: false });
+            this.clockTriggerChangeMessage.value = false;
+            this.port.postMessage(this.clockTriggerChangeMessage);
           } else {
             clockTriggerStage = clockInTriggerStages.low;
           }
@@ -103,23 +107,19 @@ registerProcessor(
         let resetTriggerStage = resetTriggerStages.keepGoing;
 
         if (this.resetTriggerOn !== resetTriggerValue > 0) {
-          this.port.postMessage({ type: 'reset-trigger-change', value: resetTriggerValue > 0 });
+          this.resetTriggerChangeMessage.value = resetTriggerValue > 0;
+          this.port.postMessage(this.resetTriggerChangeMessage);
         }
         if (resetTriggerValue > 0 && !this.resetTriggerOn) {
           resetTriggerStage = resetTriggerStages.reset;
         }
         this.resetTriggerOn = resetTriggerValue > 0;
 
-        this.userParams.attackAfterTicks = getAttackAfterTicks(sampleIndex);
-        this.userParams.releaseAfterTocks = getReleaseAfterTocks(sampleIndex);
+        this.userParams.attackAfterTicks = this.getAttackAfterTicks(sampleIndex);
+        this.userParams.releaseAfterTocks = this.getReleaseAfterTocks(sampleIndex);
 
         // mutates this.state
-        divideClockTicks(
-          this.state,
-          this.userParams,
-          clockTriggerStage,
-          resetTriggerStage
-        );
+        divideClockTicks(this.state, this.userParams, clockTriggerStage, resetTriggerStage);
         // only expecting one channel, but tolerating more in case
         for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
           const outputChannel = output[channelIndex];
