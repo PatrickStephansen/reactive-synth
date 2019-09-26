@@ -1,3 +1,5 @@
+import { getParameterValue } from "./getParameterValue";
+
 registerProcessor(
   'inverse-gain',
   class Noise extends AudioWorkletProcessor {
@@ -20,13 +22,8 @@ registerProcessor(
       // Only one input and output.
       let input = inputs[0];
       let output = outputs[0];
-      let divisor = parameters.divisor;
-      let divisorLength = divisor.length;
-      let getDivisor = divisorLength > 1 ? i => divisor[i] : () => divisor[0];
-      let getZeroDivisorOutput =
-        parameters.zeroDivisorFallback.length > 1
-          ? i => parameters.zeroDivisorFallback[i]
-          : () => parameters.zeroDivisorFallback[0];
+      this.getDivisor = getParameterValue(parameters.divisor, -1e9, 1e9);
+      this.getZeroDivisorOutput = getParameterValue(parameters.zeroDivisorFallback, -1e9, 1e9);
 
       for (let channelIndex = 0; channelIndex < input.length; channelIndex++) {
         const inputChannel = input[channelIndex];
@@ -37,9 +34,9 @@ registerProcessor(
           sampleIndex++
         ) {
           const inputSample = inputChannel[sampleIndex];
-          const divisor = getDivisor(sampleIndex);
+          const divisor = this.getDivisor(sampleIndex);
           if (divisor === 0) {
-            outputChannel[sampleIndex] = getZeroDivisorOutput(sampleIndex);
+            outputChannel[sampleIndex] = this.getZeroDivisorOutput(sampleIndex);
           } else {
             outputChannel[sampleIndex] = inputSample / divisor;
           }

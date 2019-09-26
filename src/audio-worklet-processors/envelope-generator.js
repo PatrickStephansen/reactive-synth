@@ -73,22 +73,27 @@ registerProcessor(
         releaseTime: 0.25
       };
       this.sampleRate = options.sampleRate || 44100;
-      this.outputValue;
+      this.outputValue = 0;
       this.valueOnTriggerChange = undefined;
       this.manualTriggerOn = false;
       this.previousTriggerValue = 0;
+      this.stateMessage = {
+        type: 'state',
+        state: {
+          stage: this.stage,
+          stageProgress: this.stageProgress,
+          outputValue: this.outputValue
+        }
+      };
+      this.triggerChangeMessage = { type: 'trigger-change', value: false };
     }
 
     handleMessage(event) {
       if (event.data && event.data.type === 'getState') {
-        this.port.postMessage({
-          type: 'state',
-          state: {
-            stage: this.stage,
-            stageProgress: this.stageProgress,
-            outputValue: this.outputValue
-          }
-        });
+        this.stateMessage.state.stage = this.stage;
+        this.stateMessage.state.stageProgress = this.stageProgress;
+        this.stateMessage.state.outputValue = this.outputValue;
+        this.port.postMessage(this.stateMessage);
       }
       if (event.data && event.data.type === 'manual-trigger') {
         this.manualTriggerOn = event.data.value;
@@ -98,27 +103,28 @@ registerProcessor(
     process(inputs, outputs, parameters) {
       // Only one output.
       let output = outputs[0];
-      const getTriggerValue = this.manualTriggerOn
+      this.getTriggerValue = this.manualTriggerOn
         ? () => 1e9
         : getParameterValue(parameters.trigger, -1e9, 1e9);
-      const getAttackTime = getParameterValue(parameters.attackTime, 0, 10);
-      const getAttackValue = getParameterValue(parameters.attackValue, 0, 1);
-      const getHoldTime = getParameterValue(parameters.holdTime, 0, 10);
-      const getDecayTime = getParameterValue(parameters.decayTime, 0, 10);
-      const getSustainValue = getParameterValue(parameters.sustainValue, 0, 1);
-      const getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
+      this.getAttackTime = getParameterValue(parameters.attackTime, 0, 10);
+      this.getAttackValue = getParameterValue(parameters.attackValue, 0, 1);
+      this.getHoldTime = getParameterValue(parameters.holdTime, 0, 10);
+      this.getDecayTime = getParameterValue(parameters.decayTime, 0, 10);
+      this.getSustainValue = getParameterValue(parameters.sustainValue, 0, 1);
+      this.getReleaseTime = getParameterValue(parameters.releaseTime, 0, 10);
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
-        this.state.attackTime = getAttackTime(sampleIndex);
-        this.state.attackValue = getAttackValue(sampleIndex);
-        this.state.holdTime = getHoldTime(sampleIndex);
-        this.state.decayTime = getDecayTime(sampleIndex);
-        this.state.sustainValue = getSustainValue(sampleIndex);
-        this.state.releaseTime = getReleaseTime(sampleIndex);
-        const triggerValue = getTriggerValue(sampleIndex);
+        this.state.attackTime = this.getAttackTime(sampleIndex);
+        this.state.attackValue = this.getAttackValue(sampleIndex);
+        this.state.holdTime = this.getHoldTime(sampleIndex);
+        this.state.decayTime = this.getDecayTime(sampleIndex);
+        this.state.sustainValue = this.getSustainValue(sampleIndex);
+        this.state.releaseTime = this.getReleaseTime(sampleIndex);
+        const triggerValue = this.getTriggerValue(sampleIndex);
 
         if (triggerValue > 0 != this.previousTriggerValue > 0) {
-          this.port.postMessage({ type: 'trigger-change', value: triggerValue > 0 });
+          this.triggerChangeMessage.value = triggerValue > 0;
+          this.port.postMessage(this.triggerChangeMessage);
         }
 
         const envelopeValue = getEnvelopeValue(
