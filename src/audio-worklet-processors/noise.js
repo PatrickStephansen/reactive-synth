@@ -53,6 +53,7 @@ registerProcessor(
       this.isTriggerValueHigh = false;
       this.port.onmessage = this.handleMessage.bind(this);
       this.manualTriggerOn = false;
+      this.triggerChangeMessage = { type: 'trigger-change', value: false };
     }
 
     handleMessage(event) {
@@ -64,11 +65,11 @@ registerProcessor(
     process(inputs, outputs, parameters) {
       // Get the first output.
       let output = outputs[0];
-      let getStepMin = getParameterValue(parameters.stepMin, 0, 1);
-      let getStepMax = getParameterValue(parameters.stepMax, 0, 1);
-      let getSampleHold = getParameterValue(parameters.sampleHold, 0, 1000000);
+      this.getStepMin = getParameterValue(parameters.stepMin, 0, 1);
+      this.getStepMax = getParameterValue(parameters.stepMax, 0, 1);
+      this.getSampleHold = getParameterValue(parameters.sampleHold, 0, 1000000);
 
-      let getNextValueTrigger = this.manualTriggerOn
+      this.getNextValueTrigger = this.manualTriggerOn
         ? () => 1e9
         : getParameterValue(parameters.nextValueTrigger, 0, 1);
 
@@ -78,19 +79,28 @@ registerProcessor(
           this.samplesHeld = 0;
         }
 
-        const sampleHold = getSampleHold(i);
+        const sampleHold = this.getSampleHold(i);
 
         // keep playing previous sample forever if sampleHold < 1
         if (sampleHold >= 1 && this.samplesHeld >= sampleHold) {
           this.samplesHeld -= sampleHold;
-          this.previousValue = getNextValue(this.previousValue, getStepMin(i), getStepMax(i));
+          this.previousValue = getNextValue(
+            this.previousValue,
+            this.getStepMin(i),
+            this.getStepMax(i)
+          );
         }
-        const triggerValue = getNextValueTrigger(i);
+        const triggerValue = this.getNextValueTrigger(i);
         if (this.isTriggerValueHigh != triggerValue > 0) {
-          this.port.postMessage({ type: 'trigger-change', value: triggerValue > 0 });
+          this.triggerChangeMessage.value = triggerValue > 0;
+          this.port.postMessage(this.triggerChangeMessage);
         }
         if (!this.isTriggerValueHigh && triggerValue > 0) {
-          this.previousValue = getNextValue(this.previousValue, getStepMin(i), getStepMax(i));
+          this.previousValue = getNextValue(
+            this.previousValue,
+            this.getStepMin(i),
+            this.getStepMax(i)
+          );
         }
         this.isTriggerValueHigh = triggerValue > 0;
         for (let channel = 0; channel < output.length; ++channel) {
