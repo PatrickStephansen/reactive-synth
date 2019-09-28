@@ -10,7 +10,6 @@ import {
   EventEmitter,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { curry, flip } from 'ramda';
 
 import { Visualization } from '../../model/visualization/visualization';
 import { ChangeVisualizationActiveEvent } from '../../model/visualization/change-visualization-active-event';
@@ -80,12 +79,14 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges {
   private renderVisuals() {
     this.visualization.getVisualizationData(this.visualizationData);
     const { width: canvasWidth, height: canvasHeight } = this.canvas;
-    const getPixelX = curry(
-      flip(this.visualization.renderingStrategyPerAxis[0])
-    )(this.visualization.dataLength, canvasWidth);
-    const getPixelY = curry(
-      flip(this.visualization.renderingStrategyPerAxis[1])
-    )(255, canvasHeight);
+    const getPixelX = value =>
+      this.visualization.renderingStrategyPerAxis[0](
+        value,
+        this.visualization.dataLength,
+        canvasWidth
+      );
+    const getPixelY = value =>
+      this.visualization.renderingStrategyPerAxis[1](value, 255, canvasHeight);
     this.drawingContext.clearRect(0, 0, canvasWidth, canvasHeight);
     this.drawingContext.beginPath();
     this.visualizationData.forEach((amplitude, index) => {
