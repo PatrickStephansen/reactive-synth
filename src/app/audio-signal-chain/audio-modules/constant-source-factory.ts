@@ -8,8 +8,8 @@ import { ModuleImplementation } from './module-implementation';
 import { Subscription } from 'rxjs';
 
 @Injectable()
-export class GainFactory implements AudioModuleFactory {
-  ModuleType = AudioModuleType.Gain;
+export class ConstantSourceFactory implements AudioModuleFactory {
+  ModuleType = AudioModuleType.ConstantSource;
   CreateAudioModule(
     context: IAudioContext,
     graph: Map<string, ModuleImplementation>,
@@ -21,36 +21,28 @@ export class GainFactory implements AudioModuleFactory {
     id?: string,
     name?: string
   ): CreateModuleResult {
-    const moduleType = AudioModuleType.Gain;
+    const moduleType = AudioModuleType.ConstantSource;
     id = createModuleId(moduleType, id);
-    const gain = context.createGain();
-    gain.gain.value = defaultGain;
-    const gainParameterKey = 'signal multiplier';
-    const moduleImplementation = {
-      internalNodes: [gain],
-      inputMap: new Map([['input', gain]]),
-      outputMap: new Map([['output', gain]]),
-      parameterMap: new Map([[gainParameterKey, gain.gain]])
-    };
-
-    graph.set(id, moduleImplementation);
+    const constant = context.createConstantSource();
+    constant.start();
+    graph.set(id, {
+      internalNodes: [constant],
+      parameterMap: new Map([['output value', constant.offset]]),
+      outputMap: new Map([['output', constant]])
+    });
     return new CreateModuleResult(
       {
         id,
         name,
         moduleType,
         canDelete: true,
-        helpText: `Multiplies each sample of the incoming signal by a factor to boost or attenuate it.
-          Similar to a Voltage Controlled Amplifier in a physical synth.
-          Negative values invert the phase of the signal.`
+        helpText: `Emits a "constant" stream of samples with the value of the Output Value parameter.
+          It is not always constant since the output value can be modulated.
+          Useful for adding an offset to a waveform or for controlling multiple parameters from one place.
+          It can be used together with a gain module for unit conversions eg.
+          feed it into a gain multiplier of 0.016666 to convert beats per minute to hertz.`
       },
-      [
-        {
-          name: 'input',
-          moduleId: id,
-          sources: []
-        }
-      ],
+      [],
       [
         {
           name: 'output',
@@ -59,13 +51,13 @@ export class GainFactory implements AudioModuleFactory {
       ],
       [
         {
-          name: gainParameterKey,
           moduleId: id,
           sources: [],
-          maxValue: parameterMax(gain.gain),
-          minValue: parameterMin(gain.gain),
-          stepSize: 0.01,
-          value: defaultGain
+          name: 'output value',
+          maxValue: parameterMax(constant.offset),
+          minValue: parameterMin(constant.offset),
+          value: constant.offset.value,
+          stepSize: 0.01
         }
       ],
       []

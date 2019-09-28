@@ -3,6 +3,7 @@ import { AudioModuleType } from '../model/audio-module-type';
 import { IAudioContext, IAudioParam } from 'standardized-audio-context';
 import { ModuleImplementation } from './module-implementation';
 import { InjectionToken } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 export interface AudioModuleFactory {
   ModuleType: AudioModuleType;
@@ -13,6 +14,7 @@ export interface AudioModuleFactory {
     parameterMax: (parameter: IAudioParam) => number,
     parameterMin: (parameter: IAudioParam) => number,
     createModuleId: (moduleType: string, id?: string) => string,
+    subscriptions: Subscription[],
     id?: string,
     name?: string
   ): CreateModuleResult;

@@ -27,6 +27,15 @@ import { OscillatorFactory } from './audio-modules/oscillator-factory';
 import { AUDIO_MODULE_FACTORY } from './audio-modules/audio-module-factory';
 import { GainFactory } from './audio-modules/gain-factory';
 import { BitCrusherFactory } from './audio-modules/bit-crusher-factory';
+import { DelayFactory } from './audio-modules/delay-factory';
+import { ConstantSourceFactory } from './audio-modules/constant-source-factory';
+import { ClockDividerFactory } from './audio-modules/clock-divider-factory';
+import { DistortionFactory } from './audio-modules/distortion-factory';
+import { EnvelopeGeneratorFactory } from './audio-modules/envelope-generator-factory';
+import { FilterFactory } from './audio-modules/filter-factory';
+import { InverseGainFactory } from './audio-modules/inverse-gain-factory';
+import { NoiseGeneratorFactory } from './audio-modules/noise-generator-factory';
+import { RectifierFactory } from './audio-modules/rectifier-factory';
 
 @NgModule({
   declarations: [
@@ -57,9 +66,18 @@ import { BitCrusherFactory } from './audio-modules/bit-crusher-factory';
     AudioGraphService,
     Location,
     { provide: LocationStrategy, useClass: PathLocationStrategy },
-    { provide: AUDIO_MODULE_FACTORY, useClass: OscillatorFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: BitCrusherFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: ClockDividerFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: ConstantSourceFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: DelayFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: DistortionFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: EnvelopeGeneratorFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: FilterFactory, multi: true },
     { provide: AUDIO_MODULE_FACTORY, useClass: GainFactory, multi: true },
-    { provide: AUDIO_MODULE_FACTORY, useClass: BitCrusherFactory, multi: true }
+    { provide: AUDIO_MODULE_FACTORY, useClass: InverseGainFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: NoiseGeneratorFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: OscillatorFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: RectifierFactory, multi: true }
   ]
 })
 export class AudioSignalChainModule {}

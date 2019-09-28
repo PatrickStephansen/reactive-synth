@@ -8,8 +8,8 @@ import { ModuleImplementation } from './module-implementation';
 import { Subscription } from 'rxjs';
 
 @Injectable()
-export class GainFactory implements AudioModuleFactory {
-  ModuleType = AudioModuleType.Gain;
+export class DelayFactory implements AudioModuleFactory {
+  ModuleType = AudioModuleType.Delay;
   CreateAudioModule(
     context: IAudioContext,
     graph: Map<string, ModuleImplementation>,
@@ -21,16 +21,15 @@ export class GainFactory implements AudioModuleFactory {
     id?: string,
     name?: string
   ): CreateModuleResult {
-    const moduleType = AudioModuleType.Gain;
+    const moduleType = AudioModuleType.Delay;
     id = createModuleId(moduleType, id);
-    const gain = context.createGain();
-    gain.gain.value = defaultGain;
-    const gainParameterKey = 'signal multiplier';
+    const delay = context.createDelay(60);
+    const delayParameterKey = 'delay time';
     const moduleImplementation = {
-      internalNodes: [gain],
-      inputMap: new Map([['input', gain]]),
-      outputMap: new Map([['output', gain]]),
-      parameterMap: new Map([[gainParameterKey, gain.gain]])
+      internalNodes: [delay],
+      inputMap: new Map([['input', delay]]),
+      outputMap: new Map([['output', delay]]),
+      parameterMap: new Map([[delayParameterKey, delay.delayTime]])
     };
 
     graph.set(id, moduleImplementation);
@@ -40,9 +39,11 @@ export class GainFactory implements AudioModuleFactory {
         name,
         moduleType,
         canDelete: true,
-        helpText: `Multiplies each sample of the incoming signal by a factor to boost or attenuate it.
-          Similar to a Voltage Controlled Amplifier in a physical synth.
-          Negative values invert the phase of the signal.`
+        helpText: `Emits the incoming signal unchanged after the set delay time.
+          Allows feedback loops to be created in the audio signal-chain.
+          Try connecting a percussive sound source, then feed the output to a gain module with a value between 0 and 1,
+          and connect that gain module back to the input of the delay.
+          Modulating the delay time allows phaser and chorus effects to be created.`
       },
       [
         {
@@ -59,13 +60,14 @@ export class GainFactory implements AudioModuleFactory {
       ],
       [
         {
-          name: gainParameterKey,
+          name: delayParameterKey,
+          units: 'seconds',
           moduleId: id,
           sources: [],
-          maxValue: parameterMax(gain.gain),
-          minValue: parameterMin(gain.gain),
+          maxValue: parameterMax(delay.delayTime),
+          minValue: parameterMin(delay.delayTime),
           stepSize: 0.01,
-          value: defaultGain
+          value: delay.delayTime.value
         }
       ],
       []

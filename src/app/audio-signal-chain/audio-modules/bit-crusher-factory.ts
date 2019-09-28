@@ -5,6 +5,7 @@ import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioModuleFactory } from './audio-module-factory';
 import { ModuleImplementation } from './module-implementation';
+import { Subscription } from 'rxjs';
 
 @Injectable()
 export class BitCrusherFactory implements AudioModuleFactory {
@@ -16,6 +17,7 @@ export class BitCrusherFactory implements AudioModuleFactory {
     parameterMax: (parameter: IAudioParam) => number,
     parameterMin: (parameter: IAudioParam) => number,
     createModuleId: (moduleType: string, id?: string) => string,
+    subscriptions: Subscription[],
     id?: string,
     name?: string
   ): CreateModuleResult {
