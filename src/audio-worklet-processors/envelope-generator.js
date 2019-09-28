@@ -88,6 +88,13 @@ registerProcessor(
         }
       };
       this.triggerChangeMessage = { type: 'trigger-change', value: false };
+      this.outputCache = {
+        stage: undefined,
+        secondsSinceStateTransition: undefined,
+        stageProgress: 0,
+        valueOnTriggerChange: undefined,
+        outputValue: undefined
+      };
     }
 
     handleMessage(event) {
@@ -129,20 +136,22 @@ registerProcessor(
           this.port.postMessage(this.triggerChangeMessage);
         }
 
-        const envelopeValue = getEnvelopeValue(
+        // mutates this.outputCache
+        getEnvelopeValue(
           getValueAtTime,
           this.sampleRate,
           this.state,
           this.secondsSinceStateTransition,
           this.stage,
           triggerValue,
-          this.valueOnTriggerChange
+          this.valueOnTriggerChange,
+          this.outputCache
         );
-        this.stage = envelopeValue.stage;
-        this.stageProgress = envelopeValue.stageProgress;
-        this.secondsSinceStateTransition = envelopeValue.secondsSinceStateTransition;
-        this.outputValue = envelopeValue.outputValue;
-        this.valueOnTriggerChange = envelopeValue.valueOnTriggerChange;
+        this.stage = this.outputCache.stage;
+        this.stageProgress = this.outputCache.stageProgress;
+        this.secondsSinceStateTransition = this.outputCache.secondsSinceStateTransition;
+        this.outputValue = this.outputCache.outputValue;
+        this.valueOnTriggerChange = this.outputCache.valueOnTriggerChange;
         this.previousTriggerValue = triggerValue;
 
         // only expecting one channel, but tolerating more in case
