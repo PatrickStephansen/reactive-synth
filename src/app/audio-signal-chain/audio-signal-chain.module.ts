@@ -1,9 +1,5 @@
 import { NgModule } from '@angular/core';
-import {
-  Location,
-  LocationStrategy,
-  PathLocationStrategy
-} from '@angular/common';
+import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
@@ -27,6 +23,10 @@ import { VisualizationsShellComponent } from './containers/visualizations-shell/
 import { InputListComponent } from './components/input-list/input-list.component';
 import { InputComponent } from './components/input/input.component';
 import { TriggerParameterExtensionComponent } from './components/trigger-parameter-extension/trigger-parameter-extension.component';
+import { OscillatorFactory } from './audio-modules/oscillator-factory';
+import { AUDIO_MODULE_FACTORY } from './audio-modules/audio-module-factory';
+import { GainFactory } from './audio-modules/gain-factory';
+import { BitCrusherFactory } from './audio-modules/bit-crusher-factory';
 
 @NgModule({
   declarations: [
@@ -56,7 +56,10 @@ import { TriggerParameterExtensionComponent } from './components/trigger-paramet
   providers: [
     AudioGraphService,
     Location,
-    { provide: LocationStrategy, useClass: PathLocationStrategy }
+    { provide: LocationStrategy, useClass: PathLocationStrategy },
+    { provide: AUDIO_MODULE_FACTORY, useClass: OscillatorFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: GainFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: BitCrusherFactory, multi: true }
   ]
 })
 export class AudioSignalChainModule {}

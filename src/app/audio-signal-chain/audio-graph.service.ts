@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, Inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { isNil, last } from 'ramda';
 import {
@@ -27,17 +27,11 @@ import { ExtensionEvent } from './model/extension-event';
 import { observableFromMessagePort } from './observable-from-message-port';
 import { sampleTime, map } from 'rxjs/operators';
 import { workletUrl } from '../cache-hack/cache';
+import { ModuleImplementation } from './audio-modules/module-implementation';
+import { AUDIO_MODULE_FACTORY, AudioModuleFactory } from './audio-modules/audio-module-factory';
 
 let incrementingId = 0;
 const frameRateLimit = sampleTime<ExtensionEvent>(1000 / 144);
-
-interface ModuleImplementation {
-  internalNodes: IAudioNode[];
-  inputMap?: Map<string, IAudioNode>;
-  outputMap?: Map<string, IAudioNode>;
-  parameterMap?: Map<string, IAudioParam>;
-  choiceMap?: Map<string, (newValue: string) => void>;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +43,7 @@ export class AudioGraphService {
   private defaultGain = 0.1;
 
   private createModuleMap: Map<AudioModuleType, (id: string, name: string) => CreateModuleResult>;
+  private moduleFactoryMap: Map<AudioModuleType, AudioModuleFactory>;
   private subscriptions: Subscription[] = [];
 
   private parameterMax(parameter: IAudioParam) {
@@ -59,15 +54,16 @@ export class AudioGraphService {
     return Math.max(parameter.minValue, -1000000000);
   }
 
-  constructor(private locationService: Location) {
+  constructor(
+    private locationService: Location,
+    @Inject(AUDIO_MODULE_FACTORY) moduleFactories: AudioModuleFactory[]
+  ) {
+    this.moduleFactoryMap = new Map(moduleFactories.map(factory => [factory.ModuleType, factory]));
     this.createModuleMap = new Map([
-      [AudioModuleType.Oscillator, (id, name) => this.createOscillator(id, name)],
-      [AudioModuleType.BitCrusher, (id, name) => this.createBitCrusherFixedPointModule(id, name)],
       [AudioModuleType.ConstantSource, (id, name) => this.createConstantSource(id, name)],
       [AudioModuleType.Delay, (id, name) => this.createDelayModule(id, name)],
       [AudioModuleType.Distortion, (id, name) => this.createDistortionModule(id, name)],
       [AudioModuleType.Filter, (id, name) => this.createFilterModule(id, name)],
-      [AudioModuleType.Gain, (id, name) => this.createGainModule(id, name)],
       [AudioModuleType.InverseGain, (id, name) => this.createInverseGainModule(id, name)],
       [AudioModuleType.NoiseGenerator, (id, name) => this.createNoiseGenerator(id, name)],
       [AudioModuleType.Rectifier, (id, name) => this.createRectifierModule(id, name)],
@@ -199,6 +195,19 @@ export class AudioGraphService {
   }
 
   createModule(moduleType: AudioModuleType, id?: string, name?: string): CreateModuleResult {
+    const matchingFactory = this.moduleFactoryMap.get(moduleType);
+    if (matchingFactory) {
+      return matchingFactory.CreateAudioModule(
+        this.context,
+        this.graph,
+        this.defaultGain,
+        this.parameterMax,
+        this.parameterMin,
+        this.createModuleId,
+        id,
+        name
+      );
+    }
     return this.createModuleMap.get(moduleType)(id, name);
   }
 
@@ -645,141 +654,6 @@ export class AudioGraphService {
     }
   }
 
-  createOscillator(id?: string, name?: string): CreateModuleResult {
-    const moduleType = AudioModuleType.Oscillator;
-    id = this.createModuleId(moduleType, id);
-    const oscillator = this.context.createOscillator();
-    const volumeControl = this.context.createGain();
-    volumeControl.gain.value = this.defaultGain;
-    oscillator.connect(volumeControl);
-    oscillator.start();
-    const moduleImplementation = {
-      internalNodes: [oscillator, volumeControl],
-      outputMap: new Map([['output', volumeControl]]),
-      parameterMap: new Map([
-        ['frequency', oscillator.frequency],
-        ['detune', oscillator.detune],
-        ['output gain', volumeControl.gain]
-      ]),
-      choiceMap: new Map([['waveform', waveForm => (oscillator.type = waveForm)]])
-    };
-    this.graph.set(id, moduleImplementation);
-    return new CreateModuleResult(
-      {
-        id,
-        name,
-        moduleType,
-        canDelete: true,
-        helpText: `A source that emits a periodic wave.
-          Similar to a Voltage Controlled Oscillator or Low Frequency Oscillator in a physical synth.
-          Negative frequency or gain values invert the phase.
-          Detune is a frequency offset in cents, which means 100 per semi-tone ie. 1200 per octave.
-          Output gain should be between -1 and 1 for audible signals.
-          Connect directly to the output to hear a constant tone.
-          The frequency and gain parameters can be modulated by connecting them to another oscillator.
-          Try connecting a low frequency inverted sawtooth to the output gain of an audible oscillator for a percussive sound.`
-      },
-      [],
-      [
-        {
-          name: 'output',
-          moduleId: id
-        }
-      ],
-      [
-        {
-          name: 'frequency',
-          units: 'hertz',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(oscillator.frequency),
-          minValue: this.parameterMin(oscillator.frequency),
-          value: oscillator.frequency.defaultValue,
-          stepSize: 1
-        },
-        {
-          name: 'detune',
-          units: 'cents',
-          moduleId: id,
-          sources: [],
-          maxValue: 1000000000,
-          minValue: -1000000000,
-          value: oscillator.detune.defaultValue,
-          stepSize: 1
-        },
-        {
-          name: 'output gain',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(volumeControl.gain),
-          minValue: this.parameterMin(volumeControl.gain),
-          stepSize: 0.01,
-          value: this.defaultGain
-        }
-      ],
-      [
-        {
-          name: 'waveform',
-          moduleId: id,
-          choices: ['sine', 'triangle', 'sawtooth', 'square'],
-          selection: 'sine'
-        }
-      ]
-    );
-  }
-
-  createGainModule(id?: string, name?: string): CreateModuleResult {
-    const moduleType = AudioModuleType.Gain;
-    id = this.createModuleId(moduleType, id);
-    const gain = this.context.createGain();
-    gain.gain.value = this.defaultGain;
-    const gainParameterKey = 'signal multiplier';
-    const moduleImplementation = {
-      internalNodes: [gain],
-      inputMap: new Map([['input', gain]]),
-      outputMap: new Map([['output', gain]]),
-      parameterMap: new Map([[gainParameterKey, gain.gain]])
-    };
-
-    this.graph.set(id, moduleImplementation);
-    return new CreateModuleResult(
-      {
-        id,
-        name,
-        moduleType,
-        canDelete: true,
-        helpText: `Multiplies each sample of the incoming signal by a factor to boost or attenuate it.
-          Similar to a Voltage Controlled Amplifier in a physical synth.
-          Negative values invert the phase of the signal.`
-      },
-      [
-        {
-          name: 'input',
-          moduleId: id,
-          sources: []
-        }
-      ],
-      [
-        {
-          name: 'output',
-          moduleId: id
-        }
-      ],
-      [
-        {
-          name: gainParameterKey,
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(gain.gain),
-          minValue: this.parameterMin(gain.gain),
-          stepSize: 0.01,
-          value: this.defaultGain
-        }
-      ],
-      []
-    );
-  }
-
   createInverseGainModule(id?: string, name?: string): CreateModuleResult {
     const moduleType = AudioModuleType.InverseGain;
     id = this.createModuleId(moduleType, id);
@@ -848,104 +722,6 @@ export class AudioGraphService {
         }
       ],
       []
-    );
-  }
-
-  createBitCrusherFixedPointModule(id?: string, name?: string): CreateModuleResult {
-    const moduleType = AudioModuleType.BitCrusher;
-    id = this.createModuleId(moduleType, id);
-    const crusher = new AudioWorkletNode(this.context, 'bit-crusher-fixed-point', {
-      numberOfInputs: 1,
-      numberOfOutputs: 1,
-      channelCount: 2,
-      channelCountMode: 'explicit',
-      outputChannelCount: [2],
-      channelInterpretation: 'speakers'
-    });
-    const bitDepthParameterKey = 'bit depth';
-    const bitDepthParameter = crusher.parameters.get('bitDepth');
-    const volumeControl = this.context.createGain();
-    volumeControl.gain.value = this.defaultGain;
-    crusher.connect(volumeControl);
-    const moduleImplementation = {
-      internalNodes: [crusher, volumeControl],
-      inputMap: new Map([['input', crusher]]),
-      outputMap: new Map([['output', volumeControl]]),
-      parameterMap: new Map([
-        [bitDepthParameterKey, bitDepthParameter],
-        ['output gain', volumeControl.gain]
-      ]),
-      choiceMap: new Map([
-        [
-          'fractional bit depth mode',
-          mode =>
-            crusher.port.postMessage({
-              type: 'change-fractional-bit-depth-mode',
-              newMode: mode
-            })
-        ]
-      ])
-    };
-
-    this.graph.set(id, moduleImplementation);
-    return new CreateModuleResult(
-      {
-        id,
-        name,
-        moduleType,
-        canDelete: true,
-        helpText: `Maps each sample to a less precise representation imitating an integer with a given number of bits.
-        Fractional bit depth mode tells the module how to deal with cases where bit depth is not a whole number.
-        Trve mode rounds down to the nearest whole number
-        so it outputs only numbers that would be representable using the given number of bits in real hardware.
-        Quantize-evenly mode causes bit depth to be rounded down to the nearest value that results in evenly spaced "steps"
-        in the output.
-        Continuous mode allows uneven quantization of the output space, so even small changes in bit depth will sound different.
-        For example, since a number with 2 bits it can represent 4 values and a number with 3 bits can represent 8 values,
-        there are bit depths in between 2 and 3 that can represent 5, 6, and 7 values.
-        For best results, the incoming signal should have an amplitude close to 1 (ie. values between -1 and 1).`
-      },
-      [
-        {
-          name: 'input',
-          moduleId: id,
-          sources: []
-        }
-      ],
-      [
-        {
-          name: 'output',
-          moduleId: id
-        }
-      ],
-      [
-        {
-          name: bitDepthParameterKey,
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(bitDepthParameter),
-          minValue: this.parameterMin(bitDepthParameter),
-          stepSize: 0.1,
-          value: bitDepthParameter.defaultValue
-        },
-        {
-          name: 'output gain',
-          moduleId: id,
-          sources: [],
-          maxValue: this.parameterMax(volumeControl.gain),
-          minValue: this.parameterMin(volumeControl.gain),
-          stepSize: 0.01,
-          value: this.defaultGain
-        }
-      ],
-      [
-        {
-          name: 'fractional bit depth mode',
-          moduleId: id,
-          choices: ['quantize-evenly', 'continuous', 'trve'],
-          selection: 'quantize-evenly'
-        }
-      ]
     );
   }
 
