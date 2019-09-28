@@ -26,7 +26,7 @@ export class RectifierFactory implements AudioModuleFactory {
     id = createModuleId(moduleType, id);
     const rectifier = context.createWaveShaper();
     rectifier.curve = makeRectifierCurve();
-    rectifier.oversample = '4x';
+    rectifier.oversample = 'none';
     const inputGain = context.createGain();
     inputGain.connect(rectifier);
     const outputGain = context.createGain();
