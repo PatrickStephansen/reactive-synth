@@ -7,6 +7,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AppComponent } from './app.component';
 import { AudioSignalChainModule } from './audio-signal-chain/audio-signal-chain.module';
 import { environment } from 'src/environments/environment';
+import { RouterModule } from '@angular/router';
+import { appRoutes } from './app.routes';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,8 +20,9 @@ import { environment } from 'src/environments/environment';
     StoreDevtoolsModule.instrument({
       name: 'Reactive Synth DevTools',
       maxAge: 50,
-      logOnly: environment.production,
-    })
+      logOnly: environment.production
+    }),
+    RouterModule.forRoot(appRoutes, { useHash: false })
   ],
   providers: [],
   bootstrap: [AppComponent]

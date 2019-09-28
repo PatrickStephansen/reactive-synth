@@ -10,6 +10,8 @@ import { reducer } from '../state/app.reducers';
 import { MaxValidatorDirective } from './validators/max-validator';
 import { MinValidatorDirective } from './validators/min-validator';
 import { StripSpacesPipe } from './pipes/strip-spaces.pipe';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -17,25 +19,29 @@ import { StripSpacesPipe } from './pipes/strip-spaces.pipe';
     MinValidatorDirective,
     HelpMessageComponent,
     ToggleHelpComponent,
-    StripSpacesPipe
+    StripSpacesPipe,
+    PageNotFoundComponent
   ],
   imports: [
     ClickOutsideModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    StoreModule.forFeature('app', reducer)
+    StoreModule.forFeature('app', reducer),
+    RouterModule
   ],
   exports: [
     ClickOutsideModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     HelpMessageComponent,
     ToggleHelpComponent,
     MaxValidatorDirective,
     MinValidatorDirective,
-    StripSpacesPipe
+    StripSpacesPipe,
+    PageNotFoundComponent
   ]
 })
 export class SharedModule {}
