@@ -33,7 +33,7 @@ export class ParameterComponent implements OnInit {
   parameterChanged = new EventEmitter<number>();
   @ViewChild('parameterValue', { static: true })
   parameterFormValue;
-  @ViewChild('dropdown', { static: true })
+  @ViewChild('dropdown', { static: false })
   dropdown;
 
   isDropdownUp = false;
