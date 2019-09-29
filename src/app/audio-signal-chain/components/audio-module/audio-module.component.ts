@@ -16,6 +16,8 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { AudioModule } from '../../model/audio-module';
 import { distinctUntilChanged, debounceTime, takeWhile } from 'rxjs/operators';
 import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
+import { AudioModuleType } from '../../model/audio-module-type';
+import { ActivateControlSurfaceEvent } from '../../model/activate-control-surface-event';
 
 @Component({
   selector: 'app-audio-module',
@@ -30,11 +32,13 @@ export class AudioModuleComponent implements OnInit, OnChanges, OnDestroy {
   @Output() disconnectSourceModule = new EventEmitter<ConnectModulesEvent>();
   @Output() deleteModule = new EventEmitter<string>();
   @Output() changeModuleName = new EventEmitter<ChangeModuleNameEvent>();
+  @Output() activateControlSurface = new EventEmitter<ActivateControlSurfaceEvent>();
 
   onNameChange = new EventEmitter<string>();
 
   isEditingName = false;
   isActive = true;
+  isControlSurface: boolean;
 
   connectModuleForm: FormGroup;
 
@@ -59,6 +63,8 @@ export class AudioModuleComponent implements OnInit, OnChanges, OnDestroy {
           moduleId: this.module.id
         })
       );
+
+    this.isControlSurface = this.module.moduleType === AudioModuleType.ControlSurface;
   }
 
   ngOnDestroy() {

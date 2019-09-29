@@ -31,11 +31,21 @@
       ></button>
     </div>
   </div>
+
   <div class="field">
     <label class="label">
       Module Type
     </label>
     <p class="control">{{ module.moduleType }}</p>
+    <ng-container *ngIf="isControlSurface"
+      ><button
+        type="button"
+        class="button"
+        (click)="activateControlSurface.emit({ moduleId: module.id })"
+      >
+        View Control Surface
+      </button></ng-container
+    >
   </div>
 
   <app-help-message *ngIf="module.helpText"> {{ module.helpText }} </app-help-message>

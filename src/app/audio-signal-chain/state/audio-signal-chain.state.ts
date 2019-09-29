@@ -5,6 +5,8 @@ import { ChoiceParameter } from '../model/choice-parameter';
 import { SignalChainError } from '../model/signal-chain-error';
 import { AudioModuleInput } from '../model/audio-module-input';
 import { AudioModuleOutput } from '../model/audio-module-output';
+import { ControlSurface } from '../model/control-surface';
+import { ViewMode } from '../model/view-mode';
 
 export interface AudioSignalChainState {
   modules: AudioModule[];
@@ -13,6 +15,8 @@ export interface AudioSignalChainState {
   parameters: Parameter[];
   choiceParameters: ChoiceParameter[];
   visualizations: Visualization[];
+  controlSurfaces: ControlSurface[];
+  viewMode: ViewMode;
   muted: boolean;
   errors: SignalChainError[];
 }

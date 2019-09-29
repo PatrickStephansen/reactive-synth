@@ -1,0 +1,6 @@
+<ng-container *ngIf="isModulesViewMode$ | async">
+  <app-audio-signal-chain-shell></app-audio-signal-chain-shell>
+</ng-container>
+<ng-container *ngIf="isControlsViewMode$ | async">
+  <app-controls-shell></app-controls-shell>
+</ng-container>

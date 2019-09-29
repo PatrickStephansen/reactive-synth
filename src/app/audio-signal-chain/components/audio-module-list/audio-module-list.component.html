@@ -56,6 +56,9 @@
     <button class="button" (click)="createClockDividerModule()">
       Add Clock Divider
     </button>
+    <button class="button" (click)="createControlSurfaceModule()">
+      Add Control Surface
+    </button>
   </div>
 </div>
 <h2 class="title is-3">Signal Chain</h2>
@@ -82,6 +85,7 @@
       (disconnectSourceModule)="disconnectModules.emit($event)"
       (deleteModule)="deleteModule.emit($event)"
       (changeModuleName)="changeModuleName.emit($event)"
+      (activateControlSurface)="activateControlSurface.emit($event)"
     ></app-audio-module>
   </div>
 </div>

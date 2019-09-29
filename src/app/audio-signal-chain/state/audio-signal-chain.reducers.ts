@@ -21,14 +21,18 @@ import {
   removeModule,
   changeModuleName
 } from './reducer-functions/modules';
+import { ViewMode } from '../model/view-mode';
+import { setViewMode, activateControlSurface } from './reducer-functions/view-modes';
 
 const initialState: AudioSignalChainState = {
   modules: [],
+  controlSurfaces: [],
   inputs: [],
   outputs: [],
   parameters: [],
   choiceParameters: [],
   visualizations: [],
+  viewMode: ViewMode.Modules,
   muted: false,
   errors: []
 };
@@ -53,7 +57,9 @@ export const realReducer = createReducer(
   on(audioSignalActions.clearErrors, clearErrors),
   on(audioSignalActions.addError, addError),
   on(audioSignalActions.dismissError, removeError),
-  on(audioSignalActions.toggleVisualizationActive, setVisualizationActive)
+  on(audioSignalActions.toggleVisualizationActive, setVisualizationActive),
+  on(audioSignalActions.setViewMode, setViewMode),
+  on(audioSignalActions.activateControlSurface, activateControlSurface)
 );
 
 export function reducer(state: AudioSignalChainState, action: Action) {

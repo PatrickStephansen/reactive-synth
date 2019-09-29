@@ -36,6 +36,9 @@ import { FilterFactory } from './audio-modules/filter-factory';
 import { InverseGainFactory } from './audio-modules/inverse-gain-factory';
 import { NoiseGeneratorFactory } from './audio-modules/noise-generator-factory';
 import { RectifierFactory } from './audio-modules/rectifier-factory';
+import { ViewSelectorShellComponent } from './containers/view-selector-shell/view-selector-shell.component';
+import { ControlsShellComponent } from './containers/controls-shell/controls-shell.component';
+import { ControlSurfaceFactory } from './audio-modules/control-surface-factory';
 
 @NgModule({
   declarations: [
@@ -54,14 +57,16 @@ import { RectifierFactory } from './audio-modules/rectifier-factory';
     VisualizationListComponent,
     LineGraphVisualizationComponent,
     VisualizationsShellComponent,
-    TriggerParameterExtensionComponent
+    TriggerParameterExtensionComponent,
+    ViewSelectorShellComponent,
+    ControlsShellComponent
   ],
   imports: [
     StoreModule.forFeature('signalChain', reducer),
     EffectsModule.forFeature([AudioSignalChainEffects]),
     SharedModule
   ],
-  exports: [AudioSignalChainShellComponent],
+  exports: [ViewSelectorShellComponent],
   providers: [
     AudioGraphService,
     Location,
@@ -77,7 +82,8 @@ import { RectifierFactory } from './audio-modules/rectifier-factory';
     { provide: AUDIO_MODULE_FACTORY, useClass: InverseGainFactory, multi: true },
     { provide: AUDIO_MODULE_FACTORY, useClass: NoiseGeneratorFactory, multi: true },
     { provide: AUDIO_MODULE_FACTORY, useClass: OscillatorFactory, multi: true },
-    { provide: AUDIO_MODULE_FACTORY, useClass: RectifierFactory, multi: true }
+    { provide: AUDIO_MODULE_FACTORY, useClass: RectifierFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: ControlSurfaceFactory, multi: true }
   ]
 })
 export class AudioSignalChainModule {}

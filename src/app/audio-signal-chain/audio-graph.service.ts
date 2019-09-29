@@ -17,6 +17,7 @@ import { Subscription } from 'rxjs';
 import { workletUrl } from '../cache-hack/cache';
 import { ModuleImplementation } from './audio-modules/module-implementation';
 import { AUDIO_MODULE_FACTORY, AudioModuleFactory } from './audio-modules/audio-module-factory';
+import { ViewMode } from './model/view-mode';
 
 let incrementingId = 0;
 
@@ -117,6 +118,8 @@ export class AudioGraphService {
               Click the visualizations to pause them. Click their headings to hide them to save space.`
               }
             ],
+            controlSurfaces: [],
+            viewMode: ViewMode.Modules,
             inputs: [
               {
                 moduleId: 'Output to Speakers',

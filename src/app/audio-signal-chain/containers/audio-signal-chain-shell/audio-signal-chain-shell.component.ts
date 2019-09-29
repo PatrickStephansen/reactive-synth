@@ -14,6 +14,8 @@ import { ConnectModulesEvent } from '../../model/connect-modules-event';
 import { AudioModuleOutput } from '../../model/audio-module-output';
 import { ReorderModulesEvent } from '../../model/reorder-modules-event';
 import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
+import { ActivateControlSurfaceEvent } from '../../model/activate-control-surface-event';
+import { ViewMode } from '../../model/view-mode';
 
 @Component({
   selector: 'app-audio-signal-chain-shell',
@@ -64,5 +66,12 @@ export class AudioSignalChainShellComponent implements OnInit {
 
   changeModuleName(event: ChangeModuleNameEvent) {
     this.store.dispatch(audioSignalActions.changeModuleName({ nameChange: event }));
+  }
+
+  activateControlSurface(event: ActivateControlSurfaceEvent) {
+    this.store.dispatch(
+      audioSignalActions.activateControlSurface({ activateControlSurfaceEvent: event })
+    );
+    this.store.dispatch(audioSignalActions.setViewMode({ viewMode: ViewMode.Controls }));
   }
 }

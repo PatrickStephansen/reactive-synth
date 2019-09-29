@@ -31,16 +31,31 @@ export const getSources = createSelector(
   (outputs: AudioModuleOutput[], { moduleId }: { moduleId: string }) =>
     outputs.filter(o => o.moduleId !== moduleId)
 );
+export const getControlSurfaces = createSelector(
+  getSignalChainsFeatureState,
+  signalChain => signalChain.controlSurfaces
+);
+export const getActiveControlSurface = createSelector(
+  getControlSurfaces,
+  controlSurfaces => controlSurfaces.find(controlSurface => controlSurface.isActive)
+);
+export const getViewMode = createSelector(
+  getSignalChainsFeatureState,
+  signalChain => signalChain.viewMode
+);
 
 const getParametersState = createSelector(
   getSignalChainsFeatureState,
   (signalChain: AudioSignalChainState) =>
     signalChain.parameters.map(p => ({
       ...p,
-      sources: p.sources.map(s => ({
-        ...s,
-        moduleName: signalChain.modules.find(m => m.id === s.moduleId).name
-      } as AudioModuleOutput))
+      sources: p.sources.map(
+        s =>
+          ({
+            ...s,
+            moduleName: signalChain.modules.find(m => m.id === s.moduleId).name
+          } as AudioModuleOutput)
+      )
     }))
 );
 

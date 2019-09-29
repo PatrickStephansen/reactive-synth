@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
 
 import { AudioModule } from '../../model/audio-module';
 import { ConnectModulesEvent } from '../../model/connect-modules-event';
@@ -7,6 +14,7 @@ import { AudioModuleType } from '../../model/audio-module-type';
 import { AudioModuleOutput } from '../../model/audio-module-output';
 import { ReorderModulesEvent } from '../../model/reorder-modules-event';
 import { ChangeModuleNameEvent } from '../../model/change-module-name-event';
+import { ActivateControlSurfaceEvent } from '../../model/activate-control-surface-event';
 
 @Component({
   selector: 'app-audio-module-list',
@@ -27,6 +35,7 @@ export class AudioModuleListComponent implements OnInit {
   @Output() resetSignalChain = new EventEmitter<void>();
   @Output() reorderModules = new EventEmitter<ReorderModulesEvent>();
   @Output() changeModuleName = new EventEmitter<ChangeModuleNameEvent>();
+  @Output() activateControlSurface = new EventEmitter<ActivateControlSurfaceEvent>();
 
   constructor() {}
 
@@ -71,5 +80,8 @@ export class AudioModuleListComponent implements OnInit {
   }
   createClockDividerModule() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.ClockDivider));
+  }
+  createControlSurfaceModule() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.ControlSurface));
   }
 }

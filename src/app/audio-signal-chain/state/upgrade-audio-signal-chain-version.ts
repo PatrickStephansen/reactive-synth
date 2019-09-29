@@ -1,4 +1,5 @@
 import { AudioSignalChainState } from './audio-signal-chain.state';
+import { ViewMode } from '../model/view-mode';
 
 export const upgradeAudioChainStateVersion = (
   state,
@@ -15,6 +16,8 @@ export const upgradeAudioChainStateVersion = (
           moduleType: m.moduleType,
           name: m.name
         })),
+        controlSurfaces: state.controlSurfaces || [],
+        viewMode: ViewMode.Modules,
         choiceParameters: state.choiceParameters,
         outputs: state.modules
           .map(m => ({

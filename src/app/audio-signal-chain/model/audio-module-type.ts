@@ -11,5 +11,6 @@ export enum AudioModuleType {
   EnvelopeGenerator = 'envelope',
   ClockDivider = 'clock-divider',
   ConstantSource = 'constant',
+  ControlSurface = 'control-surface',
   Output = 'output'
 }

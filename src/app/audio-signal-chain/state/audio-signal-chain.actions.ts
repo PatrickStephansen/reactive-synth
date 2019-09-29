@@ -14,6 +14,8 @@ import { AudioModuleInput } from '../model/audio-module-input';
 import { AudioModuleOutput } from '../model/audio-module-output';
 import { ReorderModulesEvent } from '../model/reorder-modules-event';
 import { ChangeModuleNameEvent } from '../model/change-module-name-event';
+import { ViewMode } from '../model/view-mode';
+import { ActivateControlSurfaceEvent } from '../model/activate-control-surface-event';
 
 export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
@@ -47,7 +49,9 @@ export enum AudioSignalChainActionTypes {
   AddError = '[Audio Signal Chain] Add SignalChain Change Error',
   DismissError = '[Audio Signal Chain] Dismiss SignalChain Change Error',
   ClearErrors = '[Audio Signal Chain] Clear All SignalChain Change Errors',
-  ToggleVisualizationActive = '[Audio Signal Chain] Toggle Visualization Active'
+  ToggleVisualizationActive = '[Audio Signal Chain] Toggle Visualization Active',
+  SetViewMode = '[Audio Signal Chain] Set View Mode',
+  ActivateControlSurface = '[Audio Signal Chain] Activate Control Surface'
 }
 
 export const audioSignalActions = {
@@ -169,5 +173,13 @@ export const audioSignalActions = {
     props<{ error: SignalChainError }>()
   ),
   dismissError: createAction(AudioSignalChainActionTypes.DismissError, props<{ id: string }>()),
-  clearErrors: createAction(AudioSignalChainActionTypes.ClearErrors)
+  clearErrors: createAction(AudioSignalChainActionTypes.ClearErrors),
+  setViewMode: createAction(
+    AudioSignalChainActionTypes.SetViewMode,
+    props<{ viewMode: ViewMode }>()
+  ),
+  activateControlSurface: createAction(
+    AudioSignalChainActionTypes.ActivateControlSurface,
+    props<{ activateControlSurfaceEvent: ActivateControlSurfaceEvent }>()
+  )
 };
