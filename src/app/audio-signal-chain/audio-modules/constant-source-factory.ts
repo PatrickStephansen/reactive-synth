@@ -57,7 +57,8 @@ export class ConstantSourceFactory implements AudioModuleFactory {
           maxValue: parameterMax(constant.offset),
           minValue: parameterMin(constant.offset),
           value: constant.offset.value,
-          stepSize: 0.01
+          stepSize: 0.01,
+          canConnectSources: true
         }
       ],
       []

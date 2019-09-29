@@ -29,6 +29,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
     const maximumX = context.createConstantSource();
     const minimumY = context.createConstantSource();
     const maximumY = context.createConstantSource();
+    x.offset.value = 0;
+    y.offset.value = 0;
     minimumX.offset.value = 0;
     minimumY.offset.value = 0;
     maximumX.offset.value = 1;
@@ -38,6 +40,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
       inputMap: new Map(),
       outputMap: new Map([['x', x], ['y', y]]),
       parameterMap: new Map([
+        ['x', x.offset],
+        ['y', y.offset],
         ['minimum x', minimumX.offset],
         ['maximum x', maximumX.offset],
         ['minimum y', minimumY.offset],
@@ -73,7 +77,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           minValue: parameterMin(minimumX.offset),
           maxValue: parameterMax(minimumX.offset),
           stepSize: 0.01,
-          value: 0
+          value: 0,
+          canConnectSources: false
         },
         {
           name: 'maximum x',
@@ -82,7 +87,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           minValue: parameterMin(maximumX.offset),
           maxValue: parameterMax(maximumX.offset),
           stepSize: 0.01,
-          value: 1
+          value: 1,
+          canConnectSources: false
         },
         {
           name: 'minimum y',
@@ -91,7 +97,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           minValue: parameterMin(minimumY.offset),
           maxValue: parameterMax(minimumY.offset),
           stepSize: 0.01,
-          value: 0
+          value: 1,
+          canConnectSources: false
         },
         {
           name: 'maximum y',
@@ -100,8 +107,29 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           minValue: parameterMin(maximumY.offset),
           maxValue: parameterMax(maximumY.offset),
           stepSize: 0.01,
-          value: 1
-        }
+          value: 1,
+          canConnectSources: false
+        },
+        {
+          name: 'x',
+          moduleId: id,
+          sources: [],
+          minValue: parameterMin(x.offset),
+          maxValue: parameterMax(x.offset),
+          stepSize: 0.01,
+          value: 0,
+          canConnectSources: true
+        },
+        {
+          name: 'y',
+          moduleId: id,
+          sources: [],
+          minValue: parameterMin(y.offset),
+          maxValue: parameterMax(y.offset),
+          stepSize: 0.01,
+          value: 0,
+          canConnectSources: true
+        },
       ],
       []
     );

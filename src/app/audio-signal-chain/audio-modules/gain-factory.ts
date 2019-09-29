@@ -65,7 +65,8 @@ export class GainFactory implements AudioModuleFactory {
           maxValue: parameterMax(gain.gain),
           minValue: parameterMin(gain.gain),
           stepSize: 0.01,
-          value: defaultGain
+          value: defaultGain,
+          canConnectSources: true
         }
       ],
       []

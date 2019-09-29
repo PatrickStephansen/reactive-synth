@@ -95,7 +95,8 @@ export class BitCrusherFactory implements AudioModuleFactory {
           maxValue: parameterMax(bitDepthParameter),
           minValue: parameterMin(bitDepthParameter),
           stepSize: 0.1,
-          value: bitDepthParameter.defaultValue
+          value: bitDepthParameter.defaultValue,
+          canConnectSources: true
         },
         {
           name: 'output gain',
@@ -104,7 +105,8 @@ export class BitCrusherFactory implements AudioModuleFactory {
           maxValue: parameterMax(volumeControl.gain),
           minValue: parameterMin(volumeControl.gain),
           stepSize: 0.01,
-          value: defaultGain
+          value: defaultGain,
+          canConnectSources: true
         }
       ],
       [

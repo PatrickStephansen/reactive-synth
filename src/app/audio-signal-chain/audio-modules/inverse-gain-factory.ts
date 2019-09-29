@@ -75,7 +75,8 @@ export class InverseGainFactory implements AudioModuleFactory {
           maxValue: parameterMax(inverseGain.parameters.get('divisor')),
           minValue: parameterMin(inverseGain.parameters.get('divisor')),
           stepSize: 0.01,
-          value: inverseGain.parameters.get('divisor').value
+          value: inverseGain.parameters.get('divisor').value,
+          canConnectSources: true
         },
         {
           name: fallBackValueKey,
@@ -84,7 +85,8 @@ export class InverseGainFactory implements AudioModuleFactory {
           maxValue: parameterMax(inverseGain.parameters.get('zeroDivisorFallback')),
           minValue: parameterMin(inverseGain.parameters.get('zeroDivisorFallback')),
           stepSize: 0.01,
-          value: inverseGain.parameters.get('zeroDivisorFallback').value
+          value: inverseGain.parameters.get('zeroDivisorFallback').value,
+          canConnectSources: true
         }
       ],
       []

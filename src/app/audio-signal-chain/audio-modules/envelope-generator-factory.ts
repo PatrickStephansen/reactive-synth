@@ -115,7 +115,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
                 new Map([['trigger-change', envelopeTriggered]]),
                 new Map([['manual-trigger', manualTriggerEventEmitter]])
               )
-            ]
+            ],
+            canConnectSources: true
           },
           {
             name: 'attack value',
@@ -124,7 +125,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(attackValue),
             minValue: parameterMin(attackValue),
             stepSize: 0.01,
-            value: attackValue.defaultValue
+            value: attackValue.defaultValue,
+            canConnectSources: true
           },
           {
             name: 'attack time',
@@ -134,7 +136,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(attackTime),
             minValue: parameterMin(attackTime),
             stepSize: 0.001,
-            value: 0.001
+            value: 0.001,
+            canConnectSources: true
           },
           {
             name: 'hold time',
@@ -144,7 +147,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(holdTime),
             minValue: parameterMin(holdTime),
             stepSize: 0.001,
-            value: holdTime.defaultValue
+            value: holdTime.defaultValue,
+            canConnectSources: true
           },
           {
             name: 'decay time',
@@ -154,7 +158,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(decayTime),
             minValue: parameterMin(decayTime),
             stepSize: 0.001,
-            value: decayTime.defaultValue
+            value: decayTime.defaultValue,
+            canConnectSources: true
           },
           {
             name: 'sustain value',
@@ -163,7 +168,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(sustainValue),
             minValue: parameterMin(sustainValue),
             stepSize: 0.01,
-            value: sustainValue.defaultValue
+            value: sustainValue.defaultValue,
+            canConnectSources: true
           },
           {
             name: 'release time',
@@ -173,7 +179,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(releaseTime),
             minValue: parameterMin(releaseTime),
             stepSize: 0.001,
-            value: releaseTime.defaultValue
+            value: releaseTime.defaultValue,
+            canConnectSources: true
           },
           {
             name: 'output gain',
@@ -182,7 +189,8 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
             maxValue: parameterMax(outputGain.gain),
             minValue: parameterMin(outputGain.gain),
             stepSize: 0.01,
-            value: defaultGain
+            value: defaultGain,
+            canConnectSources: true
           }
         ],
         []

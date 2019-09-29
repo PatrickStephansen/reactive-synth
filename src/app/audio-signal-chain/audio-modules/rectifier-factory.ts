@@ -68,7 +68,8 @@ export class RectifierFactory implements AudioModuleFactory {
           maxValue: parameterMax(inputGain.gain),
           value: inputGain.gain.value,
           stepSize: 0.01,
-          sources: []
+          sources: [],
+          canConnectSources: true
         },
         {
           name: 'output gain',
@@ -77,7 +78,8 @@ export class RectifierFactory implements AudioModuleFactory {
           maxValue: parameterMax(outputGain.gain),
           value: outputGain.gain.value,
           stepSize: 0.01,
-          sources: []
+          sources: [],
+          canConnectSources: true
         }
       ],
       []

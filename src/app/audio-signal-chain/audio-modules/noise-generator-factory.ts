@@ -99,7 +99,8 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
           maxValue: parameterMax(stepMin),
           minValue: parameterMin(stepMin),
           value: stepMin.value,
-          stepSize: 0.01
+          stepSize: 0.01,
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -108,7 +109,8 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
           maxValue: parameterMax(stepMax),
           minValue: parameterMin(stepMax),
           value: stepMax.value,
-          stepSize: 0.01
+          stepSize: 0.01,
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -117,7 +119,8 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
           maxValue: parameterMax(sampleHold),
           minValue: parameterMin(sampleHold),
           value: sampleHold.value,
-          stepSize: 1
+          stepSize: 1,
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -132,7 +135,8 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
               new Map([['trigger-change', nextSampleTriggerChanged]]),
               new Map([['manual-trigger', manualTriggerEventEmitter]])
             )
-          ]
+          ],
+          canConnectSources: true
         },
         {
           name: 'output gain',
@@ -141,7 +145,8 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
           maxValue: parameterMax(volumeControl.gain),
           minValue: parameterMin(volumeControl.gain),
           stepSize: 0.01,
-          value: defaultGain
+          value: defaultGain,
+          canConnectSources: true
         }
       ],
       []

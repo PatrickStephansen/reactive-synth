@@ -1,10 +1,7 @@
 import { AudioSignalChainState } from './audio-signal-chain.state';
 import { ViewMode } from '../model/view-mode';
 
-export const upgradeAudioChainStateVersion = (
-  state,
-  version: number
-): AudioSignalChainState => {
+export const upgradeAudioChainStateVersion = (state, version: number): AudioSignalChainState => {
   switch (version) {
     case 1:
       const upgradedState = {
@@ -42,7 +39,8 @@ export const upgradeAudioChainStateVersion = (
           sources: p.sourceIds.map(s => ({
             moduleId: s,
             name: 'output'
-          }))
+          })),
+          canConnectSources: p.canConnectSources === undefined ? true : p.canConnectSources
         }))
       };
 

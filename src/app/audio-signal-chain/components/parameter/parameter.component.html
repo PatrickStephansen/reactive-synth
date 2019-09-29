@@ -30,7 +30,7 @@
             name="parameterValue"
           />
         </div>
-        <div class="control">
+        <div *ngIf="parameter.canConnectSources" class="control">
           <div
             #dropdown
             class="dropdown is-right"
@@ -80,7 +80,7 @@
       {{ parameter.name }} must be a number between {{ parameter.minValue }} and
       {{ parameter.maxValue }}
     </div>
-    <div class="tags" *ngIf="parameter.sources?.length">
+    <div class="tags" *ngIf="parameter.canConnectSources && parameter.sources?.length">
       <ng-container *ngFor="let sourceModuleOutput of parameter.sources">
         <span class="tag is-clipped"
           ><span class="is-clipped">

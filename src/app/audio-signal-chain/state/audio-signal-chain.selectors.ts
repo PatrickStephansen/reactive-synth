@@ -7,6 +7,7 @@ import { Visualization } from '../model/visualization/visualization';
 import { always, applySpec, compose, map, omit, pick, prop } from 'ramda';
 import { AudioModuleInput } from '../model/audio-module-input';
 import { AudioModuleOutput } from '../model/audio-module-output';
+import { AudioModuleType } from '../model/audio-module-type';
 
 const getSignalChainsFeatureState = createFeatureSelector<AudioSignalChainState>('signalChain');
 export const getSignalChainOutputActiveState = createSelector(
@@ -32,12 +33,21 @@ export const getSources = createSelector(
     outputs.filter(o => o.moduleId !== moduleId)
 );
 export const getControlSurfaces = createSelector(
-  getSignalChainsFeatureState,
-  signalChain => signalChain.controlSurfaces
+  getModulesState,
+  modules => modules.filter(module => module.moduleType === AudioModuleType.ControlSurface)
 );
+const getActiveControlSurfaceId = createSelector(
+  getSignalChainsFeatureState,
+  signalChain => signalChain.activeControlSurfaceId
+);
+const moduleToControlSurface = module => (module ? { moduleId: module.id, isActive: true } : null);
 export const getActiveControlSurface = createSelector(
   getControlSurfaces,
-  controlSurfaces => controlSurfaces.find(controlSurface => controlSurface.isActive)
+  getActiveControlSurfaceId,
+  (controlSurfaces, activeControlSurfaceId) =>
+    moduleToControlSurface(
+      controlSurfaces.find(controlSurface => controlSurface.id === activeControlSurfaceId)
+    )
 );
 export const getViewMode = createSelector(
   getSignalChainsFeatureState,
@@ -126,7 +136,7 @@ export const getSignalChainStateForSave = createSelector(
       prop('choiceParameters')
     ),
     parameters: compose(
-      map(pick(['name', 'moduleId', 'value', 'sources'])),
+      map(pick(['name', 'moduleId', 'value', 'sources', 'canConnectSources'])),
       prop('parameters')
     )
   })

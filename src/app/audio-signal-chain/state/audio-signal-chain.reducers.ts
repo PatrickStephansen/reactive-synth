@@ -26,7 +26,6 @@ import { setViewMode, activateControlSurface } from './reducer-functions/view-mo
 
 const initialState: AudioSignalChainState = {
   modules: [],
-  controlSurfaces: [],
   inputs: [],
   outputs: [],
   parameters: [],

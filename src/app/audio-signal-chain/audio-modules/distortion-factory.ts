@@ -69,7 +69,8 @@ export class DistortionFactory implements AudioModuleFactory {
           value: inputGain.gain.value,
           minValue: parameterMin(inputGain.gain),
           maxValue: parameterMax(inputGain.gain),
-          stepSize: 0.01
+          stepSize: 0.01,
+          canConnectSources: true
         }
       ],
       []

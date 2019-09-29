@@ -11,4 +11,5 @@ export interface Parameter {
   stepSize: number;
   sources: AudioModuleOutput[];
   extensions?: ParameterExtension[];
+  canConnectSources: boolean;
 }

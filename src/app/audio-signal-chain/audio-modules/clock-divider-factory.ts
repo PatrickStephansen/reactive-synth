@@ -120,7 +120,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
               new Map([['trigger-change', clockTriggered]]),
               new Map([['manual-trigger', manualClockTriggerEventEmitter]])
             )
-          ]
+          ],
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -135,7 +136,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
               new Map([['trigger-change', resetTriggered]]),
               new Map([['manual-trigger', manualResetTriggerEventEmitter]])
             )
-          ]
+          ],
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -144,7 +146,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
           stepSize: 0.25,
           maxValue: parameterMax(attackAfterTicks),
           minValue: parameterMin(attackAfterTicks),
-          value: attackAfterTicks.defaultValue
+          value: attackAfterTicks.defaultValue,
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -153,7 +156,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
           stepSize: 0.25,
           maxValue: parameterMax(releaseAfterTocks),
           minValue: parameterMin(releaseAfterTocks),
-          value: releaseAfterTocks.defaultValue
+          value: releaseAfterTocks.defaultValue,
+          canConnectSources: true
         },
         {
           moduleId: id,
@@ -162,7 +166,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
           stepSize: 0.01,
           maxValue: parameterMax(outputGain.gain),
           minValue: parameterMin(outputGain.gain),
-          value: defaultGain
+          value: defaultGain,
+          canConnectSources: true
         }
       ],
       []

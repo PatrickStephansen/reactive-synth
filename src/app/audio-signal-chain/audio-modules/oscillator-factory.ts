@@ -70,7 +70,8 @@ export class OscillatorFactory implements AudioModuleFactory {
           maxValue: parameterMax(oscillator.frequency),
           minValue: parameterMin(oscillator.frequency),
           value: oscillator.frequency.defaultValue,
-          stepSize: 1
+          stepSize: 1,
+          canConnectSources: true
         },
         {
           name: 'detune',
@@ -80,7 +81,8 @@ export class OscillatorFactory implements AudioModuleFactory {
           maxValue: 1000000000,
           minValue: -1000000000,
           value: oscillator.detune.defaultValue,
-          stepSize: 1
+          stepSize: 1,
+          canConnectSources: true
         },
         {
           name: 'output gain',
@@ -89,7 +91,8 @@ export class OscillatorFactory implements AudioModuleFactory {
           maxValue: parameterMax(volumeControl.gain),
           minValue: parameterMin(volumeControl.gain),
           stepSize: 0.01,
-          value: defaultGain
+          value: defaultGain,
+          canConnectSources: true
         }
       ],
       [

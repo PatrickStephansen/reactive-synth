@@ -71,7 +71,8 @@ export class FilterFactory implements AudioModuleFactory {
           minValue: parameterMin(filter.frequency),
           stepSize: 1,
           sources: [],
-          value: filter.frequency.value
+          value: filter.frequency.value,
+          canConnectSources: true
         },
         {
           name: 'detune',
@@ -81,7 +82,8 @@ export class FilterFactory implements AudioModuleFactory {
           maxValue: parameterMax(filter.detune),
           minValue: parameterMin(filter.detune),
           value: filter.detune.defaultValue,
-          stepSize: 1
+          stepSize: 1,
+          canConnectSources: true
         },
         {
           name: 'quality factor',
@@ -90,7 +92,8 @@ export class FilterFactory implements AudioModuleFactory {
           minValue: 0,
           stepSize: 1,
           sources: [],
-          value: filter.Q.value
+          value: filter.Q.value,
+          canConnectSources: true
         }
       ],
       [

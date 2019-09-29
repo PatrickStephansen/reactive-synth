@@ -7,8 +7,5 @@ export const setViewMode = (state: AudioSignalChainState, action) => ({
 
 export const activateControlSurface = (state: AudioSignalChainState, action) => ({
   ...state,
-  controlSurfaces: state.controlSurfaces.map(controlSurface => ({
-    ...controlSurface,
-    isActive: controlSurface.moduleId === action.activateControlSurfaceEvent.moduleId
-  }))
+  activeControlSurfaceId: action.activateControlSurfaceEvent.moduleId
 });

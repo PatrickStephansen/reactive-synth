@@ -67,7 +67,8 @@ export class DelayFactory implements AudioModuleFactory {
           maxValue: parameterMax(delay.delayTime),
           minValue: parameterMin(delay.delayTime),
           stepSize: 0.01,
-          value: delay.delayTime.value
+          value: delay.delayTime.value,
+          canConnectSources: true
         }
       ],
       []
