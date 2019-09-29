@@ -1,4 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { distinctUntilChanged, sampleTime } from 'rxjs/operators';
 
 import { Parameter } from '../../model/parameter';

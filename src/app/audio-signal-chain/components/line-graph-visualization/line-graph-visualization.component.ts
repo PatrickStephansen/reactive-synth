@@ -8,7 +8,8 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  OnDestroy
 } from '@angular/core';
 
 import { Visualization } from '../../model/visualization/visualization';
@@ -20,7 +21,7 @@ import { ChangeVisualizationActiveEvent } from '../../model/visualization/change
   styleUrls: ['./line-graph-visualization.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LineGraphVisualizationComponent implements OnInit, OnChanges {
+export class LineGraphVisualizationComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   visualization: Visualization;
 
@@ -32,6 +33,7 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges {
   private canvas: HTMLCanvasElement;
   private drawingContext: CanvasRenderingContext2D;
   hideCanvas: boolean;
+  isOnScreen: boolean;
 
   constructor() {}
 
@@ -46,6 +48,11 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges {
     } else {
       this.hideCanvas = true;
     }
+    this.isOnScreen = true;
+  }
+
+  ngOnDestroy() {
+    this.isOnScreen = false;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -99,7 +106,7 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges {
       }
     });
     this.drawingContext.stroke();
-    if (this.visualization.isActive) {
+    if (this.visualization.isActive && this.isOnScreen) {
       requestAnimationFrame(() => this.renderVisuals());
     } else {
       this.drawPause(canvasWidth, canvasHeight);
