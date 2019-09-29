@@ -35,8 +35,14 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
     minimumY.offset.value = 0;
     maximumX.offset.value = 1;
     maximumY.offset.value = 1;
+    x.start();
+    y.start();
+    minimumX.start();
+    minimumY.start();
+    maximumX.start();
+    maximumY.start();
     const moduleImplementation = {
-      internalNodes: [],
+      internalNodes: [x, y, minimumX, minimumY, maximumX, maximumY],
       inputMap: new Map(),
       outputMap: new Map([['x', x], ['y', y]]),
       parameterMap: new Map([
@@ -129,7 +135,7 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           stepSize: 0.01,
           value: 0,
           canConnectSources: true
-        },
+        }
       ],
       []
     );
