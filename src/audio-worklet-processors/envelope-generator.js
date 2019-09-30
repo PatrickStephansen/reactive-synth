@@ -1,5 +1,5 @@
 import { getParameterValue } from './getParameterValue';
-import { getEnvelopeValue } from './getEnvelopeValue';
+import { getEnvelopeValue, restStage } from './getEnvelopeValue';
 import { getValueAtTime } from './linear-change';
 
 const getParamValue = getParameterValue;
@@ -60,8 +60,7 @@ registerProcessor(
 
     constructor(options) {
       super(options);
-      this.stages = ['rest', 'attack', 'hold', 'decay', 'sustain', 'release'];
-      this.stage = this.stages[0];
+      this.stage = restStage;
       // stageProgress advances from 0 to 1 to show progress of stage
       this.stageProgress = 0;
       this.secondsSinceStateTransition = 0;
@@ -156,9 +155,7 @@ registerProcessor(
 
         // only expecting one channel, but tolerating more in case
         for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
-          const outputChannel = output[channelIndex];
-
-          outputChannel[sampleIndex] = this.outputValue;
+          output[channelIndex][sampleIndex] = this.outputValue;
         }
       }
       return true;
