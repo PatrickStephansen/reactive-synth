@@ -1,4 +1,5 @@
 import { AudioSignalChainState } from '../audio-signal-chain.state';
+import { ChangeParameterBoundsEvent } from '../../model/change-parameter-bounds-event';
 
 export const updateParameter = (state: AudioSignalChainState, { parameter }) => {
   const updatedParameters = state.parameters.map(p =>
@@ -45,4 +46,26 @@ export const connectParameter = (state: AudioSignalChainState, { connection }) =
 export const addParameter = (state: AudioSignalChainState, action) => ({
   ...state,
   parameters: [...state.parameters, action.parameter]
+});
+
+export const changeParameterBounds = (
+  state: AudioSignalChainState,
+  { change }: { change: ChangeParameterBoundsEvent }
+) => ({
+  ...state,
+  parameters: state.parameters.map(parameter =>
+    parameter.moduleId === change.moduleId && parameter.name === change.parameterName
+      ? {
+          ...parameter,
+          minShownValue: Math.max(
+            parameter.minValue,
+            Math.min(change.newMaxValue, change.newMinValue)
+          ),
+          maxShownValue: Math.min(
+            parameter.maxValue,
+            Math.max(change.newMaxValue, change.newMinValue)
+          )
+        }
+      : parameter
+  )
 });

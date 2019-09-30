@@ -65,7 +65,9 @@ const getParametersState = createSelector(
             ...s,
             moduleName: signalChain.modules.find(m => m.id === s.moduleId).name
           } as AudioModuleOutput)
-      )
+      ),
+      maxShownValue: p.maxShownValue === undefined ? p.maxValue : p.maxShownValue,
+      minShownValue: p.maxShownValue === undefined ? p.minValue : p.minShownValue
     }))
 );
 
@@ -96,6 +98,17 @@ export const getParametersForModuleState = createSelector(
   getParametersState,
   (parameters: Parameter[], { moduleId }: { moduleId: string }) =>
     parameters.filter(parameter => parameter.moduleId === moduleId)
+);
+
+export const getParameterState = createSelector(
+  getParametersState,
+  (
+    parameters: Parameter[],
+    { moduleId, parameterName }: { moduleId: string; parameterName: string }
+  ) =>
+    parameters.find(
+      parameter => parameter.moduleId === moduleId && parameter.name === parameterName
+    )
 );
 
 export const getInputsForModuleState = createSelector(

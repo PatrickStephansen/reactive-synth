@@ -8,6 +8,8 @@ export interface Parameter {
   units?: string;
   minValue: number;
   maxValue: number;
+  minShownValue?: number;
+  maxShownValue?: number;
   stepSize: number;
   sources: AudioModuleOutput[];
   extensions?: ParameterExtension[];

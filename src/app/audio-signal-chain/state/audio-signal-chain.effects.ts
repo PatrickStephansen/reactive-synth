@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select, Action } from '@ngrx/store';
-import { from, Observable, of, OperatorFunction } from 'rxjs';
-import { mergeMap, map, catchError, tap, filter, debounceTime } from 'rxjs/operators';
+import { from, Observable, of, OperatorFunction, combineLatest } from 'rxjs';
+import { mergeMap, map, catchError, tap, filter, debounceTime, switchMap, withLatestFrom } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
 import { audioSignalActions, AudioSignalChainActionTypes } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioSignalChainState } from './audio-signal-chain.state';
-import { getSignalChainStateForSave } from './audio-signal-chain.selectors';
+import { getSignalChainStateForSave, getParameterState } from './audio-signal-chain.selectors';
 import { CreateModuleEvent } from '../model/create-module-event';
 import { AudioModule } from '../model/audio-module';
 import { upgradeAudioChainStateVersion } from './upgrade-audio-signal-chain-version';
@@ -18,6 +18,7 @@ import { ConnectParameterEvent } from '../model/connect-parameter-event';
 import { ChangeParameterEvent } from '../model/change-parameter-event';
 import { ChangeChoiceEvent } from '../model/change-choice-event';
 import { ConnectModulesEvent } from '../model/connect-modules-event';
+import { ChangeParameterBoundsEvent } from '../model/change-parameter-bounds-event';
 
 let errorId = 0;
 

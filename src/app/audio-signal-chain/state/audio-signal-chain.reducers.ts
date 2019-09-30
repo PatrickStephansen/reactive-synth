@@ -7,7 +7,8 @@ import {
   addParameter,
   connectParameter,
   disconnectParameter,
-  updateParameter
+  updateParameter,
+  changeParameterBounds
 } from './reducer-functions/parameters';
 import { addOutput } from './reducer-functions/outputs';
 import { addInput } from './reducer-functions/inputs';
@@ -40,6 +41,7 @@ export const realReducer = createReducer(
   initialState,
   on(audioSignalActions.resetSignalChainSuccess, setSignalChainSuccess),
   on(audioSignalActions.changeParameterSuccess, updateParameter),
+  on(audioSignalActions.changeParameterBounds, changeParameterBounds),
   on(audioSignalActions.changeChoiceParameterSuccess, updateChoice),
   on(audioSignalActions.connectModulesSuccess, connectModules),
   on(audioSignalActions.disconnectModulesSuccess, disconnectModules),

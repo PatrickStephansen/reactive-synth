@@ -16,6 +16,7 @@ import { ReorderModulesEvent } from '../model/reorder-modules-event';
 import { ChangeModuleNameEvent } from '../model/change-module-name-event';
 import { ViewMode } from '../model/view-mode';
 import { ActivateControlSurfaceEvent } from '../model/activate-control-surface-event';
+import { ChangeParameterBoundsEvent } from '../model/change-parameter-bounds-event';
 
 export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
@@ -24,6 +25,7 @@ export enum AudioSignalChainActionTypes {
   LoadSignalChainStateFailure = '[Audio Signal Chain] Load State Failure',
   ChangeParameter = '[Audio Signal Chain] Change Parameter',
   ChangeParameterSuccess = '[Audio Signal Chain] Change Parameter Success',
+  ChangeParameterBounds = '[Audio Signal Chain] Change Parameter Bounds',
   ChangeChoiceParameter = '[Audio Signal Chain] Change Choice Parameter',
   ChangeChoiceParameterSuccess = '[Audio Signal Chain] Change Choice Parameter Success',
   ConnectModules = '[Audio Signal Chain] Connect Modules',
@@ -75,6 +77,10 @@ export const audioSignalActions = {
   changeParameterSuccess: createAction(
     AudioSignalChainActionTypes.ChangeParameterSuccess,
     props<{ parameter: ChangeParameterEvent }>()
+  ),
+  changeParameterBounds: createAction(
+    AudioSignalChainActionTypes.ChangeParameterBounds,
+    props<{ change: ChangeParameterBoundsEvent }>()
   ),
   changeChoiceParameter: createAction(
     AudioSignalChainActionTypes.ChangeChoiceParameter,
