@@ -3,21 +3,14 @@ import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select, Action } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction, combineLatest } from 'rxjs';
-import {
-  mergeMap,
-  map,
-  catchError,
-  tap,
-  filter,
-  debounceTime
-} from 'rxjs/operators';
+import { mergeMap, map, catchError, tap, filter, debounceTime } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
 import { audioSignalActions, AudioSignalChainActionTypes } from './audio-signal-chain.actions';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioSignalChainState } from './audio-signal-chain.state';
-import { getSignalChainStateForSave, getParameterState } from './audio-signal-chain.selectors';
+import { getSignalChainStateForSave } from './audio-signal-chain.selectors';
 import { CreateModuleEvent } from '../model/create-module-event';
 import { AudioModule } from '../model/audio-module';
 import { upgradeAudioChainStateVersion } from './upgrade-audio-signal-chain-version';
@@ -145,6 +138,21 @@ export class AudioSignalChainEffects implements OnInitEffects {
                 }
               })
             ),
+            ...signalChain.parameters
+              .filter(
+                parameter =>
+                  parameter.minShownValue !== undefined || parameter.maxShownValue !== undefined
+              )
+              .map(parameter =>
+                audioSignalActions.changeParameterBounds({
+                  change: {
+                    moduleId: parameter.moduleId,
+                    parameterName: parameter.name,
+                    newMinValue: parameter.minShownValue,
+                    newMaxValue: parameter.maxShownValue
+                  }
+                })
+              ),
             ...signalChain.choiceParameters.map(parameter =>
               audioSignalActions.changeChoiceParameter({
                 choice: {
