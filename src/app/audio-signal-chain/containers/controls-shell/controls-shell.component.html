@@ -1,9 +1,20 @@
 <button type="button" class="button" (click)="goToModulesView()">Back to Modules View</button>
 <ng-container *ngIf="ActiveControlSurface$ | async as activeControlSurface">
   <h3 class="subtitle">{{ activeControlSurface.name }}</h3>
-  <app-control-surface
-    [controlSurface]="activeControlSurface"
-    (updateCoords)="updateCoordinates($event)"
-    (updateRange)="updateRange($event)"
-  ></app-control-surface>
+  <div class="columns is-multiline">
+    <div class="column is-half-desktop is-full-tablet">
+      <div class="box">
+        <app-control-surface
+          [controlSurface]="activeControlSurface"
+          (updateCoords)="updateCoordinates($event)"
+          (updateRange)="updateRange($event)"
+        ></app-control-surface>
+      </div>
+    </div>
+    <div class="column is-half-desktop is-full-tablet">
+      <div class="box">
+        <app-visualizations-shell moduleId="Output to Speakers"></app-visualizations-shell>
+      </div>
+    </div>
+  </div>
 </ng-container>
