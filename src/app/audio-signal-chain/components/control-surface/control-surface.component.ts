@@ -94,7 +94,12 @@ export class ControlSurfaceComponent implements OnInit {
     this.isChanging = true;
     this.surfaceElement.nativeElement.setPointerCapture(event.pointerId);
     this.updateCoords.emit(this.domCoordToParamCoord(this.controlSurface.moduleId, event));
+    this.killEvent(event);
+  }
+
+  killEvent(event) {
     event.preventDefault();
+    event.stopPropagation();
   }
 
   movePoint(event) {
@@ -102,12 +107,13 @@ export class ControlSurfaceComponent implements OnInit {
       return;
     }
     this.updateCoords.emit(this.domCoordToParamCoord(this.controlSurface.moduleId, event));
-    event.preventDefault();
+    this.killEvent(event);
   }
 
   releasePoint(event) {
     this.isChanging = false;
     this.surfaceElement.nativeElement.releasePointerCapture(event.pointerId);
+    this.killEvent(event);
   }
 
   private domCoordToParamCoord(moduleId, { offsetX, offsetY }) {

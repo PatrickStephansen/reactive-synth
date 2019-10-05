@@ -113,9 +113,11 @@
     width="100%"
     max-width="600"
     [attr.height]="surfaceSize"
+    (pointerdown)="grabPoint($event)"
+    (touchstart)="killEvent($event)"
+    (touchmove)="killEvent($event)"
     (pointermove)="movePoint($event)"
     (pointerup)="releasePoint($event)"
-    (pointerdown)="grabPoint($event)"
     attr.viewBox="{{ controlSurface.shownMinX }} {{ controlSurface.shownMinY }} {{
       controlSurface.shownMaxX - controlSurface.shownMinX
     }} {{ controlSurface.shownMaxY - controlSurface.shownMinY }}"
