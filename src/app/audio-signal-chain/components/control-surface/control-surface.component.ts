@@ -32,10 +32,14 @@ export class ControlSurfaceComponent implements OnInit {
   minY;
   @ViewChild('maxY', { static: true })
   maxY;
+  @ViewChild('surface', { static: true })
+  surfaceElement;
 
   isChanging = false;
 
-  surfaceSize = 600;
+  get surfaceSize() {
+    return this.surfaceElement.nativeElement.clientWidth;
+  }
 
   constructor() {}
 
@@ -88,8 +92,7 @@ export class ControlSurfaceComponent implements OnInit {
 
   grabPoint(event) {
     this.isChanging = true;
-    const surfaceElement = this.getParentSvg(event.target);
-    surfaceElement.setPointerCapture(event.pointerId);
+    this.surfaceElement.nativeElement.setPointerCapture(event.pointerId);
     this.updateCoords.emit(this.domCoordToParamCoord(this.controlSurface.moduleId, event));
   }
 
@@ -102,8 +105,7 @@ export class ControlSurfaceComponent implements OnInit {
 
   releasePoint(event) {
     this.isChanging = false;
-    const surfaceElement = this.getParentSvg(event.target);
-    surfaceElement.releasePointerCapture(event.pointerId);
+    this.surfaceElement.nativeElement.releasePointerCapture(event.pointerId);
   }
 
   private domCoordToParamCoord(moduleId, { offsetX, offsetY }) {
@@ -113,13 +115,16 @@ export class ControlSurfaceComponent implements OnInit {
         this.controlSurface.shownMinX,
         this.controlSurface.shownMaxX,
         this.controlSurface.shownMinX +
-          ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * offsetX) / this.surfaceSize
+          ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * offsetX) /
+            this.surfaceSize
       ),
       y: this.clamp(
         this.controlSurface.shownMinY,
         this.controlSurface.shownMaxY,
         this.controlSurface.shownMinY +
-          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * (this.surfaceSize - offsetY)) / this.surfaceSize
+          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) *
+            (this.surfaceSize - offsetY)) /
+            this.surfaceSize
       )
     };
   }

@@ -108,9 +108,11 @@
   <svg:svg
     version="1.1"
     class="control-surface"
+    #surface
     preserveAspectRatio="none meet"
+    width="100%"
+    max-width="600"
     [attr.height]="surfaceSize"
-    [attr.width]="surfaceSize"
     (pointermove)="movePoint($event)"
     (pointerup)="releasePoint($event)"
     (pointerdown)="grabPoint($event)"

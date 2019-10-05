@@ -1,6 +1,6 @@
 @import '../../../../variables';
 svg.control-surface {
-  max-width: 100%;
+  max-width: 600px;
   border: 1px solid $grey-lighter;
 
   .current-user-value {
@@ -9,6 +9,6 @@ svg.control-surface {
   }
 }
 .selected-values {
-  width: 600px;
-  max-width: 100%
+  width: 100%;
+  max-width: 600px;
 }
