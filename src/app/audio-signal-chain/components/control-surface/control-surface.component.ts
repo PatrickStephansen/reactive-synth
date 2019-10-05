@@ -22,6 +22,8 @@ export class ControlSurfaceComponent implements OnInit {
   @Output() updateCoords = new EventEmitter<ControlSurfaceValueChangeEvent>();
   @Output() updateRange = new EventEmitter<ControlSurfaceRangeChangeEvent>();
 
+  // TODO: extract each axis/value to it's own component
+
   @ViewChild('minX', { static: true })
   minX;
   @ViewChild('maxX', { static: true })
@@ -80,5 +82,40 @@ export class ControlSurfaceComponent implements OnInit {
         shownMaxY: newMax
       });
     }
+  }
+
+  grabPoint(event) {
+    this.isChanging = true;
+    const surfaceElement = this.getParentSvg(event.target);
+    surfaceElement.setPointerCapture(event.pointerId);
+    this.updateCoords.emit(this.domCoordToParamCoord(this.controlSurface.moduleId, event));
+  }
+
+  movePoint(event) {
+    if (!this.isChanging) {
+      return;
+    }
+    this.updateCoords.emit(this.domCoordToParamCoord(this.controlSurface.moduleId, event));
+  }
+
+  releasePoint(event) {
+    this.isChanging = false;
+    const surfaceElement = this.getParentSvg(event.target);
+    surfaceElement.releasePointerCapture(event.pointerId);
+  }
+
+  private domCoordToParamCoord(moduleId, { clientX, clientY }) {
+    return {
+      moduleId,
+      x: ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * clientX) / 800,
+      y: ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * clientY) / 800
+    };
+  }
+
+  private getParentSvg(element) {
+    if (element.nodeName === 'svg') {
+      return element;
+    }
+    return this.getParentSvg(element.parentElement);
   }
 }

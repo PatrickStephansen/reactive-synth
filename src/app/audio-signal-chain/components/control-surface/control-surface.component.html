@@ -1,100 +1,132 @@
 <pre>
   {{ controlSurface | json }}
 </pre>
-
-<label class="label" for="{{ controlSurface.moduleId }}-x-range-min">
-  <div class="field">
-    <div class="input-name">
-      X Range Minimum
-    </div>
-    <div class="control">
-      <input
-        id="{{ controlSurface.moduleId }}-x-range-min"
-        type="number"
-        step="1"
-        required
-        [appMin]="controlSurface.minX"
-        [appMax]="controlSurface.maxX"
-        [attr.min]="controlSurface.minX"
-        [attr.max]="controlSurface.maxX"
-        #minX="ngModel"
-        [ngClass]="{ 'is-danger': minX?.errors, input: true }"
-        [ngModel]="controlSurface.shownMinX"
-        (ngModelChange)="xMinChanged($event)"
-        name="X Range Minimum"
-      />
-    </div>
+<div class="columns is-multiline">
+  <div class="column is-one-quarter">
+    <label class="label" for="{{ controlSurface.moduleId }}-x-range-min">
+      <div class="field">
+        <div class="input-name">
+          X Range Minimum
+        </div>
+        <div class="control">
+          <input
+            id="{{ controlSurface.moduleId }}-x-range-min"
+            type="number"
+            step="1"
+            required
+            [appMin]="controlSurface.minX"
+            [appMax]="controlSurface.maxX"
+            [attr.min]="controlSurface.minX"
+            [attr.max]="controlSurface.maxX"
+            #minX="ngModel"
+            [ngClass]="{ 'is-danger': minX?.errors, input: true }"
+            [ngModel]="controlSurface.shownMinX"
+            (ngModelChange)="xMinChanged($event)"
+            name="X Range Minimum"
+          />
+        </div>
+      </div>
+    </label>
   </div>
-</label>
-<label class="label" for="{{ controlSurface.moduleId }}-x-range-max">
-  <div class="field">
-    <div class="input-name">
-      X Range Maximum
-    </div>
-    <div class="control">
-      <input
-        id="{{ controlSurface.moduleId }}-x-range-max"
-        type="number"
-        step="1"
-        required
-        [appMax]="controlSurface.maxX"
-        [appMax]="controlSurface.maxX"
-        [attr.max]="controlSurface.maxX"
-        [attr.max]="controlSurface.maxX"
-        #maxX="ngModel"
-        [ngClass]="{ 'is-danger': maxX?.errors, input: true }"
-        [ngModel]="controlSurface.shownMaxX"
-        (ngModelChange)="xMaxChanged($event)"
-        name="X Range Maximum"
-      />
-    </div>
+  <div class="column is-one-quarter">
+    <label class="label" for="{{ controlSurface.moduleId }}-x-range-max">
+      <div class="field">
+        <div class="input-name">
+          X Range Maximum
+        </div>
+        <div class="control">
+          <input
+            id="{{ controlSurface.moduleId }}-x-range-max"
+            type="number"
+            step="1"
+            required
+            [appMax]="controlSurface.maxX"
+            [appMax]="controlSurface.maxX"
+            [attr.max]="controlSurface.maxX"
+            [attr.max]="controlSurface.maxX"
+            #maxX="ngModel"
+            [ngClass]="{ 'is-danger': maxX?.errors, input: true }"
+            [ngModel]="controlSurface.shownMaxX"
+            (ngModelChange)="xMaxChanged($event)"
+            name="X Range Maximum"
+          />
+        </div>
+      </div>
+    </label>
   </div>
-</label>
-<label class="label" for="{{ controlSurface.moduleId }}-x-range-min">
-  <div class="field">
-    <div class="input-name">
-      Y Range Minimum
-    </div>
-    <div class="control">
-      <input
-        id="{{ controlSurface.moduleId }}-x-range-min"
-        type="number"
-        step="1"
-        required
-        [appMin]="controlSurface.minY"
-        [appMax]="controlSurface.maxY"
-        [attr.min]="controlSurface.minY"
-        [attr.max]="controlSurface.maxY"
-        #minY="ngModel"
-        [ngClass]="{ 'is-danger': minY?.errors, input: true }"
-        [ngModel]="controlSurface.shownMinY"
-        (ngModelChange)="yMinChanged($event)"
-        name="Y Range Minimum"
-      />
-    </div>
+  <div class="column is-one-quarter">
+    <label class="label" for="{{ controlSurface.moduleId }}-x-range-min">
+      <div class="field">
+        <div class="input-name">
+          Y Range Minimum
+        </div>
+        <div class="control">
+          <input
+            id="{{ controlSurface.moduleId }}-x-range-min"
+            type="number"
+            step="1"
+            required
+            [appMin]="controlSurface.minY"
+            [appMax]="controlSurface.maxY"
+            [attr.min]="controlSurface.minY"
+            [attr.max]="controlSurface.maxY"
+            #minY="ngModel"
+            [ngClass]="{ 'is-danger': minY?.errors, input: true }"
+            [ngModel]="controlSurface.shownMinY"
+            (ngModelChange)="yMinChanged($event)"
+            name="Y Range Minimum"
+          />
+        </div>
+      </div>
+    </label>
   </div>
-</label>
-<label class="label" for="{{ controlSurface.moduleId }}-y-range-max">
-  <div class="field">
-    <div class="input-name">
-      Y Range Maximum
-    </div>
-    <div class="control">
-      <input
-        id="{{ controlSurface.moduleId }}-y-range-max"
-        type="number"
-        step="1"
-        required
-        [appMax]="controlSurface.maxY"
-        [appMax]="controlSurface.maxY"
-        [attr.max]="controlSurface.maxY"
-        [attr.max]="controlSurface.maxY"
-        #maxY="ngModel"
-        [ngClass]="{ 'is-danger': maxY?.errors, input: true }"
-        [ngModel]="controlSurface.shownMaxY"
-        (ngModelChange)="yMaxChanged($event)"
-        name="Y Range Maximum"
-      />
-    </div>
+  <div class="column is-one-quarter">
+    <label class="label" for="{{ controlSurface.moduleId }}-y-range-max">
+      <div class="field">
+        <div class="input-name">
+          Y Range Maximum
+        </div>
+        <div class="control">
+          <input
+            id="{{ controlSurface.moduleId }}-y-range-max"
+            type="number"
+            step="1"
+            required
+            [appMax]="controlSurface.maxY"
+            [appMax]="controlSurface.maxY"
+            [attr.max]="controlSurface.maxY"
+            [attr.max]="controlSurface.maxY"
+            #maxY="ngModel"
+            [ngClass]="{ 'is-danger': maxY?.errors, input: true }"
+            [ngModel]="controlSurface.shownMaxY"
+            (ngModelChange)="yMaxChanged($event)"
+            name="Y Range Maximum"
+          />
+        </div>
+      </div>
+    </label>
   </div>
-</label>
+</div>
+<svg:svg
+  version="1.1"
+  class="control-surface"
+  preserveAspectRatio="none meet"
+  height="800"
+  width="800"
+  (pointermove)="movePoint($event)"
+  (pointerup)="releasePoint($event)"
+  attr.viewBox="{{ controlSurface.shownMinX }} {{ controlSurface.shownMinY }} {{
+    controlSurface.shownMaxX - controlSurface.shownMinX
+  }} {{ controlSurface.shownMaxY - controlSurface.shownMinY }}"
+>
+  <svg:g
+    class="current-user-value"
+    [attr.x]="controlSurface.x"
+    [attr.y]="controlSurface.y"
+    (pointerdown)="grabPoint($event)"
+  >
+    <svg:circle
+      attr.r="{{ 0.01 * (controlSurface.shownMaxX - controlSurface.shownMinX) }}"
+    ></svg:circle>
+  </svg:g>
+</svg:svg>

@@ -1,0 +1,9 @@
+@import '../../../../variables';
+svg.control-surface {
+  max-width: 100%;
+  border: 1px solid $grey-lighter;
+
+  .current-user-value {
+    fill: #00aadd;
+  }
+}
