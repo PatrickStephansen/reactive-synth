@@ -104,37 +104,39 @@
     </label>
   </div>
 </div>
-<svg:svg
-  version="1.1"
-  class="control-surface"
-  preserveAspectRatio="none meet"
-  height="800"
-  width="800"
-  (pointermove)="movePoint($event)"
-  (pointerup)="releasePoint($event)"
-  (pointerdown)="grabPoint($event)"
-  attr.viewBox="{{ controlSurface.shownMinX }} {{ controlSurface.shownMinY }} {{
-    controlSurface.shownMaxX - controlSurface.shownMinX
-  }} {{ controlSurface.shownMaxY - controlSurface.shownMinY }}"
->
-  <svg:line
-    class="current-user-value"
-    [attr.x1]="controlSurface.shownMinX"
-    [attr.x2]="controlSurface.shownMaxX"
-    attr.y1="{{ controlSurface.shownMaxY - controlSurface.y }}"
-    attr.y2="{{ controlSurface.shownMaxY - controlSurface.y }}"
-    attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxY - controlSurface.shownMinY) }}"
-  ></svg:line>
-  <svg:line
-    class="current-user-value"
-    [attr.x1]="controlSurface.x"
-    [attr.x2]="controlSurface.x"
-    [attr.y1]="controlSurface.shownMinY"
-    [attr.y2]="controlSurface.shownMaxY"
-    attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxX - controlSurface.shownMinX) }}"
-  ></svg:line>
-</svg:svg>
-
-<pre>
-  {{ controlSurface | json }}
-</pre>
+<div class="middle-me-this">
+  <svg:svg
+    version="1.1"
+    class="control-surface"
+    preserveAspectRatio="none meet"
+    [attr.height]="surfaceSize"
+    [attr.width]="surfaceSize"
+    (pointermove)="movePoint($event)"
+    (pointerup)="releasePoint($event)"
+    (pointerdown)="grabPoint($event)"
+    attr.viewBox="{{ controlSurface.shownMinX }} {{ controlSurface.shownMinY }} {{
+      controlSurface.shownMaxX - controlSurface.shownMinX
+    }} {{ controlSurface.shownMaxY - controlSurface.shownMinY }}"
+  >
+    <svg:line
+      class="current-user-value"
+      [attr.x1]="controlSurface.shownMinX"
+      [attr.x2]="controlSurface.shownMaxX"
+      attr.y1="{{ controlSurface.shownMaxY - controlSurface.y }}"
+      attr.y2="{{ controlSurface.shownMaxY - controlSurface.y }}"
+      attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxY - controlSurface.shownMinY) }}"
+    ></svg:line>
+    <svg:line
+      class="current-user-value"
+      [attr.x1]="controlSurface.x"
+      [attr.x2]="controlSurface.x"
+      [attr.y1]="controlSurface.shownMinY"
+      [attr.y2]="controlSurface.shownMaxY"
+      attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxX - controlSurface.shownMinX) }}"
+    ></svg:line>
+  </svg:svg>
+  <pre class="selected-values">
+    x: {{ controlSurface.x }}
+    y: {{ controlSurface.y }}
+  </pre>
+</div>

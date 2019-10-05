@@ -35,6 +35,8 @@ export class ControlSurfaceComponent implements OnInit {
 
   isChanging = false;
 
+  surfaceSize = 600;
+
   constructor() {}
 
   ngOnInit() {}
@@ -111,13 +113,13 @@ export class ControlSurfaceComponent implements OnInit {
         this.controlSurface.shownMinX,
         this.controlSurface.shownMaxX,
         this.controlSurface.shownMinX +
-          ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * offsetX) / 800
+          ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * offsetX) / this.surfaceSize
       ),
       y: this.clamp(
         this.controlSurface.shownMinY,
         this.controlSurface.shownMaxY,
         this.controlSurface.shownMinY +
-          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * (800 - offsetY)) / 800
+          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * (this.surfaceSize - offsetY)) / this.surfaceSize
       )
     };
   }

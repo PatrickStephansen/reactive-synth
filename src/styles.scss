@@ -5,3 +5,9 @@
 .box.is-fullheight {
   height: 100%;
 }
+
+.middle-me-this {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
