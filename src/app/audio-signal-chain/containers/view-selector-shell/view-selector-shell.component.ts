@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ViewMode } from '../../model/view-mode';
 import { Store, select } from '@ngrx/store';
@@ -10,7 +10,8 @@ import { audioSignalActions } from '../../state/audio-signal-chain.actions';
 @Component({
   selector: 'app-view-selector-shell',
   templateUrl: './view-selector-shell.component.html',
-  styleUrls: ['./view-selector-shell.component.scss']
+  styleUrls: ['./view-selector-shell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ViewSelectorShellComponent implements OnInit {
   isControlsViewMode$: Observable<boolean>;

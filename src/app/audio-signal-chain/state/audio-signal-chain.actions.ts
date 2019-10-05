@@ -17,6 +17,8 @@ import { ChangeModuleNameEvent } from '../model/change-module-name-event';
 import { ViewMode } from '../model/view-mode';
 import { ActivateControlSurfaceEvent } from '../model/activate-control-surface-event';
 import { ChangeParameterBoundsEvent } from '../model/change-parameter-bounds-event';
+import { ControlSurfaceValueChangeEvent } from '../model/control-surface-value-change-event';
+import { ControlSurfaceRangeChangeEvent } from '../model/control-surface-range-change-event';
 
 export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
@@ -53,7 +55,9 @@ export enum AudioSignalChainActionTypes {
   ClearErrors = '[Audio Signal Chain] Clear All SignalChain Change Errors',
   ToggleVisualizationActive = '[Audio Signal Chain] Toggle Visualization Active',
   SetViewMode = '[Audio Signal Chain] Set View Mode',
-  ActivateControlSurface = '[Audio Signal Chain] Activate Control Surface'
+  ActivateControlSurface = '[Audio Signal Chain] Activate Control Surface',
+  UpdateControlSurfaceCoordinates = '[Audio Signal Chain] Update Control Surface Coordinates',
+  UpdateControlSurfaceRange = '[Audio Signal Chain] Update Control Surface Range'
 }
 
 export const audioSignalActions = {
@@ -187,5 +191,13 @@ export const audioSignalActions = {
   activateControlSurface: createAction(
     AudioSignalChainActionTypes.ActivateControlSurface,
     props<{ activateControlSurfaceEvent: ActivateControlSurfaceEvent }>()
+  ),
+  updateControlSurfaceCoordinates: createAction(
+    AudioSignalChainActionTypes.UpdateControlSurfaceCoordinates,
+    props<{ change: ControlSurfaceValueChangeEvent }>()
+  ),
+  updateControlSurfaceRange: createAction(
+    AudioSignalChainActionTypes.UpdateControlSurfaceRange,
+    props<{ change: ControlSurfaceRangeChangeEvent }>()
   )
 };

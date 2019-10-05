@@ -39,6 +39,7 @@ import { RectifierFactory } from './audio-modules/rectifier-factory';
 import { ViewSelectorShellComponent } from './containers/view-selector-shell/view-selector-shell.component';
 import { ControlsShellComponent } from './containers/controls-shell/controls-shell.component';
 import { ControlSurfaceFactory } from './audio-modules/control-surface-factory';
+import { ControlSurfaceComponent } from './components/control-surface/control-surface.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { ControlSurfaceFactory } from './audio-modules/control-surface-factory';
     VisualizationsShellComponent,
     TriggerParameterExtensionComponent,
     ViewSelectorShellComponent,
-    ControlsShellComponent
+    ControlsShellComponent,
+    ControlSurfaceComponent
   ],
   imports: [
     StoreModule.forFeature('signalChain', reducer),

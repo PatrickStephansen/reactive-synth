@@ -66,6 +66,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           sources: [],
           minValue: parameterMin(x.offset),
           maxValue: parameterMax(x.offset),
+          minShownValue: -1,
+          maxShownValue: 1,
           stepSize: 0.01,
           value: 0,
           canConnectSources: true
@@ -76,6 +78,8 @@ export class ControlSurfaceFactory implements AudioModuleFactory {
           sources: [],
           minValue: parameterMin(y.offset),
           maxValue: parameterMax(y.offset),
+          minShownValue: -1,
+          maxShownValue: 1,
           stepSize: 0.01,
           value: 0,
           canConnectSources: true

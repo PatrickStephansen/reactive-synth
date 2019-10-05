@@ -1,3 +1,9 @@
-<p>controls-shell works!</p>
-{{ ActiveControlSurface$ | async | json }}
-<button type="button" class="button" (click)="goToModulesView()">Modules View</button>
+<button type="button" class="button" (click)="goToModulesView()">Back to Modules View</button>
+<ng-container *ngIf="ActiveControlSurface$ | async as activeControlSurface">
+  <h3 class="subtitle">{{ activeControlSurface.name }}</h3>
+  <app-control-surface
+    [controlSurface]="activeControlSurface"
+    (updateCoords)="updateCoordinates($event)"
+    (updateRange)="updateRange($event)"
+  ></app-control-surface>
+</ng-container>

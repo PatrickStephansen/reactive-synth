@@ -3,7 +3,16 @@ import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select, Action } from '@ngrx/store';
 import { from, Observable, of, OperatorFunction, combineLatest } from 'rxjs';
-import { mergeMap, map, catchError, tap, filter, debounceTime, switchMap, withLatestFrom } from 'rxjs/operators';
+import {
+  mergeMap,
+  map,
+  catchError,
+  tap,
+  filter,
+  debounceTime,
+  switchMap,
+  withLatestFrom
+} from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
@@ -19,6 +28,8 @@ import { ChangeParameterEvent } from '../model/change-parameter-event';
 import { ChangeChoiceEvent } from '../model/change-choice-event';
 import { ConnectModulesEvent } from '../model/connect-modules-event';
 import { ChangeParameterBoundsEvent } from '../model/change-parameter-bounds-event';
+import { ControlSurfaceValueChangeEvent } from '../model/control-surface-value-change-event';
+import { ControlSurfaceRangeChangeEvent } from '../model/control-surface-range-change-event';
 
 let errorId = 0;
 
@@ -249,6 +260,56 @@ export class AudioSignalChainEffects implements OnInitEffects {
         map(() => audioSignalActions.changeParameterSuccess({ parameter })),
         this.handleSignalChainChangeError
       )
+    )
+  );
+
+  @Effect()
+  changeControlSurfaceValue$: Observable<Action> = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.UpdateControlSurfaceCoordinates),
+    mergeMap(({ change }: { change: ControlSurfaceValueChangeEvent }) =>
+      from([
+        audioSignalActions.changeParameter({
+          parameter: {
+            moduleId: change.moduleId,
+            parameterName: 'x',
+            setImmediately: true,
+            value: change.x
+          }
+        }),
+        audioSignalActions.changeParameter({
+          parameter: {
+            moduleId: change.moduleId,
+            parameterName: 'y',
+            setImmediately: true,
+            value: change.y
+          }
+        })
+      ])
+    )
+  );
+
+  @Effect()
+  changeControlSurfaceRange$: Observable<Action> = this.actions$.pipe(
+    ofType(AudioSignalChainActionTypes.UpdateControlSurfaceRange),
+    mergeMap(({ change }: { change: ControlSurfaceRangeChangeEvent }) =>
+      from([
+        audioSignalActions.changeParameterBounds({
+          change: {
+            moduleId: change.moduleId,
+            parameterName: 'x',
+            newMinValue: change.shownMinX,
+            newMaxValue: change.shownMaxX
+          }
+        }),
+        audioSignalActions.changeParameterBounds({
+          change: {
+            moduleId: change.moduleId,
+            parameterName: 'y',
+            newMinValue: change.shownMinY,
+            newMaxValue: change.shownMaxY
+          }
+        })
+      ])
     )
   );
 

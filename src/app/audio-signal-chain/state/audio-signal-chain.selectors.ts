@@ -8,6 +8,8 @@ import { always, applySpec, compose, map, omit, pick, prop } from 'ramda';
 import { AudioModuleInput } from '../model/audio-module-input';
 import { AudioModuleOutput } from '../model/audio-module-output';
 import { AudioModuleType } from '../model/audio-module-type';
+import { AudioModule } from '../model/audio-module';
+import { ControlSurface } from '../model/control-surface';
 
 const getSignalChainsFeatureState = createFeatureSelector<AudioSignalChainState>('signalChain');
 export const getSignalChainOutputActiveState = createSelector(
@@ -39,15 +41,6 @@ export const getControlSurfaces = createSelector(
 const getActiveControlSurfaceId = createSelector(
   getSignalChainsFeatureState,
   signalChain => signalChain.activeControlSurfaceId
-);
-const moduleToControlSurface = module => (module ? { moduleId: module.id, isActive: true } : null);
-export const getActiveControlSurface = createSelector(
-  getControlSurfaces,
-  getActiveControlSurfaceId,
-  (controlSurfaces, activeControlSurfaceId) =>
-    moduleToControlSurface(
-      controlSurfaces.find(controlSurface => controlSurface.id === activeControlSurfaceId)
-    )
 );
 export const getViewMode = createSelector(
   getSignalChainsFeatureState,
@@ -132,6 +125,38 @@ export const getVisualizationsForModuleState = createSelector(
 export const getSignalChainErrors = createSelector(
   getSignalChainsFeatureState,
   signalChain => signalChain.errors
+);
+const moduleToControlSurface = (module: AudioModule, parameters: Parameter[]): ControlSurface => {
+  if (module) {
+    const xParam = parameters.find(p => p.name === 'x');
+    const yParam = parameters.find(p => p.name === 'y');
+    return {
+      moduleId: module.id,
+      name: module.name,
+      minX: xParam.minValue,
+      maxX: xParam.maxValue,
+      minY: yParam.minValue,
+      maxY: yParam.maxValue,
+      shownMinX: xParam.minShownValue,
+      shownMaxX: xParam.maxShownValue,
+      shownMinY: yParam.minShownValue,
+      shownMaxY: yParam.maxShownValue,
+      x: xParam.value,
+      y: yParam.value
+    };
+  } else {
+    return null;
+  }
+};
+export const getActiveControlSurface = createSelector(
+  getControlSurfaces,
+  getParametersState,
+  getActiveControlSurfaceId,
+  (controlSurfaces, parameters, activeControlSurfaceId) =>
+    moduleToControlSurface(
+      controlSurfaces.find(controlSurface => controlSurface.id === activeControlSurfaceId),
+      parameters.filter(parameter => parameter.moduleId === activeControlSurfaceId)
+    )
 );
 
 export const getSignalChainStateForSave = createSelector(
