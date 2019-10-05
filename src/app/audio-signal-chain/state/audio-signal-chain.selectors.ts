@@ -174,7 +174,17 @@ export const getSignalChainStateForSave = createSelector(
       prop('choiceParameters')
     ),
     parameters: compose(
-      map(pick(['name', 'moduleId', 'value', 'sources', 'canConnectSources'])),
+      map(
+        pick([
+          'name',
+          'moduleId',
+          'minShownValue',
+          'maxShownValue',
+          'value',
+          'sources',
+          'canConnectSources'
+        ])
+      ),
       prop('parameters')
     )
   })

@@ -9,9 +9,7 @@ import {
   catchError,
   tap,
   filter,
-  debounceTime,
-  switchMap,
-  withLatestFrom
+  debounceTime
 } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
@@ -27,7 +25,6 @@ import { ConnectParameterEvent } from '../model/connect-parameter-event';
 import { ChangeParameterEvent } from '../model/change-parameter-event';
 import { ChangeChoiceEvent } from '../model/change-choice-event';
 import { ConnectModulesEvent } from '../model/connect-modules-event';
-import { ChangeParameterBoundsEvent } from '../model/change-parameter-bounds-event';
 import { ControlSurfaceValueChangeEvent } from '../model/control-surface-value-change-event';
 import { ControlSurfaceRangeChangeEvent } from '../model/control-surface-range-change-event';
 
@@ -272,7 +269,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
           parameter: {
             moduleId: change.moduleId,
             parameterName: 'x',
-            setImmediately: true,
+            setImmediately: false,
             value: change.x
           }
         }),
@@ -280,7 +277,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
           parameter: {
             moduleId: change.moduleId,
             parameterName: 'y',
-            setImmediately: true,
+            setImmediately: false,
             value: change.y
           }
         })

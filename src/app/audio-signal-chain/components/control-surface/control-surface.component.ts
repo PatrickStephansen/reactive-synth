@@ -104,11 +104,21 @@ export class ControlSurfaceComponent implements OnInit {
     surfaceElement.releasePointerCapture(event.pointerId);
   }
 
-  private domCoordToParamCoord(moduleId, { clientX, clientY }) {
+  private domCoordToParamCoord(moduleId, { offsetX, offsetY }) {
     return {
       moduleId,
-      x: ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * clientX) / 800,
-      y: ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * clientY) / 800
+      x: this.clamp(
+        this.controlSurface.shownMinX,
+        this.controlSurface.shownMaxX,
+        this.controlSurface.shownMinX +
+          ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * offsetX) / 800
+      ),
+      y: this.clamp(
+        this.controlSurface.shownMinY,
+        this.controlSurface.shownMaxY,
+        this.controlSurface.shownMinY +
+          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * offsetY) / 800
+      )
     };
   }
 
@@ -117,5 +127,9 @@ export class ControlSurfaceComponent implements OnInit {
       return element;
     }
     return this.getParentSvg(element.parentElement);
+  }
+
+  private clamp(min, max, value) {
+    return value < min ? min : value > max ? max : value;
   }
 }

@@ -1,6 +1,3 @@
-<pre>
-  {{ controlSurface | json }}
-</pre>
 <div class="columns is-multiline">
   <div class="column is-one-quarter">
     <label class="label" for="{{ controlSurface.moduleId }}-x-range-min">
@@ -115,18 +112,29 @@
   width="800"
   (pointermove)="movePoint($event)"
   (pointerup)="releasePoint($event)"
+  (pointerdown)="grabPoint($event)"
   attr.viewBox="{{ controlSurface.shownMinX }} {{ controlSurface.shownMinY }} {{
     controlSurface.shownMaxX - controlSurface.shownMinX
   }} {{ controlSurface.shownMaxY - controlSurface.shownMinY }}"
 >
-  <svg:g
+  <svg:line
     class="current-user-value"
-    [attr.x]="controlSurface.x"
-    [attr.y]="controlSurface.y"
-    (pointerdown)="grabPoint($event)"
-  >
-    <svg:circle
-      attr.r="{{ 0.01 * (controlSurface.shownMaxX - controlSurface.shownMinX) }}"
-    ></svg:circle>
-  </svg:g>
+    [attr.x1]="controlSurface.shownMinX"
+    [attr.x2]="controlSurface.shownMaxX"
+    [attr.y1]="controlSurface.y"
+    [attr.y2]="controlSurface.y"
+    attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxY - controlSurface.shownMinY) }}"
+  ></svg:line>
+  <svg:line
+    class="current-user-value"
+    [attr.x1]="controlSurface.x"
+    [attr.x2]="controlSurface.x"
+    [attr.y1]="controlSurface.shownMinY"
+    [attr.y2]="controlSurface.shownMaxY"
+    attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxX - controlSurface.shownMinX) }}"
+  ></svg:line>
 </svg:svg>
+
+<pre>
+  {{ controlSurface | json }}
+</pre>
