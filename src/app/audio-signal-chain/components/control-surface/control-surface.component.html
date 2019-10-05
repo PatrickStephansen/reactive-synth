@@ -121,8 +121,8 @@
     class="current-user-value"
     [attr.x1]="controlSurface.shownMinX"
     [attr.x2]="controlSurface.shownMaxX"
-    [attr.y1]="controlSurface.y"
-    [attr.y2]="controlSurface.y"
+    attr.y1="{{ controlSurface.shownMaxY - controlSurface.y }}"
+    attr.y2="{{ controlSurface.shownMaxY - controlSurface.y }}"
     attr.stroke-width="{{ 0.003 * (controlSurface.shownMaxY - controlSurface.shownMinY) }}"
   ></svg:line>
   <svg:line

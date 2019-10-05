@@ -117,7 +117,7 @@ export class ControlSurfaceComponent implements OnInit {
         this.controlSurface.shownMinY,
         this.controlSurface.shownMaxY,
         this.controlSurface.shownMinY +
-          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * offsetY) / 800
+          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) * (800 - offsetY)) / 800
       )
     };
   }
