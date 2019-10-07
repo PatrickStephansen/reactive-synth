@@ -92,7 +92,7 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges, OnDes
     const getPixelX = value =>
       this.visualization.renderingStrategyPerAxis[0](
         value,
-        this.visualization.dataLength,
+        this.visualization.dataLength - 1,
         canvasWidth
       );
     const getPixelY = value =>
