@@ -40,7 +40,6 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges, OnDes
   ngOnInit() {
     this.canvas = this.canvasRef.nativeElement;
     this.drawingContext = this.canvas.getContext('2d');
-    this.drawingContext.strokeStyle = 'green';
     this.visualizationData = new Uint8Array(this.visualization.dataLength);
     if (this.visualization.isActive) {
       requestAnimationFrame(() => this.renderVisuals());
@@ -85,7 +84,11 @@ export class LineGraphVisualizationComponent implements OnInit, OnChanges, OnDes
 
   private renderVisuals() {
     this.visualization.getVisualizationData(this.visualizationData);
-    const { width: canvasWidth, height: canvasHeight } = this.canvas;
+    const canvasHeight = this.canvas.clientHeight;
+    const canvasWidth = this.canvas.clientWidth;
+    this.canvas.height = canvasHeight;
+    this.canvas.width = canvasWidth;
+    this.drawingContext.strokeStyle = 'green';
     const getPixelX = value =>
       this.visualization.renderingStrategyPerAxis[0](
         value,
