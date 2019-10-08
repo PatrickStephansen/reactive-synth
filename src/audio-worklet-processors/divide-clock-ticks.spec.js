@@ -8,9 +8,9 @@ import { extend } from '../jest-matchers/to-be-verbose';
 
 extend(expect);
 
-const unityParams = { attackAfterTicks: 1, releaseAfterTocks: 1 };
-const unevenParams = { attackAfterTicks: 2, releaseAfterTocks: 3 };
-const realNumberParams = { attackAfterTicks: 2.33, releaseAfterTocks: 1.65 };
+const unityParams = { attackAfterTicks: 1, releaseAfterTocks: 1, ticksOnReset: 0, tocksOnReset: 0 };
+const unevenParams = { attackAfterTicks: 2, releaseAfterTocks: 3, ticksOnReset: 0, tocksOnReset: 0 };
+const realNumberParams = { attackAfterTicks: 2.33, releaseAfterTocks: 1.65, ticksOnReset: 0, tocksOnReset: 0 };
 
 describe('divide clock ticks', () => {
   test.each([
@@ -317,11 +317,11 @@ describe('divide clock ticks', () => {
     }
   );
 
-  describe('it should get ready for next tick when reset', () => {
-    test('from tick stage', () => {
+  describe('it should reset to the specified state', () => {
+    test('from tick stage to primed', () => {
       const result = divideClockTicks(
         { stage: clockStages.tick, ticksPast: 0.99, tocksPast: 12 },
-        { attackAfterTicks: 2, releaseAfterTocks: 15 },
+        { attackAfterTicks: 2, releaseAfterTocks: 15, ticksOnReset: 1, tocksOnReset: 0 },
         clockInTriggerStages.high,
         resetTriggerStages.reset
       );
@@ -333,10 +333,10 @@ describe('divide clock ticks', () => {
       );
       expect(result.tocksPast).toBeCloseToVerbose(0, 1e-5, 'tocks reset to 0');
     });
-    test('from tock stage', () => {
+    test('from tock stage to primed', () => {
       const result = divideClockTicks(
         { stage: clockStages.tock, ticksPast: 0.99, tocksPast: 12 },
-        { attackAfterTicks: 2, releaseAfterTocks: 15 },
+        { attackAfterTicks: 2, releaseAfterTocks: 15, ticksOnReset: 1, tocksOnReset: 0 },
         clockInTriggerStages.release,
         resetTriggerStages.reset
       );
@@ -351,7 +351,7 @@ describe('divide clock ticks', () => {
     test('reset and attack on same sample', () => {
       const result = divideClockTicks(
         { stage: clockStages.tock, ticksPast: 0.77, tocksPast: 12 },
-        { attackAfterTicks: 2, releaseAfterTocks: 15 },
+        { attackAfterTicks: 2, releaseAfterTocks: 15, ticksOnReset: 1, tocksOnReset: 0 },
         clockInTriggerStages.attack,
         resetTriggerStages.reset
       );
@@ -363,6 +363,50 @@ describe('divide clock ticks', () => {
       );
       expect(result.tocksPast).toBeCloseToVerbose(0, 1e-5, 'tocks reset to 0');
     });
-
+    test('from tick stage to awaiting late, shortened first note', () => {
+      const result = divideClockTicks(
+        { stage: clockStages.tick, ticksPast: 0.99, tocksPast: 12 },
+        { attackAfterTicks: 2, releaseAfterTocks: 15, ticksOnReset: 0, tocksOnReset: 12 },
+        clockInTriggerStages.high,
+        resetTriggerStages.reset
+      );
+      expect(result.stage).toBeVerbose(clockStages.tock, 'reset to tock');
+      expect(result.ticksPast).toBeCloseToVerbose(
+        0,
+        1e-5,
+        'ticks reset to 0'
+      );
+      expect(result.tocksPast).toBeCloseToVerbose(12, 1e-5, 'tocks reset to 12');
+    });
+    test('reborn into tick debt, immediately pay one back', () => {
+      const result = divideClockTicks(
+        { stage: clockStages.tick, ticksPast: 0.99, tocksPast: 12 },
+        { attackAfterTicks: 2, releaseAfterTocks: 15, ticksOnReset: -2, tocksOnReset: -1 },
+        clockInTriggerStages.attack,
+        resetTriggerStages.reset
+      );
+      expect(result.stage).toBeVerbose(clockStages.tock, 'reset to tock');
+      expect(result.ticksPast).toBeCloseToVerbose(
+        -1,
+        1e-5,
+        'ticks reset to -2, and straight away incremented to -1'
+      );
+      expect(result.tocksPast).toBeCloseToVerbose(-1, 1e-5, 'tocks reset to -1');
+    });
+    test('from tock stage to over the bar-line hold (shorter first note)', () => {
+      const result = divideClockTicks(
+        { stage: clockStages.tock, ticksPast: 0.99, tocksPast: 12 },
+        { attackAfterTicks: 4, releaseAfterTocks: 2, ticksOnReset: 1, tocksOnReset: 1 },
+        clockInTriggerStages.release,
+        resetTriggerStages.reset
+      );
+      expect(result.stage).toBeVerbose(clockStages.tock, 'reset to tock');
+      expect(result.ticksPast).toBeCloseToVerbose(
+        1,
+        1e-5,
+        'ticks set to 1 as specified'
+      );
+      expect(result.tocksPast).toBeCloseToVerbose(1, 1e-5, 'tocks reset to 1');
+    });
   });
 });

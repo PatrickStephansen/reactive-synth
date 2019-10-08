@@ -38,6 +38,20 @@ registerProcessor(
           minValue: 1,
           maxValue: 1e9,
           automationRate: 'a-rate'
+        },
+        {
+          name: 'ticksOnReset',
+          defaultValue: 0,
+          minValue: -1e9,
+          maxValue: 1e9,
+          automationRate: 'a-rate'
+        },
+        {
+          name: 'tocksOnReset',
+          defaultValue: 0,
+          minValue: -1e9,
+          maxValue: 1e9,
+          automationRate: 'a-rate'
         }
       ];
     }
@@ -49,7 +63,12 @@ registerProcessor(
         ticksPast: 0,
         tocksPast: 0
       };
-      this.userParams = { attackAfterTicks: 0, releaseAfterTocks: 0 };
+      this.userParams = {
+        attackAfterTicks: 0,
+        releaseAfterTocks: 0,
+        ticksOnReset: 0,
+        tocksOnReset: 0
+      };
       this.initialReset = true;
       this.port.onmessage = this.handleMessage.bind(this);
       this.manualClockTriggerOn = false;
@@ -84,6 +103,8 @@ registerProcessor(
           : getParamValue(parameters.resetTrigger, -1e9, 1e9);
       this.getAttackAfterTicks = getParamValue(parameters.attackAfterTicks, 1, 1e9);
       this.getReleaseAfterTocks = getParamValue(parameters.releaseAfterTocks, 1, 1e9);
+      this.getTicksOnReset = getParamValue(parameters.ticksOnReset, -1e9, 1e9);
+      this.getTocksOnReset = getParamValue(parameters.tocksOnReset, -1e9, 1e9);
 
       for (let sampleIndex = 0; sampleIndex < output[0].length; sampleIndex++) {
         const clockTriggerValue = this.getClockTriggerValue(sampleIndex);
@@ -121,6 +142,8 @@ registerProcessor(
 
         this.userParams.attackAfterTicks = this.getAttackAfterTicks(sampleIndex);
         this.userParams.releaseAfterTocks = this.getReleaseAfterTocks(sampleIndex);
+        this.userParams.ticksOnReset = this.getTicksOnReset(sampleIndex);
+        this.userParams.tocksOnReset = this.getTocksOnReset(sampleIndex);
 
         // mutates this.state
         divideClockTicks(this.state, this.userParams, clockTriggerStage, resetTriggerStage);

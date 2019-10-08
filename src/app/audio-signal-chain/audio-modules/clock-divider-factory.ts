@@ -40,6 +40,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
     const resetTrigger = clockDividerNode.parameters.get('resetTrigger');
     const attackAfterTicks = clockDividerNode.parameters.get('attackAfterTicks');
     const releaseAfterTocks = clockDividerNode.parameters.get('releaseAfterTocks');
+    const ticksOnReset = clockDividerNode.parameters.get('ticksOnReset');
+    const tocksOnReset = clockDividerNode.parameters.get('tocksOnReset');
 
     const outputGain = context.createGain();
     outputGain.gain.value = defaultGain;
@@ -53,6 +55,8 @@ export class ClockDividerFactory implements AudioModuleFactory {
         ['reset trigger', resetTrigger],
         ['attack after ticks', attackAfterTicks],
         ['release after tocks', releaseAfterTocks],
+        ['ticks on reset', ticksOnReset],
+        ['tocks on reset', tocksOnReset],
         ['output gain', outputGain.gain]
       ])
     });
@@ -95,8 +99,9 @@ export class ClockDividerFactory implements AudioModuleFactory {
           as a tock when the sample value is 0 or less.
           The Attack After Ticks and Release After Ticks parameters control the ratio between incoming and output clock pulses.
           Higher values mean more incoming pulses per output pulse.
-          The Reset Trigger puts the module back in a state where it will output a tick on the next tick received.
+          The Reset Trigger sets the internal tick and tock counters to the state specified by Ticks On Reset and Tocks On Reset.
           It can be used to synchronize with other modules.
+          If the Clock Trigger ticks on the same sample as the reset, the tick counts.
         `
       },
       [],
@@ -157,6 +162,26 @@ export class ClockDividerFactory implements AudioModuleFactory {
           maxValue: parameterMax(releaseAfterTocks),
           minValue: parameterMin(releaseAfterTocks),
           value: releaseAfterTocks.defaultValue,
+          canConnectSources: true
+        },
+        {
+          moduleId: id,
+          name: 'ticks on reset',
+          sources: [],
+          stepSize: 0.25,
+          maxValue: parameterMax(ticksOnReset),
+          minValue: parameterMin(ticksOnReset),
+          value: ticksOnReset.defaultValue,
+          canConnectSources: true
+        },
+        {
+          moduleId: id,
+          name: 'tocks on reset',
+          sources: [],
+          stepSize: 0.25,
+          maxValue: parameterMax(tocksOnReset),
+          minValue: parameterMin(tocksOnReset),
+          value: tocksOnReset.defaultValue,
           canConnectSources: true
         },
         {

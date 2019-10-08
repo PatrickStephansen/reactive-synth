@@ -17,14 +17,14 @@ export const resetTriggerStages = {
 
 export function divideClockTicks(
   state, // { stage, ticksPast, tocksPast },
-  { attackAfterTicks, releaseAfterTocks },
+  { attackAfterTicks, releaseAfterTocks, ticksOnReset, tocksOnReset },
   clockInStage,
   resetTriggerStage
 ) {
   if (resetTriggerStage === resetTriggerStages.reset) {
     state.stage = clockStages.tock;
-    state.tocksPast = 0;
-    state.ticksPast = attackAfterTicks - 1;
+    state.tocksPast = tocksOnReset;
+    state.ticksPast = ticksOnReset;
   }
   if (clockInStage === clockInTriggerStages.attack && state.stage === clockStages.tock) {
     state.ticksPast++;

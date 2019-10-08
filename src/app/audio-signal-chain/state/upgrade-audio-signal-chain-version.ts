@@ -1,6 +1,25 @@
 import { AudioSignalChainState } from './audio-signal-chain.state';
 import { ViewMode } from '../model/view-mode';
 
+const appendDefaultTicksAfterResetParameter = state =>
+  state.parameters.some(p => p.name === 'ticks on reset')
+    ? state
+    : {
+        ...state,
+        parameters: [
+          ...state.parameters,
+          ...state.parameters
+            .filter(p => p.name === 'attack after ticks')
+            .map(a => ({
+              name: 'ticks on reset',
+              moduleId: a.moduleId,
+              value: a.value - 1,
+              sources: [],
+              canConnectSources: true
+            }))
+        ]
+      };
+
 export const upgradeAudioChainStateVersion = (state, version: number): AudioSignalChainState => {
   switch (version) {
     case 1:
@@ -44,9 +63,9 @@ export const upgradeAudioChainStateVersion = (state, version: number): AudioSign
         }))
       };
 
-      return upgradedState;
+      return appendDefaultTicksAfterResetParameter(upgradedState);
 
     default:
-      return state;
+      return appendDefaultTicksAfterResetParameter(state);
   }
 };
