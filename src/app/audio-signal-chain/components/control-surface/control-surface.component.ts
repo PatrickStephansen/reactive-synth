@@ -123,25 +123,18 @@ export class ControlSurfaceComponent implements OnInit {
         this.controlSurface.shownMinX,
         this.controlSurface.shownMaxX,
         this.controlSurface.shownMinX +
-          ((this.controlSurface.shownMaxX - this.controlSurface.shownMinX) * offsetX) /
+          (offsetX * (this.controlSurface.shownMaxX - this.controlSurface.shownMinX)) /
             this.surfaceSize
       ),
       y: this.clamp(
         this.controlSurface.shownMinY,
         this.controlSurface.shownMaxY,
         this.controlSurface.shownMinY +
-          ((this.controlSurface.shownMaxY - this.controlSurface.shownMinY) *
-            (this.surfaceSize - offsetY)) /
+          ((this.surfaceSize - offsetY) *
+            (this.controlSurface.shownMaxY - this.controlSurface.shownMinY)) /
             this.surfaceSize
       )
     };
-  }
-
-  private getParentSvg(element) {
-    if (element.nodeName === 'svg') {
-      return element;
-    }
-    return this.getParentSvg(element.parentElement);
   }
 
   private clamp(min, max, value) {
