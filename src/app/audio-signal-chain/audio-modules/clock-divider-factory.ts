@@ -99,9 +99,11 @@ export class ClockDividerFactory implements AudioModuleFactory {
           as a tock when the sample value is 0 or less.
           The Attack After Ticks and Release After Ticks parameters control the ratio between incoming and output clock pulses.
           Higher values mean more incoming pulses per output pulse.
-          The Reset Trigger sets the internal tick and tock counters to the state specified by Ticks On Reset and Tocks On Reset.
+          The Reset Trigger sets the internal tick and tock counters
+          (which count up to Attack After Ticks and Release After Ticks before changing the module state)
+          to the state specified by Ticks On Reset and Tocks On Reset.
           It can be used to synchronize with other modules.
-          If the Clock Trigger ticks on the same sample as the reset, the tick counts.
+          If the Clock Trigger ticks on the same sample as the reset, the tick applies after the reset.
         `
       },
       [],
