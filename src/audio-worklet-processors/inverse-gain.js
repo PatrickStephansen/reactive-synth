@@ -4,7 +4,7 @@ const getParamValue = getParameterValue;
 
 registerProcessor(
   'inverse-gain',
-  class Noise extends AudioWorkletProcessor {
+  class InverseGain extends AudioWorkletProcessor {
     static get parameterDescriptors() {
       return [
         {
