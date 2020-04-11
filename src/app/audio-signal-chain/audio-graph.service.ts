@@ -32,6 +32,7 @@ export class AudioGraphService {
 
   private moduleFactoryMap: Map<AudioModuleType, AudioModuleFactory>;
   private subscriptions: Subscription[] = [];
+  private pocWasmBinary: ArrayBuffer;
 
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
@@ -106,6 +107,11 @@ export class AudioGraphService {
         ]);
         return this.context.audioWorklet
           .addModule(this.locationService.prepareExternalUrl(workletUrl))
+          .then(() => fetch(this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/wasm_audio_nodes_bg.wasm')))
+          .then(wasmData => wasmData.arrayBuffer())
+          .then(wasmBinary => {
+            this.pocWasmBinary = wasmBinary;
+          })
           .then(() => ({
             modules: [
               {
@@ -180,7 +186,8 @@ export class AudioGraphService {
         this.createModuleId,
         this.subscriptions,
         id,
-        name
+        name,
+        this.pocWasmBinary
       );
     }
     return null;

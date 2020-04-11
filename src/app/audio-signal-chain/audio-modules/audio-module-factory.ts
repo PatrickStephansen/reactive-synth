@@ -16,7 +16,8 @@ export interface AudioModuleFactory {
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
-    name?: string
+    name?: string,
+    wasmBinary?: ArrayBuffer
   ): CreateModuleResult;
 }
 

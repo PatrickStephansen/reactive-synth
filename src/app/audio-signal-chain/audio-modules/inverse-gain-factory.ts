@@ -19,7 +19,8 @@ export class InverseGainFactory implements AudioModuleFactory {
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
-    name?: string
+    name?: string,
+    wasmBinary?: ArrayBuffer
   ): CreateModuleResult {
     const moduleType = AudioModuleType.InverseGain;
     id = createModuleId(moduleType, id);
@@ -43,6 +44,7 @@ export class InverseGainFactory implements AudioModuleFactory {
         [fallBackValueKey, inverseGain.parameters.get('zeroDivisorFallback')]
       ])
     };
+    inverseGain.port.postMessage({wasmBinary, type: 'wasm'});
 
     graph.set(id, moduleImplementation);
     return new CreateModuleResult(
