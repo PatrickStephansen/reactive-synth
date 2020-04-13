@@ -107,7 +107,7 @@ export class AudioGraphService {
         ]);
         return this.context.audioWorklet
           .addModule(this.locationService.prepareExternalUrl(workletUrl))
-          .then(() => fetch(this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/wasm_audio_nodes_bg.wasm')))
+          .then(() => fetch(this.locationService.prepareExternalUrl('/assets/audio-worklet-processors/wasm_audio_nodes.wasm')))
           .then(wasmData => wasmData.arrayBuffer())
           .then(wasmBinary => {
             this.pocWasmBinary = wasmBinary;
