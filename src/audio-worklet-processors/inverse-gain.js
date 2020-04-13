@@ -47,6 +47,7 @@ registerProcessor(
 
     process(inputs, outputs, parameters) {
       // Only one input and output.
+      // TODO: garbage collection still happens every ~3s - find out what's still reallocating
       let input = inputs[0];
       let output = outputs[0];
       if (input[0].length && this.wasmModule) {
@@ -70,10 +71,10 @@ registerProcessor(
             parameters.divisor.length,
             parameters.zeroDivisorFallback.length
           ) / bytesPerSample;
-        const outArray = this.float32WasmMemory.slice(outputPointer, outputPointer + 128);
         for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
+          // TODO: can this not be done with some array util that's faster?
           for (let sample = 0; sample < output[channelIndex].length; sample++) {
-            output[channelIndex][sample] = outArray[sample];
+            output[channelIndex][sample] = this.float32WasmMemory[outputPointer + sample];
           }
         }
       }
