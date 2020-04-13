@@ -27,9 +27,9 @@ export class InverseGainFactory implements AudioModuleFactory {
     const inverseGain = new AudioWorkletNode(context, 'inverse-gain', {
       numberOfInputs: 1,
       numberOfOutputs: 1,
-      channelCount: 2,
+      channelCount: 1,
       channelCountMode: 'explicit',
-      outputChannelCount: [2],
+      outputChannelCount: [1],
       channelInterpretation: 'speakers'
     });
     const divisorParameterKey = 'signal divisor';

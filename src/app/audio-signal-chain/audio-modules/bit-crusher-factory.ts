@@ -26,9 +26,9 @@ export class BitCrusherFactory implements AudioModuleFactory {
     const crusher = new AudioWorkletNode(context, 'bit-crusher-fixed-point', {
       numberOfInputs: 1,
       numberOfOutputs: 1,
-      channelCount: 2,
+      channelCount: 1,
       channelCountMode: 'explicit',
-      outputChannelCount: [2],
+      outputChannelCount: [1],
       channelInterpretation: 'speakers'
     });
     const bitDepthParameterKey = 'bit depth';
