@@ -46,13 +46,10 @@ registerProcessor(
     }
 
     process(inputs, outputs, parameters) {
-      // Only one input and output.
-      // TODO: garbage collection still happens every ~3s - find out what's still reallocating
-      let input = inputs[0];
-      let output = outputs[0];
-      if (input[0].length && this.wasmModule) {
+      // TODO: garbage collection still happens every ~5s - find out what's still reallocating
+      if (inputs[0][0].length && this.wasmModule) {
         this.float32WasmMemory.set(
-          input[0],
+          inputs[0][0],
           this.wasmModule.exports.get_quotient_ptr(this.internalProcessorPtr) / bytesPerSample
         );
         this.float32WasmMemory.set(
@@ -67,14 +64,14 @@ registerProcessor(
         const outputPointer =
           this.wasmModule.exports.process_quantum(
             this.internalProcessorPtr,
-            input[0].length,
+            inputs[0][0].length,
             parameters.divisor.length,
             parameters.zeroDivisorFallback.length
           ) / bytesPerSample;
-        for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
+        for (let channelIndex = 0; channelIndex < outputs[0].length; channelIndex++) {
           // TODO: can this not be done with some array util that's faster?
-          for (let sample = 0; sample < output[channelIndex].length; sample++) {
-            output[channelIndex][sample] = this.float32WasmMemory[outputPointer + sample];
+          for (let sample = 0; sample < outputs[0][channelIndex].length; sample++) {
+            outputs[0][channelIndex][sample] = this.float32WasmMemory[outputPointer + sample];
           }
         }
       }
