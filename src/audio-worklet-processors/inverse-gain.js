@@ -64,7 +64,12 @@ registerProcessor(
             bytesPerSample
         );
         const outputPointer =
-          this.wasmModule.exports.process_quantum(this.internalProcessorPtr) / bytesPerSample;
+          this.wasmModule.exports.process_quantum(
+            this.internalProcessorPtr,
+            input[0].length,
+            parameters.divisor.length,
+            parameters.zeroDivisorFallback.length
+          ) / bytesPerSample;
         const outArray = this.float32WasmMemory.slice(outputPointer, outputPointer + 128);
         for (let channelIndex = 0; channelIndex < output.length; channelIndex++) {
           for (let sample = 0; sample < output[channelIndex].length; sample++) {
