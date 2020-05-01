@@ -46,7 +46,8 @@ registerProcessor(
     }
 
     process(inputs, outputs, parameters) {
-      // TODO: garbage collection still happens every ~5s - find out what's still reallocating
+      // Garbage collection still happens every ~5s clearing 1MB - even if the process function does nothing but return true.
+      // The allocation of the inputs and parameters must be causing this, but it's surprising that they would be re-allocated every time.
       if (inputs[0][0].length && this.wasmModule) {
         this.float32WasmMemory.set(
           inputs[0][0],
