@@ -2,7 +2,7 @@
 
 A modular synth that runs in the broswer. The live version is hosted at https://patrickstephansen.github.io/reactive-synth/.
 
-Only Chromium-based browsers are currently supported because they are the only ones that implement important portions of the [Web Audio API spec](https://webaudio.github.io/web-audio-api/).
+Most devices and browsers should work except for iOS devices, which might work partially. [audioworklet](https://webaudio.github.io/web-audio-api/#audioworklet) is required for more complex modules, but it's not implemented in the WebKit engine all browsers are forced to use on iOS. Performance is not great on Linux because browsers rely on PulseAudio, which is not well suited to real-time audio.
 
 ## Example patches
 
