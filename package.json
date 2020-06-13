@@ -12,7 +12,8 @@
     "test": "jest",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "deploy": "npm run build && gh-pages -d dist/reactive-synth"
+    "deploy": "npm run build && gh-pages -d dist/reactive-synth",
+    "postinstall": "ngcc"
   },
   "description": "A modular syth made as an exercise to learn ng-rx",
   "homepage": "https://PatrickStephansen.github.io/reactive-synth",
