@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select, Action } from '@ngrx/store';
-import { from, Observable, of, OperatorFunction, combineLatest } from 'rxjs';
-import { mergeMap, map, catchError, tap, filter, debounceTime } from 'rxjs/operators';
+import { from, Observable, of, OperatorFunction } from 'rxjs';
+import { mergeMap, map, catchError, tap, filter, debounceTime, concatMap } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
 import { AudioGraphService } from '../audio-graph.service';
@@ -335,7 +335,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect()
   toggleSignalChainActive$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ToggleSignalChainActive),
-    mergeMap(({ isActive }) => {
+    concatMap(({ isActive }) => {
       const servicePromise = isActive ? this.graphService.unmute() : this.graphService.mute();
 
       return from(servicePromise).pipe(

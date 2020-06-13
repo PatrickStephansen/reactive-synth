@@ -44,10 +44,7 @@ export class ParameterComponent implements OnInit {
     this.addInputsId = `add-input-${this.parameter.moduleId}-${this.parameter.name}`;
 
     this.parameterChanged
-      .pipe(
-        distinctUntilChanged(),
-        sampleTime(100)
-      )
+      .pipe(distinctUntilChanged(), sampleTime(100))
       .subscribe(parameterValue => {
         if (this.parameterFormValue.valid) {
           this.updateParameterValue.emit({
@@ -60,7 +57,9 @@ export class ParameterComponent implements OnInit {
   }
 
   setDropdownPlacement() {
-    this.dropdown.nativeElement.getBoundingClientRect().top / window['visualViewport'].height > 0.5
+    this.dropdown.nativeElement.getBoundingClientRect().top /
+      ((document.documentElement && document.documentElement.clientHeight) || 100) >
+    0.5
       ? (this.isDropdownUp = true)
       : (this.isDropdownUp = false);
   }
