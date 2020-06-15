@@ -37,12 +37,14 @@
     "core-js": "^2.6.11",
     "ng-click-outside": "^6.0.0",
     "ramda": "^0.26.1",
+    "reactive-synth-bitcrusher": "^1.0.0",
     "rxjs": "^6.5.5",
     "standardized-audio-context": "^19.1.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
+    "@angular-builders/custom-webpack": "^9.1.0",
     "@angular-devkit/build-angular": "~0.901.8",
     "@angular/cli": "^9.1.8",
     "@angular/compiler-cli": "^9.1.11",
@@ -56,6 +58,7 @@
     "babel-preset-env": "^1.7.0",
     "clean-webpack-plugin": "^3.0.0",
     "codelyzer": "^5.1.2",
+    "file-loader": "^6.0.0",
     "gh-pages": "^2.2.0",
     "jest": "^24.9.0",
     "prettier": "^1.19.1",

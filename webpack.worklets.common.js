@@ -7,7 +7,6 @@ module.exports = {
   entry: {
     worklets: [
       './src/audio-worklet-processors/noise.js',
-      './src/audio-worklet-processors/bit-crusher-fixed-point.js',
       './src/audio-worklet-processors/inverse-gain.js',
       './src/audio-worklet-processors/envelope-generator.js',
       './src/audio-worklet-processors/clock-divider.js'

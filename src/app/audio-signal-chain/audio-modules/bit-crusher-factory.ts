@@ -19,11 +19,12 @@ export class BitCrusherFactory implements AudioModuleFactory {
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
-    name?: string
+    name?: string,
+    wasmBinary?: ArrayBuffer
   ): CreateModuleResult {
     const moduleType = AudioModuleType.BitCrusher;
     id = createModuleId(moduleType, id);
-    const crusher = new AudioWorkletNode(context, 'bit-crusher-fixed-point', {
+    const crusher = new AudioWorkletNode(context, 'reactive-synth-bitcrusher', {
       numberOfInputs: 1,
       numberOfOutputs: 1,
       channelCount: 1,
@@ -31,6 +32,7 @@ export class BitCrusherFactory implements AudioModuleFactory {
       outputChannelCount: [1],
       channelInterpretation: 'speakers'
     });
+    crusher.port.postMessage({ type: 'wasm', wasmBinary });
     const bitDepthParameterKey = 'bit depth';
     const bitDepthParameter = crusher.parameters['get']('bitDepth');
     const volumeControl = context.createGain();
