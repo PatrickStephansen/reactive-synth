@@ -9,7 +9,9 @@ module.exports = {
     worklets: [
       './src/audio-worklet-processors/noise.js',
       './src/audio-worklet-processors/envelope-generator.js',
-      './src/audio-worklet-processors/clock-divider.js'
+      './src/audio-worklet-processors/clock-divider.js',
+      './node_modules/reactive-synth-bitcrusher/bitcrusher.js',
+      './node_modules/reactive-synth-inverse-gain/inverse-gain.js'
     ]
   },
   output: {
@@ -22,13 +24,13 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'node_modules/reactive-synth-inverse-gain/dist/*.*',
+          from: 'node_modules/reactive-synth-inverse-gain/reactive_synth_inverse_gain.wasm',
           // somehow it knows to copy to the assets folder
           to: '[name].[contenthash].[ext]',
           toType: 'template'
         },
         {
-          from: 'node_modules/reactive-synth-bitcrusher/dist/*.*',
+          from: 'node_modules/reactive-synth-bitcrusher/reactive_synth_bitcrusher.wasm',
           to: '[name].[contenthash].[ext]',
           toType: 'template'
         }

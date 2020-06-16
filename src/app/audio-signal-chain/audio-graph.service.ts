@@ -17,9 +17,7 @@ import { Subscription } from 'rxjs';
 import {
   workletUrl,
   bitcrusherWasmUrl,
-  bitcrusherWorkletUrl,
-  inverseGainWasmUrl,
-  inverseGainWorkletUrl
+  inverseGainWasmUrl
 } from '../cache-hack/cache';
 import { ModuleImplementation } from './audio-modules/module-implementation';
 import { AUDIO_MODULE_FACTORY, AudioModuleFactory } from './audio-modules/audio-module-factory';
@@ -113,16 +111,6 @@ export class AudioGraphService {
         ]);
         return this.context.audioWorklet
           .addModule(this.locationService.prepareExternalUrl(workletUrl))
-          .then(() =>
-            Promise.all([
-              this.context.audioWorklet.addModule(
-                this.locationService.prepareExternalUrl(bitcrusherWorkletUrl)
-              ),
-              this.context.audioWorklet.addModule(
-                this.locationService.prepareExternalUrl(inverseGainWorkletUrl)
-              )
-            ])
-          )
           .then(() =>
             Promise.all([
               fetch(this.locationService.prepareExternalUrl(bitcrusherWasmUrl)),
