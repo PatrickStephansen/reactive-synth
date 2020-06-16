@@ -24,7 +24,7 @@ export class InverseGainFactory implements AudioModuleFactory {
   ): CreateModuleResult {
     const moduleType = AudioModuleType.InverseGain;
     id = createModuleId(moduleType, id);
-    const inverseGain = new AudioWorkletNode(context, 'inverse-gain', {
+    const inverseGain = new AudioWorkletNode(context, 'reactive-synth-inverse-gain', {
       numberOfInputs: 1,
       numberOfOutputs: 1,
       channelCount: 1,

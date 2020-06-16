@@ -14,16 +14,16 @@ import { AudioModuleType } from './model/audio-module-type';
 import { CreateModuleResult } from './model/create-module-result';
 import { ConnectModulesEvent } from './model/connect-modules-event';
 import { Subscription } from 'rxjs';
-import { workletUrl } from '../cache-hack/cache';
+import {
+  workletUrl,
+  bitcrusherWasmUrl,
+  bitcrusherWorkletUrl,
+  inverseGainWasmUrl,
+  inverseGainWorkletUrl
+} from '../cache-hack/cache';
 import { ModuleImplementation } from './audio-modules/module-implementation';
 import { AUDIO_MODULE_FACTORY, AudioModuleFactory } from './audio-modules/audio-module-factory';
 import { ViewMode } from './model/view-mode';
-// The below should work, but it seems to try load them as modules no matter what
-// import bitcrusherWasmUrl from "!!file-loader!reactive-synth-bitcrusher/reactive_synth_bitcrusher.wasm";
-// import bitcrusherWorkletUrl from "!!file-loader!reactive-synth-bitcrusher/bitcrusher.js;
-
-const bitcrusherWasmUrl = '/assets/audio-worklet-processors/reactive_synth_bitcrusher.wasm';
-const bitcrusherWorkletUrl = '/assets/audio-worklet-processors/bitcrusher.js';
 
 let incrementingId = 0;
 
@@ -114,22 +114,23 @@ export class AudioGraphService {
         return this.context.audioWorklet
           .addModule(this.locationService.prepareExternalUrl(workletUrl))
           .then(() =>
-            this.context.audioWorklet.addModule(
-              this.locationService.prepareExternalUrl(bitcrusherWorkletUrl)
-            )
+            Promise.all([
+              this.context.audioWorklet.addModule(
+                this.locationService.prepareExternalUrl(bitcrusherWorkletUrl)
+              ),
+              this.context.audioWorklet.addModule(
+                this.locationService.prepareExternalUrl(inverseGainWorkletUrl)
+              )
+            ])
           )
           .then(() =>
             Promise.all([
-              fetch(
-                this.locationService.prepareExternalUrl(
-                  '/assets/audio-worklet-processors/wasm_audio_nodes.wasm'
-                )
-              ),
-              fetch(this.locationService.prepareExternalUrl(bitcrusherWasmUrl))
+              fetch(this.locationService.prepareExternalUrl(bitcrusherWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(inverseGainWasmUrl))
             ])
           )
           .then(wasmResponses => Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer())))
-          .then(([inverseGainBinary, bitcrusherWasmBinary]) => {
+          .then(([bitcrusherWasmBinary, inverseGainBinary]) => {
             this.moduleBinaryMap = new Map([
               [AudioModuleType.InverseGain, inverseGainBinary],
               [AudioModuleType.BitCrusher, bitcrusherWasmBinary]

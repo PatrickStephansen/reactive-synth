@@ -6,14 +6,14 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "webpack --config=webpack.worklets.dev.js && ng serve",
-    "build": "webpack --config=webpack.worklets.production.js && node get-worklets-url.js > src/app/cache-hack/cache.prod.ts && ng run reactive-synth:build:production --base-href /reactive-synth/",
+    "start": "webpack --config=webpack.worklets.dev.js && node get-worklets-url.js > src/app/cache-hack/cache.ts && ng serve",
+    "build": "webpack --config=webpack.worklets.production.js && node get-worklets-url.js > src/app/cache-hack/cache.ts && ng run reactive-synth:build:production --base-href /reactive-synth/",
     "watch:worklets": "webpack --config=webpack.worklets.dev.js --watch",
     "test": "jest",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deploy": "npm run build && gh-pages -d dist/reactive-synth",
-    "postinstall": "ngcc"
+    "postinstall": "ngcc && npm link reactive-synth-bitcrusher && npm link reactive-synth-inverse-gain"
   },
   "description": "A modular syth made as an exercise to learn ng-rx",
   "homepage": "https://PatrickStephansen.github.io/reactive-synth",
@@ -37,7 +37,6 @@
     "core-js": "^2.6.11",
     "ng-click-outside": "^6.0.0",
     "ramda": "^0.26.1",
-    "reactive-synth-bitcrusher": "^1.0.0",
     "rxjs": "^6.5.5",
     "standardized-audio-context": "^19.1.1",
     "tslib": "^1.10.0",
@@ -58,6 +57,7 @@
     "babel-preset-env": "^1.7.0",
     "clean-webpack-plugin": "^3.0.0",
     "codelyzer": "^5.1.2",
+    "copy-webpack-plugin": "^6.0.2",
     "file-loader": "^6.0.0",
     "gh-pages": "^2.2.0",
     "jest": "^24.9.0",

@@ -36,10 +36,6 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/app/cache-hack/cache.ts",
-                  "with": "src/app/cache-hack/cache.prod.ts"
                 }
               ],
               "optimization": true,
