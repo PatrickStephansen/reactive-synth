@@ -25,7 +25,7 @@ export class ClockDividerFactory implements AudioModuleFactory {
     subscriptions: Subscription[],
     id?: string,
     name?: string,
-    wasmBinary?: ArrayBuffer
+    wasmModule?: ArrayBuffer
   ): CreateModuleResult {
     const moduleType = AudioModuleType.ClockDivider;
     id = createModuleId(moduleType, id);
@@ -88,7 +88,7 @@ export class ClockDividerFactory implements AudioModuleFactory {
         .pipe(map((event: ExtensionEvent) => ({ ...event, type: 'manual-reset-trigger' })))
         .subscribe((next: ExtensionEvent) => clockDividerNode.port.postMessage(next))
     );
-    clockDividerNode.port.postMessage({ wasmBinary, type: 'wasm' });
+    clockDividerNode.port.postMessage({ wasmModule, type: 'wasm' });
 
     return new CreateModuleResult(
       {

@@ -38,7 +38,7 @@ export class AudioGraphService {
 
   private moduleFactoryMap: Map<AudioModuleType, AudioModuleFactory>;
   private subscriptions: Subscription[] = [];
-  private moduleBinaryMap: Map<AudioModuleType, ArrayBuffer>;
+  private moduleBinaryMap: Map<AudioModuleType, WebAssembly.Module>;
 
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
@@ -118,18 +118,27 @@ export class AudioGraphService {
               fetch(this.locationService.prepareExternalUrl(bitcrusherWasmUrl)),
               fetch(this.locationService.prepareExternalUrl(inverseGainWasmUrl)),
               fetch(this.locationService.prepareExternalUrl(noiseGeneratorWasmUrl)),
-              fetch(this.locationService.prepareExternalUrl(clockDividerWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(clockDividerWasmUrl))
             ])
           )
-          .then(wasmResponses => Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer())))
-          .then(([bitcrusherWasmBinary, inverseGainBinary, noiseGeneratorBinary, clockDividerBinary]) => {
-            this.moduleBinaryMap = new Map([
-              [AudioModuleType.InverseGain, inverseGainBinary],
-              [AudioModuleType.BitCrusher, bitcrusherWasmBinary],
-              [AudioModuleType.NoiseGenerator, noiseGeneratorBinary],
-              [AudioModuleType.ClockDivider, clockDividerBinary],
-            ]);
-          })
+          .then(wasmResponses =>
+            Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer().then(WebAssembly.compile)))
+          )
+          .then(
+            ([
+              bitcrusherWasmBinary,
+              inverseGainBinary,
+              noiseGeneratorBinary,
+              clockDividerBinary
+            ]) => {
+              this.moduleBinaryMap = new Map([
+                [AudioModuleType.InverseGain, inverseGainBinary],
+                [AudioModuleType.BitCrusher, bitcrusherWasmBinary],
+                [AudioModuleType.NoiseGenerator, noiseGeneratorBinary],
+                [AudioModuleType.ClockDivider, clockDividerBinary]
+              ]);
+            }
+          )
           .then(() => ({
             modules: [
               {

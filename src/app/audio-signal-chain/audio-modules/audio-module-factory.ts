@@ -17,7 +17,7 @@ export interface AudioModuleFactory {
     subscriptions: Subscription[],
     id?: string,
     name?: string,
-    wasmBinary?: ArrayBuffer
+    wasmModule?: WebAssembly.Module
   ): CreateModuleResult;
 }
 

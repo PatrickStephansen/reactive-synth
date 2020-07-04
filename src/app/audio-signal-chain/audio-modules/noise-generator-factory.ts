@@ -24,7 +24,7 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
     subscriptions: Subscription[],
     id?: string,
     name?: string,
-    wasmBinary?: ArrayBuffer
+    wasmModule?: ArrayBuffer
   ): CreateModuleResult {
     const moduleType = AudioModuleType.NoiseGenerator;
     id = createModuleId(moduleType, id);
@@ -60,7 +60,7 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
       'trigger-change'
     ).pipe(frameRateLimit);
     noiseGeneratorNode.port.start();
-    noiseGeneratorNode.port.postMessage({ type: 'wasm', wasmBinary });
+    noiseGeneratorNode.port.postMessage({ type: 'wasm', wasmModule });
 
     const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
 
