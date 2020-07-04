@@ -7,9 +7,9 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     worklets: [
-      './src/audio-worklet-processors/noise.js',
       './src/audio-worklet-processors/envelope-generator.js',
       './src/audio-worklet-processors/clock-divider.js',
+      './node_modules/reactive-synth-noise-generator/noise-generator.js',
       './node_modules/reactive-synth-bitcrusher/bitcrusher.js',
       './node_modules/reactive-synth-inverse-gain/inverse-gain.js'
     ]
@@ -33,7 +33,12 @@ module.exports = {
           from: 'node_modules/reactive-synth-bitcrusher/reactive_synth_bitcrusher.wasm',
           to: '[name].[contenthash].[ext]',
           toType: 'template'
-        }
+        },
+        {
+          from: 'node_modules/reactive-synth-noise-generator/reactive_synth_noise_generator.wasm',
+          to: '[name].[contenthash].[ext]',
+          toType: 'template'
+        },
       ]
     })
   ]

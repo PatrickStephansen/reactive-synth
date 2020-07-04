@@ -23,16 +23,18 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
-    name?: string
+    name?: string,
+    wasmBinary?: ArrayBuffer
   ): CreateModuleResult {
     const moduleType = AudioModuleType.NoiseGenerator;
     id = createModuleId(moduleType, id);
-    const noiseGeneratorNode = new AudioWorkletNode(context, 'noise', {
+    const noiseGeneratorNode = new AudioWorkletNode(context, 'reactive-synth-noise-generator', {
       numberOfInputs: 0,
       numberOfOutputs: 1,
       channelCount: 1,
       channelCountMode: 'explicit',
-      outputChannelCount: [1]
+      outputChannelCount: [1],
+      channelInterpretation: 'speakers'
     });
     const stepMin = noiseGeneratorNode.parameters.get('stepMin');
     const stepMax = noiseGeneratorNode.parameters.get('stepMax');
@@ -58,6 +60,7 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
       'trigger-change'
     ).pipe(frameRateLimit);
     noiseGeneratorNode.port.start();
+    noiseGeneratorNode.port.postMessage({ type: 'wasm', wasmBinary });
 
     const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
 
