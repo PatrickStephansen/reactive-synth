@@ -18,7 +18,7 @@ export interface AudioModuleFactory {
     id?: string,
     name?: string,
     wasmModule?: WebAssembly.Module
-  ): CreateModuleResult;
+  ): CreateModuleResult | Promise<CreateModuleResult>;
 }
 
 export const AUDIO_MODULE_FACTORY = new InjectionToken('AUDIO_MODULE_FACTORY');

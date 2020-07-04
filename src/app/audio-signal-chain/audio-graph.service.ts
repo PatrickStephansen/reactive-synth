@@ -201,10 +201,10 @@ export class AudioGraphService {
       });
   }
 
-  createModule(moduleType: AudioModuleType, id?: string, name?: string): CreateModuleResult {
+  createModule(moduleType: AudioModuleType, id?: string, name?: string): Promise<CreateModuleResult> {
     const matchingFactory = this.moduleFactoryMap.get(moduleType);
     if (matchingFactory) {
-      return matchingFactory.CreateAudioModule(
+      return Promise.resolve(matchingFactory.CreateAudioModule(
         this.context,
         this.graph,
         this.defaultGain,
@@ -215,9 +215,9 @@ export class AudioGraphService {
         id,
         name,
         this.moduleBinaryMap.get(moduleType)
-      );
+      ));
     }
-    return null;
+    return Promise.resolve(null);
   }
 
   connectModules({

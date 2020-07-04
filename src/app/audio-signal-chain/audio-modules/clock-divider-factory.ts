@@ -11,6 +11,7 @@ import { frameRateLimit } from '../frame-rate-limit';
 import { ExtensionEvent } from '../model/extension-event';
 import { map } from 'rxjs/operators';
 import { TriggerExtension } from '../model/trigger-extension';
+import { createModuleReadyPromise } from '../module-ready-promise';
 
 @Injectable()
 export class ClockDividerFactory implements AudioModuleFactory {
@@ -26,7 +27,7 @@ export class ClockDividerFactory implements AudioModuleFactory {
     id?: string,
     name?: string,
     wasmModule?: ArrayBuffer
-  ): CreateModuleResult {
+  ): Promise<CreateModuleResult> {
     const moduleType = AudioModuleType.ClockDivider;
     id = createModuleId(moduleType, id);
     const clockDividerNode = new AudioWorkletNode(context, 'reactive-synth-clock-divider', {
@@ -66,7 +67,6 @@ export class ClockDividerFactory implements AudioModuleFactory {
       clockDividerNode.port,
       'clock-trigger-change'
     ).pipe(frameRateLimit);
-    clockDividerNode.port.start();
 
     const manualClockTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
 
@@ -90,13 +90,15 @@ export class ClockDividerFactory implements AudioModuleFactory {
     );
     clockDividerNode.port.postMessage({ wasmModule, type: 'wasm' });
 
-    return new CreateModuleResult(
-      {
-        id,
-        name,
-        moduleType,
-        canDelete: true,
-        helpText: `Interprets the incoming Clock Trigger parameter as a clock signal and outputs clock pulses of equal or slower tempo.
+    return createModuleReadyPromise(clockDividerNode.port).then(
+      () =>
+        new CreateModuleResult(
+          {
+            id,
+            name,
+            moduleType,
+            canDelete: true,
+            helpText: `Interprets the incoming Clock Trigger parameter as a clock signal and outputs clock pulses of equal or slower tempo.
           The signal is interpretted as being a tick when sample value is greater than 0 and
           as a tock when the sample value is 0 or less.
           The Attack After Ticks and Release After Ticks parameters control the ratio between incoming and output clock pulses.
@@ -107,99 +109,100 @@ export class ClockDividerFactory implements AudioModuleFactory {
           It can be used to synchronize with other modules.
           If the Clock Trigger ticks on the same sample as the reset, the tick applies after the reset.
         `
-      },
-      [],
-      [
-        {
-          moduleId: id,
-          name: 'output'
-        }
-      ],
-      [
-        {
-          moduleId: id,
-          name: 'clock trigger',
-          sources: [],
-          stepSize: 0.01,
-          maxValue: parameterMax(clockTrigger),
-          minValue: parameterMin(clockTrigger),
-          value: clockTrigger.defaultValue,
-          extensions: [
-            new TriggerExtension(
-              new Map([['trigger-change', clockTriggered]]),
-              new Map([['manual-trigger', manualClockTriggerEventEmitter]])
-            )
+          },
+          [],
+          [
+            {
+              moduleId: id,
+              name: 'output'
+            }
           ],
-          canConnectSources: true
-        },
-        {
-          moduleId: id,
-          name: 'reset trigger',
-          sources: [],
-          stepSize: 0.01,
-          maxValue: parameterMax(resetTrigger),
-          minValue: parameterMin(resetTrigger),
-          value: resetTrigger.defaultValue,
-          extensions: [
-            new TriggerExtension(
-              new Map([['trigger-change', resetTriggered]]),
-              new Map([['manual-trigger', manualResetTriggerEventEmitter]])
-            )
+          [
+            {
+              moduleId: id,
+              name: 'clock trigger',
+              sources: [],
+              stepSize: 0.01,
+              maxValue: parameterMax(clockTrigger),
+              minValue: parameterMin(clockTrigger),
+              value: clockTrigger.defaultValue,
+              extensions: [
+                new TriggerExtension(
+                  new Map([['trigger-change', clockTriggered]]),
+                  new Map([['manual-trigger', manualClockTriggerEventEmitter]])
+                )
+              ],
+              canConnectSources: true
+            },
+            {
+              moduleId: id,
+              name: 'reset trigger',
+              sources: [],
+              stepSize: 0.01,
+              maxValue: parameterMax(resetTrigger),
+              minValue: parameterMin(resetTrigger),
+              value: resetTrigger.defaultValue,
+              extensions: [
+                new TriggerExtension(
+                  new Map([['trigger-change', resetTriggered]]),
+                  new Map([['manual-trigger', manualResetTriggerEventEmitter]])
+                )
+              ],
+              canConnectSources: true
+            },
+            {
+              moduleId: id,
+              name: 'attack after ticks',
+              sources: [],
+              stepSize: 0.25,
+              maxValue: parameterMax(attackAfterTicks),
+              minValue: parameterMin(attackAfterTicks),
+              value: attackAfterTicks.defaultValue,
+              canConnectSources: true
+            },
+            {
+              moduleId: id,
+              name: 'release after tocks',
+              sources: [],
+              stepSize: 0.25,
+              maxValue: parameterMax(releaseAfterTocks),
+              minValue: parameterMin(releaseAfterTocks),
+              value: releaseAfterTocks.defaultValue,
+              canConnectSources: true
+            },
+            {
+              moduleId: id,
+              name: 'ticks on reset',
+              sources: [],
+              stepSize: 0.25,
+              maxValue: parameterMax(ticksOnReset),
+              minValue: parameterMin(ticksOnReset),
+              value: ticksOnReset.defaultValue,
+              canConnectSources: true
+            },
+            {
+              moduleId: id,
+              name: 'tocks on reset',
+              sources: [],
+              stepSize: 0.25,
+              maxValue: parameterMax(tocksOnReset),
+              minValue: parameterMin(tocksOnReset),
+              value: tocksOnReset.defaultValue,
+              canConnectSources: true
+            },
+            {
+              moduleId: id,
+              name: 'output gain',
+              sources: [],
+              stepSize: 0.01,
+              maxValue: parameterMax(outputGain.gain),
+              minValue: parameterMin(outputGain.gain),
+              value: defaultGain,
+              canConnectSources: true
+            }
           ],
-          canConnectSources: true
-        },
-        {
-          moduleId: id,
-          name: 'attack after ticks',
-          sources: [],
-          stepSize: 0.25,
-          maxValue: parameterMax(attackAfterTicks),
-          minValue: parameterMin(attackAfterTicks),
-          value: attackAfterTicks.defaultValue,
-          canConnectSources: true
-        },
-        {
-          moduleId: id,
-          name: 'release after tocks',
-          sources: [],
-          stepSize: 0.25,
-          maxValue: parameterMax(releaseAfterTocks),
-          minValue: parameterMin(releaseAfterTocks),
-          value: releaseAfterTocks.defaultValue,
-          canConnectSources: true
-        },
-        {
-          moduleId: id,
-          name: 'ticks on reset',
-          sources: [],
-          stepSize: 0.25,
-          maxValue: parameterMax(ticksOnReset),
-          minValue: parameterMin(ticksOnReset),
-          value: ticksOnReset.defaultValue,
-          canConnectSources: true
-        },
-        {
-          moduleId: id,
-          name: 'tocks on reset',
-          sources: [],
-          stepSize: 0.25,
-          maxValue: parameterMax(tocksOnReset),
-          minValue: parameterMin(tocksOnReset),
-          value: tocksOnReset.defaultValue,
-          canConnectSources: true
-        },
-        {
-          moduleId: id,
-          name: 'output gain',
-          sources: [],
-          stepSize: 0.01,
-          maxValue: parameterMax(outputGain.gain),
-          minValue: parameterMin(outputGain.gain),
-          value: defaultGain,
-          canConnectSources: true
-        }
-      ],
-      []
+          []
+        )
     );
   }
 }

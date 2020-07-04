@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select, Action } from '@ngrx/store';
-import { from, Observable, of, OperatorFunction } from 'rxjs';
+import { from, Observable, of, OperatorFunction, defer } from 'rxjs';
 import { mergeMap, map, catchError, tap, filter, debounceTime, concatMap } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
@@ -100,6 +100,10 @@ export class AudioSignalChainEffects implements OnInitEffects {
                 )
               })
             ),
+            // the rest need to wait for the modules to finish being created otherwise they get overridden by the default values, have nothing to connect to etc.
+            // it is very fucking hard. at least 3 hours wasted.
+            // do all the real work in the service then announce the new state with potentially a lot of actions.
+            // mixes of sync and async effects cannot be coordinated by mortals.
             ...flatten(
               signalChain.inputs.map(input =>
                 input.sources.map(source =>
@@ -175,8 +179,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   CreateModule$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateModule),
     mergeMap(({ module }: { module: CreateModuleEvent }) =>
-      of(() => this.graphService.createModule(module.moduleType, module.id, module.name)).pipe(
-        map(serviceMethod => serviceMethod()),
+      defer(() => this.graphService.createModule(module.moduleType, module.id, module.name)).pipe(
         filter(
           compose(
             not,

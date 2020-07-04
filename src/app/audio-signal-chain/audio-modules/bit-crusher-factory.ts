@@ -6,6 +6,7 @@ import { CreateModuleResult } from '../model/create-module-result';
 import { AudioModuleFactory } from './audio-module-factory';
 import { ModuleImplementation } from './module-implementation';
 import { Subscription } from 'rxjs';
+import { createModuleReadyPromise } from '../module-ready-promise';
 
 @Injectable()
 export class BitCrusherFactory implements AudioModuleFactory {
@@ -21,7 +22,7 @@ export class BitCrusherFactory implements AudioModuleFactory {
     id?: string,
     name?: string,
     wasmModule?: ArrayBuffer
-  ): CreateModuleResult {
+  ): Promise<CreateModuleResult> {
     const moduleType = AudioModuleType.BitCrusher;
     id = createModuleId(moduleType, id);
     const crusher = new AudioWorkletNode(context, 'reactive-synth-bitcrusher', {
@@ -33,6 +34,7 @@ export class BitCrusherFactory implements AudioModuleFactory {
       channelInterpretation: 'speakers'
     });
     crusher.port.postMessage({ type: 'wasm', wasmModule });
+    crusher.port.start();
     const bitDepthParameterKey = 'bit depth';
     const bitDepthParameter = crusher.parameters['get']('bitDepth');
     const volumeControl = context.createGain();
@@ -59,13 +61,15 @@ export class BitCrusherFactory implements AudioModuleFactory {
     };
 
     graph.set(id, moduleImplementation);
-    return new CreateModuleResult(
-      {
-        id,
-        name,
-        moduleType,
-        canDelete: true,
-        helpText: `Maps each sample to a less precise representation imitating an integer with a given number of bits.
+    return createModuleReadyPromise(crusher.port).then(
+      () =>
+        new CreateModuleResult(
+          {
+            id,
+            name,
+            moduleType,
+            canDelete: true,
+            helpText: `Maps each sample to a less precise representation imitating an integer with a given number of bits.
         Fractional bit depth mode tells the module how to deal with cases where bit depth is not a whole number.
         Trve mode rounds down to the nearest whole number
         so it outputs only numbers that would be representable using the given number of bits in real hardware.
@@ -75,50 +79,51 @@ export class BitCrusherFactory implements AudioModuleFactory {
         For example, since a number with 2 bits it can represent 4 values and a number with 3 bits can represent 8 values,
         there are bit depths in between 2 and 3 that can represent 5, 6, and 7 values.
         For best results, the incoming signal should have an amplitude close to 1 (ie. values between -1 and 1).`
-      },
-      [
-        {
-          name: 'input',
-          moduleId: id,
-          sources: []
-        }
-      ],
-      [
-        {
-          name: 'output',
-          moduleId: id
-        }
-      ],
-      [
-        {
-          name: bitDepthParameterKey,
-          moduleId: id,
-          sources: [],
-          maxValue: parameterMax(bitDepthParameter),
-          minValue: parameterMin(bitDepthParameter),
-          stepSize: 0.1,
-          value: bitDepthParameter.defaultValue,
-          canConnectSources: true
-        },
-        {
-          name: 'output gain',
-          moduleId: id,
-          sources: [],
-          maxValue: parameterMax(volumeControl.gain),
-          minValue: parameterMin(volumeControl.gain),
-          stepSize: 0.01,
-          value: defaultGain,
-          canConnectSources: true
-        }
-      ],
-      [
-        {
-          name: 'fractional bit depth mode',
-          moduleId: id,
-          choices: ['quantize-evenly', 'continuous', 'trve'],
-          selection: 'quantize-evenly'
-        }
-      ]
+          },
+          [
+            {
+              name: 'input',
+              moduleId: id,
+              sources: []
+            }
+          ],
+          [
+            {
+              name: 'output',
+              moduleId: id
+            }
+          ],
+          [
+            {
+              name: bitDepthParameterKey,
+              moduleId: id,
+              sources: [],
+              maxValue: parameterMax(bitDepthParameter),
+              minValue: parameterMin(bitDepthParameter),
+              stepSize: 0.1,
+              value: bitDepthParameter.defaultValue,
+              canConnectSources: true
+            },
+            {
+              name: 'output gain',
+              moduleId: id,
+              sources: [],
+              maxValue: parameterMax(volumeControl.gain),
+              minValue: parameterMin(volumeControl.gain),
+              stepSize: 0.01,
+              value: defaultGain,
+              canConnectSources: true
+            }
+          ],
+          [
+            {
+              name: 'fractional bit depth mode',
+              moduleId: id,
+              choices: ['quantize-evenly', 'continuous', 'trve'],
+              selection: 'quantize-evenly'
+            }
+          ]
+        )
     );
   }
 }
