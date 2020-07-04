@@ -18,7 +18,8 @@ import {
   workletUrl,
   bitcrusherWasmUrl,
   inverseGainWasmUrl,
-  noiseGeneratorWasmUrl
+  noiseGeneratorWasmUrl,
+  clockDividerWasmUrl
 } from '../cache-hack/cache';
 import { ModuleImplementation } from './audio-modules/module-implementation';
 import { AUDIO_MODULE_FACTORY, AudioModuleFactory } from './audio-modules/audio-module-factory';
@@ -117,14 +118,16 @@ export class AudioGraphService {
               fetch(this.locationService.prepareExternalUrl(bitcrusherWasmUrl)),
               fetch(this.locationService.prepareExternalUrl(inverseGainWasmUrl)),
               fetch(this.locationService.prepareExternalUrl(noiseGeneratorWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(clockDividerWasmUrl)),
             ])
           )
           .then(wasmResponses => Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer())))
-          .then(([bitcrusherWasmBinary, inverseGainBinary, noiseGeneratorBinary]) => {
+          .then(([bitcrusherWasmBinary, inverseGainBinary, noiseGeneratorBinary, clockDividerBinary]) => {
             this.moduleBinaryMap = new Map([
               [AudioModuleType.InverseGain, inverseGainBinary],
               [AudioModuleType.BitCrusher, bitcrusherWasmBinary],
-              [AudioModuleType.NoiseGenerator, noiseGeneratorBinary]
+              [AudioModuleType.NoiseGenerator, noiseGeneratorBinary],
+              [AudioModuleType.ClockDivider, clockDividerBinary],
             ]);
           })
           .then(() => ({

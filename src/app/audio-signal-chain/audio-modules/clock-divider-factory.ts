@@ -24,11 +24,12 @@ export class ClockDividerFactory implements AudioModuleFactory {
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
-    name?: string
+    name?: string,
+    wasmBinary?: ArrayBuffer
   ): CreateModuleResult {
     const moduleType = AudioModuleType.ClockDivider;
     id = createModuleId(moduleType, id);
-    const clockDividerNode = new AudioWorkletNode(context, 'clock-divider', {
+    const clockDividerNode = new AudioWorkletNode(context, 'reactive-synth-clock-divider', {
       numberOfInputs: 0,
       numberOfOutputs: 1,
       channelCount: 1,
@@ -87,6 +88,7 @@ export class ClockDividerFactory implements AudioModuleFactory {
         .pipe(map((event: ExtensionEvent) => ({ ...event, type: 'manual-reset-trigger' })))
         .subscribe((next: ExtensionEvent) => clockDividerNode.port.postMessage(next))
     );
+    clockDividerNode.port.postMessage({ wasmBinary, type: 'wasm' });
 
     return new CreateModuleResult(
       {

@@ -8,7 +8,7 @@ module.exports = {
   entry: {
     worklets: [
       './src/audio-worklet-processors/envelope-generator.js',
-      './src/audio-worklet-processors/clock-divider.js',
+      './node_modules/reactive-synth-clock-divider/clock-divider.js',
       './node_modules/reactive-synth-noise-generator/noise-generator.js',
       './node_modules/reactive-synth-bitcrusher/bitcrusher.js',
       './node_modules/reactive-synth-inverse-gain/inverse-gain.js'
@@ -36,6 +36,11 @@ module.exports = {
         },
         {
           from: 'node_modules/reactive-synth-noise-generator/reactive_synth_noise_generator.wasm',
+          to: '[name].[contenthash].[ext]',
+          toType: 'template'
+        },
+        {
+          from: 'node_modules/reactive-synth-clock-divider/reactive_synth_clock_divider.wasm',
           to: '[name].[contenthash].[ext]',
           toType: 'template'
         },
