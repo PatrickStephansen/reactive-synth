@@ -8,7 +8,7 @@ module.exports = {
   entry: {
     worklets: [
       './src/audio-worklet-processors/envelope-generator.js',
-      './node_modules/reactive-synth-clock-divider/clock-divider.js',
+      './src/audio-worklet-processors/clock-divider.js',
       './node_modules/reactive-synth-noise-generator/noise-generator.js',
       './node_modules/reactive-synth-bitcrusher/bitcrusher.js',
       './node_modules/reactive-synth-inverse-gain/inverse-gain.js'
