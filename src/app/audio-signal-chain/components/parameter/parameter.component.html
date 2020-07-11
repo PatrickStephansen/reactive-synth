@@ -18,10 +18,10 @@
             id="input-{{ parameter.moduleId }}-{{ parameter.name | stripSpaces }}"
             required
             [step]="parameter.stepSize"
-            [appMin]="parameter.minValue"
-            [appMax]="parameter.maxValue"
             [attr.min]="parameter.minValue"
             [attr.max]="parameter.maxValue"
+            [appMin]="parameter.minValue"
+            [appMax]="parameter.maxValue"
             type="number"
             [ngClass]="{ 'is-danger': parameterValue?.errors, input: true }"
             [ngModel]="parameter.value"
@@ -76,7 +76,7 @@
         </div>
       </div>
     </div>
-    <div class="validation-errors has-text-danger" *ngIf="parameterValue.invalid">
+    <div class="validation-errors has-text-danger" *ngIf="isParameterInvalid()">
       {{ parameter.name }} must be a number between {{ parameter.minValue }} and
       {{ parameter.maxValue }}
     </div>
