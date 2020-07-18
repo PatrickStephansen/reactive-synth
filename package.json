@@ -13,7 +13,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deploy": "npm run build && gh-pages -d dist/reactive-synth",
-    "postinstall": "ngcc && npm link reactive-synth-bitcrusher && npm link reactive-synth-inverse-gain && npm link reactive-synth-noise-generator && npm link reactive-synth-clock-divider"
+    "postinstall": "ngcc && npm link reactive-synth-bitcrusher && npm link reactive-synth-inverse-gain && npm link reactive-synth-noise-generator && npm link reactive-synth-clock-divider && npm link reactive-synth-envelope-generator"
   },
   "description": "A modular syth made as an exercise to learn ng-rx",
   "homepage": "https://PatrickStephansen.github.io/reactive-synth",
