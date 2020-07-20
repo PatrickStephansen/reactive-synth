@@ -1,5 +1,6 @@
 import { AudioSignalChainState } from './audio-signal-chain.state';
 import { ViewMode } from '../model/view-mode';
+import { audioSignalChainSchemaV1 } from './audio-signal-chain-schema';
 
 const appendDefaultTicksAfterResetParameter = state =>
   state.parameters.some(p => p.name === 'ticks on reset')
@@ -23,6 +24,7 @@ const appendDefaultTicksAfterResetParameter = state =>
 export const upgradeAudioChainStateVersion = (state, version: number): AudioSignalChainState => {
   switch (version) {
     case 1:
+      audioSignalChainSchemaV1.validateSync(state);
       const upgradedState = {
         errors: [],
         muted: true,

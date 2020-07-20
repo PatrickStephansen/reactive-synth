@@ -411,7 +411,7 @@ export class AudioGraphService {
           ...input,
           sources: [
             ...input.sources,
-            ...graphState.inputs.find(i => i.moduleId === input.moduleId && i.name === input.name)
+            ...graphState.inputs?.find(i => i.moduleId === input.moduleId && i.name === input.name)
               ?.sources
           ]
         })),
