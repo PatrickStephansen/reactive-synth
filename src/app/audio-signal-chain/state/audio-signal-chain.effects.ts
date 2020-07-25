@@ -82,7 +82,13 @@ export class AudioSignalChainEffects implements OnInitEffects {
     ofType(AudioSignalChainActionTypes.LoadSignalChainState),
     mergeMap(({ signalChain }) =>
       from(this.graphService.loadState(signalChain)).pipe(
-        map(newState => audioSignalActions.resetSignalChainSuccess({ signalChain: newState })),
+        mergeMap(newState => {
+          const actions = [audioSignalActions.resetSignalChainSuccess({ signalChain: newState })] as Action[];
+          if (newState.muted) {
+            actions.push(audioSignalActions.toggleSignalChainActive({ isActive: true }));
+          }
+          return actions;
+        }),
         this.handleSignalChainChangeError
       )
     )
@@ -246,7 +252,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect()
   toggleSignalChainActive$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ToggleSignalChainActive),
-    concatMap(({ isActive }) => {
+    mergeMap(({ isActive }) => {
       const servicePromise = isActive ? this.graphService.unmute() : this.graphService.mute();
 
       return from(servicePromise).pipe(

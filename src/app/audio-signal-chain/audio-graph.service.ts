@@ -400,8 +400,6 @@ export class AudioGraphService {
       this.makeChoice(param.moduleId, param.name, param.selection)
     );
 
-    await this.unmute();
-
     return {
       modules: resetState.modules.concat(newModules.flatMap(m => m?.module).filter(identity)),
       errors,
