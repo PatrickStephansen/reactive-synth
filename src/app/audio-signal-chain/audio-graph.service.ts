@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Location } from '@angular/common';
-import { isNil, last } from 'ramda';
+import { identity, isNil, last } from 'ramda';
 import { AudioContext, IAudioParam } from 'standardized-audio-context';
 
 import { AudioSignalChainState } from './state/audio-signal-chain.state';
@@ -14,7 +14,14 @@ import { AudioModuleType } from './model/audio-module-type';
 import { CreateModuleResult } from './model/create-module-result';
 import { ConnectModulesEvent } from './model/connect-modules-event';
 import { Subscription } from 'rxjs';
-import { workletUrl } from '../cache-hack/cache';
+import {
+  workletUrl,
+  bitcrusherWasmUrl,
+  inverseGainWasmUrl,
+  noiseGeneratorWasmUrl,
+  clockDividerWasmUrl,
+  envelopeGeneratorWasmUrl
+} from '../cache-hack/cache';
 import { ModuleImplementation } from './audio-modules/module-implementation';
 import { AUDIO_MODULE_FACTORY, AudioModuleFactory } from './audio-modules/audio-module-factory';
 import { ViewMode } from './model/view-mode';
@@ -32,6 +39,7 @@ export class AudioGraphService {
 
   private moduleFactoryMap: Map<AudioModuleType, AudioModuleFactory>;
   private subscriptions: Subscription[] = [];
+  private moduleBinaryMap: Map<AudioModuleType, WebAssembly.Module>;
 
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
@@ -106,6 +114,35 @@ export class AudioGraphService {
         ]);
         return this.context.audioWorklet
           .addModule(this.locationService.prepareExternalUrl(workletUrl))
+          .then(() =>
+            Promise.all([
+              fetch(this.locationService.prepareExternalUrl(bitcrusherWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(inverseGainWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(noiseGeneratorWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(clockDividerWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(envelopeGeneratorWasmUrl)),
+            ])
+          )
+          .then(wasmResponses =>
+            Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer().then(WebAssembly.compile)))
+          )
+          .then(
+            ([
+              bitcrusherWasmBinary,
+              inverseGainBinary,
+              noiseGeneratorBinary,
+              clockDividerBinary,
+              envelopeGeneratorBinary
+            ]) => {
+              this.moduleBinaryMap = new Map([
+                [AudioModuleType.InverseGain, inverseGainBinary],
+                [AudioModuleType.BitCrusher, bitcrusherWasmBinary],
+                [AudioModuleType.NoiseGenerator, noiseGeneratorBinary],
+                [AudioModuleType.ClockDivider, clockDividerBinary],
+                [AudioModuleType.EnvelopeGenerator, envelopeGeneratorBinary]
+              ]);
+            }
+          )
           .then(() => ({
             modules: [
               {
@@ -168,22 +205,29 @@ export class AudioGraphService {
       });
   }
 
-  createModule(moduleType: AudioModuleType, id?: string, name?: string): CreateModuleResult {
+  createModule(
+    moduleType: AudioModuleType,
+    id?: string,
+    name?: string
+  ): Promise<CreateModuleResult> {
     const matchingFactory = this.moduleFactoryMap.get(moduleType);
     if (matchingFactory) {
-      return matchingFactory.CreateAudioModule(
-        this.context,
-        this.graph,
-        this.defaultGain,
-        this.parameterMax,
-        this.parameterMin,
-        this.createModuleId,
-        this.subscriptions,
-        id,
-        name
+      return Promise.resolve(
+        matchingFactory.CreateAudioModule(
+          this.context,
+          this.graph,
+          this.defaultGain,
+          this.parameterMax,
+          this.parameterMin,
+          this.createModuleId,
+          this.subscriptions,
+          id,
+          name,
+          this.moduleBinaryMap.get(moduleType)
+        )
       );
     }
-    return null;
+    return Promise.resolve(null);
   }
 
   connectModules({
@@ -308,5 +352,103 @@ export class AudioGraphService {
       });
       this.graph.delete(moduleId);
     }
+  }
+
+  async loadState(graphState: AudioSignalChainState): Promise<AudioSignalChainState> {
+    const errors = [];
+    let errorMessageId = 1;
+    const createError = e => ({
+      id: `signal-chain-error-${errorMessageId++}`,
+      errorMessage: e.toString()
+    });
+    const resetState = await this.resetGraph(
+      graphState.modules.find(module => module.id === 'Output to Speakers')?.name
+    );
+    await this.mute();
+    const newModules: CreateModuleResult[] = await Promise.all(
+      graphState.modules.map(m =>
+        this.createModule(m.moduleType, m.id, m.name).catch(e => {
+          errors.push(createError(e));
+          return null;
+        })
+      )
+    );
+    graphState.inputs.forEach(input =>
+      input.sources.forEach(source => {
+        this.connectModules({
+          sourceId: source.moduleId,
+          sourceOutputName: source.name,
+          destinationId: input.moduleId,
+          destinationInputName: input.name
+        });
+      })
+    );
+    graphState.parameters.forEach(param =>
+      param.sources.forEach(source => {
+        this.connectParameter({
+          sourceModuleId: source.moduleId,
+          sourceOutputName: source.name,
+          destinationModuleId: param.moduleId,
+          destinationParameterName: param.name
+        });
+      })
+    );
+    graphState.parameters.forEach(param =>
+      this.changeParameterValue(param.moduleId, param.name, param.value, true)
+    );
+    graphState.choiceParameters.forEach(param =>
+      this.makeChoice(param.moduleId, param.name, param.selection)
+    );
+
+    return {
+      modules: resetState.modules.concat(newModules.flatMap(m => m?.module).filter(identity)),
+      errors,
+      inputs: resetState.inputs
+        .concat(newModules.flatMap(m => m?.inputs).filter(identity))
+        .map(input => ({
+          ...input,
+          sources: [
+            ...input.sources,
+            ...graphState.inputs?.find(i => i.moduleId === input.moduleId && i.name === input.name)
+              ?.sources
+          ]
+        })),
+      viewMode: resetState.viewMode,
+      muted: this.context.state === 'suspended',
+      outputs: newModules.flatMap(m => m?.outputs).filter(identity),
+      parameters: newModules
+        .flatMap(m => m?.parameters)
+        .filter(identity)
+        .map(param => ({
+          ...param,
+          sources: [
+            ...param.sources,
+            ...graphState.parameters.find(
+              p => p.moduleId === param.moduleId && p.name === param.name
+            )?.sources
+          ],
+          minShownValue: graphState.parameters.find(
+            p => p.moduleId === param.moduleId && p.name === param.name
+          )?.minShownValue,
+          maxShownValue: graphState.parameters.find(
+            p => p.moduleId === param.moduleId && p.name === param.name
+          )?.maxShownValue,
+          value: graphState.parameters.find(
+            p => p.moduleId === param.moduleId && p.name === param.name
+          )?.value
+        })),
+      choiceParameters: newModules
+        .flatMap(m => m?.choiceParameters)
+        .filter(identity)
+        .map(choice => ({
+          ...choice,
+          selection: graphState.choiceParameters.find(
+            c => c.moduleId === choice.moduleId && c.name === choice.name
+          )?.selection
+        })),
+      // this will need revision when more visuals are added
+      visualizations: resetState.visualizations,
+      activeControlSurfaceId: resetState.activeControlSurfaceId
+    };
   }
 }

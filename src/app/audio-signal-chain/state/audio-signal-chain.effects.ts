@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Location } from '@angular/common';
 import { Actions, Effect, ofType, OnInitEffects } from '@ngrx/effects';
 import { Store, select, Action } from '@ngrx/store';
-import { from, Observable, of, OperatorFunction } from 'rxjs';
+import { from, Observable, of, OperatorFunction, defer } from 'rxjs';
 import { mergeMap, map, catchError, tap, filter, debounceTime, concatMap } from 'rxjs/operators';
 import { compose, flatten, head, isNil, last, not, path } from 'ramda';
 
@@ -80,91 +80,14 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect()
   loadSignalChainState$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.LoadSignalChainState),
-    mergeMap(({ signalChain }: { signalChain: AudioSignalChainState }) =>
-      from(
-        this.graphService.resetGraph(
-          signalChain.modules.find(module => module.id === 'Output to Speakers').name
-        )
-      ).pipe(
-        map(newState => audioSignalActions.resetSignalChainSuccess({ signalChain: newState })),
-        mergeMap(resetSuccess => {
-          const events = [
-            audioSignalActions.toggleSignalChainActive({ isActive: false }),
-            resetSuccess,
-            ...signalChain.modules.map((audioModule: AudioModule) =>
-              audioSignalActions.createModule({
-                module: new CreateModuleEvent(
-                  audioModule.moduleType,
-                  audioModule.id,
-                  audioModule.name
-                )
-              })
-            ),
-            ...flatten(
-              signalChain.inputs.map(input =>
-                input.sources.map(source =>
-                  audioSignalActions.connectModules({
-                    connection: {
-                      sourceId: source.moduleId,
-                      sourceOutputName: source.name,
-                      destinationId: input.moduleId,
-                      destinationInputName: input.name
-                    }
-                  })
-                )
-              )
-            ),
-            ...flatten(
-              signalChain.parameters.map(parameter =>
-                parameter.sources.map(source =>
-                  audioSignalActions.connectParameter({
-                    connection: {
-                      sourceModuleId: source.moduleId,
-                      sourceOutputName: source.name,
-                      destinationModuleId: parameter.moduleId,
-                      destinationParameterName: parameter.name
-                    }
-                  })
-                )
-              )
-            ),
-            ...signalChain.parameters.map(parameter =>
-              audioSignalActions.changeParameter({
-                parameter: {
-                  moduleId: parameter.moduleId,
-                  parameterName: parameter.name,
-                  value: parameter.value,
-                  setImmediately: true
-                }
-              })
-            ),
-            ...signalChain.parameters
-              .filter(
-                parameter =>
-                  parameter.minShownValue !== undefined || parameter.maxShownValue !== undefined
-              )
-              .map(parameter =>
-                audioSignalActions.changeParameterBounds({
-                  change: {
-                    moduleId: parameter.moduleId,
-                    parameterName: parameter.name,
-                    newMinValue: parameter.minShownValue,
-                    newMaxValue: parameter.maxShownValue
-                  }
-                })
-              ),
-            ...signalChain.choiceParameters.map(parameter =>
-              audioSignalActions.changeChoiceParameter({
-                choice: {
-                  moduleId: parameter.moduleId,
-                  parameterName: parameter.name,
-                  value: parameter.selection
-                }
-              })
-            ),
-            audioSignalActions.toggleSignalChainActive({ isActive: true })
-          ];
-          return from(events);
+    mergeMap(({ signalChain }) =>
+      from(this.graphService.loadState(signalChain)).pipe(
+        mergeMap(newState => {
+          const actions = [audioSignalActions.resetSignalChainSuccess({ signalChain: newState })] as Action[];
+          if (newState.muted) {
+            actions.push(audioSignalActions.toggleSignalChainActive({ isActive: true }));
+          }
+          return actions;
         }),
         this.handleSignalChainChangeError
       )
@@ -175,14 +98,8 @@ export class AudioSignalChainEffects implements OnInitEffects {
   CreateModule$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.CreateModule),
     mergeMap(({ module }: { module: CreateModuleEvent }) =>
-      of(() => this.graphService.createModule(module.moduleType, module.id, module.name)).pipe(
-        map(serviceMethod => serviceMethod()),
-        filter(
-          compose(
-            not,
-            isNil
-          )
-        ),
+      defer(() => this.graphService.createModule(module.moduleType, module.id, module.name)).pipe(
+        filter(compose(not, isNil)),
         mergeMap((result: CreateModuleResult) =>
           from([
             audioSignalActions.createModuleSuccess({ module: result.module }),
@@ -335,7 +252,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
   @Effect()
   toggleSignalChainActive$: Observable<Action> = this.actions$.pipe(
     ofType(AudioSignalChainActionTypes.ToggleSignalChainActive),
-    concatMap(({ isActive }) => {
+    mergeMap(({ isActive }) => {
       const servicePromise = isActive ? this.graphService.unmute() : this.graphService.mute();
 
       return from(servicePromise).pipe(

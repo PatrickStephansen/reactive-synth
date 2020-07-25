@@ -31,7 +31,7 @@ export class ParameterComponent implements OnInit {
   addInputsId: string;
   isSourceListOpen = false;
   parameterChanged = new EventEmitter<number>();
-  @ViewChild('parameterValue', { static: true })
+  @ViewChild('parameterValue', { static: false })
   parameterFormValue;
   @ViewChild('dropdown', { static: false })
   dropdown;
@@ -96,5 +96,9 @@ export class ParameterComponent implements OnInit {
 
   getExtensionType(index, extension) {
     return extension.type;
+  }
+
+  isParameterInvalid() {
+    return this.parameterFormValue?.invalid;
   }
 }
