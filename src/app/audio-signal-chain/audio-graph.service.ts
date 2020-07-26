@@ -409,8 +409,8 @@ export class AudioGraphService {
           ...input,
           sources: [
             ...input.sources,
-            ...graphState.inputs?.find(i => i.moduleId === input.moduleId && i.name === input.name)
-              ?.sources
+            ...(graphState.inputs?.find(i => i.moduleId === input.moduleId && i.name === input.name)
+              ?.sources ?? [])
           ]
         })),
       viewMode: resetState.viewMode,
@@ -423,9 +423,9 @@ export class AudioGraphService {
           ...param,
           sources: [
             ...param.sources,
-            ...graphState.parameters.find(
+            ...(graphState.parameters.find(
               p => p.moduleId === param.moduleId && p.name === param.name
-            )?.sources
+            )?.sources ?? [])
           ],
           minShownValue: graphState.parameters.find(
             p => p.moduleId === param.moduleId && p.name === param.name

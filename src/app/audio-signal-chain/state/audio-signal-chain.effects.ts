@@ -36,6 +36,7 @@ export class AudioSignalChainEffects implements OnInitEffects {
 
   private handleSignalChainChangeError: OperatorFunction<any, Action> = catchError(error => {
     const errorMessage = error.message || error;
+    console.error(error);
     return of(
       audioSignalActions.addError({
         error: {
