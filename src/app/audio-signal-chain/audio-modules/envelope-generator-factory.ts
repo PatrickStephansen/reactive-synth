@@ -25,7 +25,7 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
     subscriptions: Subscription[],
     id?: string,
     name?: string,
-    wasmModule?: WebAssembly.Module
+    wasmModule?: ArrayBuffer
   ): Promise<CreateModuleResult> {
     try {
       const moduleType = AudioModuleType.EnvelopeGenerator;

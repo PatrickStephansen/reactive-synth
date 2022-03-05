@@ -39,7 +39,7 @@ export class AudioGraphService {
 
   private moduleFactoryMap: Map<AudioModuleType, AudioModuleFactory>;
   private subscriptions: Subscription[] = [];
-  private moduleBinaryMap: Map<AudioModuleType, WebAssembly.Module>;
+  private moduleBinaryMap: Map<AudioModuleType, ArrayBuffer>;
 
   private parameterMax(parameter: IAudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
@@ -124,7 +124,7 @@ export class AudioGraphService {
             ])
           )
           .then(wasmResponses =>
-            Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer().then(WebAssembly.compile)))
+            Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer()))
           )
           .then(
             ([
