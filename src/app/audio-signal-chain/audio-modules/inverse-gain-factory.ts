@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { IAudioContext, IAudioParam, AudioWorkletNode } from 'standardized-audio-context';
 
 import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
@@ -12,11 +11,11 @@ import { createModuleReadyPromise } from '../module-ready-promise';
 export class InverseGainFactory implements AudioModuleFactory {
   ModuleType = AudioModuleType.InverseGain;
   CreateAudioModule(
-    context: IAudioContext,
+    context: AudioContext,
     graph: Map<string, ModuleImplementation>,
     defaultGain: number,
-    parameterMax: (parameter: IAudioParam) => number,
-    parameterMin: (parameter: IAudioParam) => number,
+    parameterMax: (parameter: AudioParam) => number,
+    parameterMin: (parameter: AudioParam) => number,
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
@@ -41,8 +40,8 @@ export class InverseGainFactory implements AudioModuleFactory {
       inputMap: new Map([['input', inverseGain]]),
       outputMap: new Map([['output', inverseGain]]),
       parameterMap: new Map([
-        [divisorParameterKey, inverseGain.parameters.get('divisor')],
-        [fallBackValueKey, inverseGain.parameters.get('zeroDivisorFallback')]
+        [divisorParameterKey, inverseGain.parameters['get']('divisor')],
+        [fallBackValueKey, inverseGain.parameters['get']('zeroDivisorFallback')]
       ])
     };
     inverseGain.port.postMessage({ wasmModule, type: 'wasm' });
@@ -79,20 +78,20 @@ export class InverseGainFactory implements AudioModuleFactory {
               name: divisorParameterKey,
               moduleId: id,
               sources: [],
-              maxValue: parameterMax(inverseGain.parameters.get('divisor')),
-              minValue: parameterMin(inverseGain.parameters.get('divisor')),
+              maxValue: parameterMax(inverseGain.parameters['get']('divisor')),
+              minValue: parameterMin(inverseGain.parameters['get']('divisor')),
               stepSize: 0.01,
-              value: inverseGain.parameters.get('divisor').value,
+              value: inverseGain.parameters['get']('divisor').value,
               canConnectSources: true
             },
             {
               name: fallBackValueKey,
               moduleId: id,
               sources: [],
-              maxValue: parameterMax(inverseGain.parameters.get('zeroDivisorFallback')),
-              minValue: parameterMin(inverseGain.parameters.get('zeroDivisorFallback')),
+              maxValue: parameterMax(inverseGain.parameters['get']('zeroDivisorFallback')),
+              minValue: parameterMin(inverseGain.parameters['get']('zeroDivisorFallback')),
               stepSize: 0.01,
-              value: inverseGain.parameters.get('zeroDivisorFallback').value,
+              value: inverseGain.parameters['get']('zeroDivisorFallback').value,
               canConnectSources: true
             }
           ],

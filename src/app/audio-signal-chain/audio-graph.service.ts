@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { identity, isNil, last } from 'ramda';
-import { AudioContext, IAudioParam } from 'standardized-audio-context';
 
 import { AudioSignalChainState } from './state/audio-signal-chain.state';
 import { ConnectParameterEvent } from './model/connect-parameter-event';
@@ -41,11 +40,11 @@ export class AudioGraphService {
   private subscriptions: Subscription[] = [];
   private moduleBinaryMap: Map<AudioModuleType, ArrayBuffer>;
 
-  private parameterMax(parameter: IAudioParam) {
+  private parameterMax(parameter: AudioParam) {
     return Math.min(parameter.maxValue, 1000000000);
   }
 
-  private parameterMin(parameter: IAudioParam) {
+  private parameterMin(parameter: AudioParam) {
     return Math.max(parameter.minValue, -1000000000);
   }
 

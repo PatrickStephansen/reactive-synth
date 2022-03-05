@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { IAudioContext, IAudioParam, AudioWorkletNode } from 'standardized-audio-context';
 
 import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
@@ -12,11 +11,11 @@ import { createModuleReadyPromise } from '../module-ready-promise';
 export class BitCrusherFactory implements AudioModuleFactory {
   ModuleType = AudioModuleType.BitCrusher;
   CreateAudioModule(
-    context: IAudioContext,
+    context: AudioContext,
     graph: Map<string, ModuleImplementation>,
     defaultGain: number,
-    parameterMax: (parameter: IAudioParam) => number,
-    parameterMin: (parameter: IAudioParam) => number,
+    parameterMax: (parameter: AudioParam) => number,
+    parameterMin: (parameter: AudioParam) => number,
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,

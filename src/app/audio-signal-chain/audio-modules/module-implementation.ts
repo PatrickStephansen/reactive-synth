@@ -1,9 +1,7 @@
-import { IAudioNode, IAudioParam } from 'standardized-audio-context';
-
 export interface ModuleImplementation {
-  internalNodes: IAudioNode[];
-  inputMap?: Map<string, IAudioNode>;
-  outputMap?: Map<string, IAudioNode>;
-  parameterMap?: Map<string, IAudioParam>;
+  internalNodes: AudioNode[];
+  inputMap?: Map<string, AudioNode>;
+  outputMap?: Map<string, AudioNode>;
+  parameterMap?: Map<string, AudioParam>;
   choiceMap?: Map<string, (newValue: string) => void>;
 }

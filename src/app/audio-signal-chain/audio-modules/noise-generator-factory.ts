@@ -1,5 +1,4 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { IAudioContext, IAudioParam, AudioWorkletNode } from 'standardized-audio-context';
 
 import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
@@ -16,11 +15,11 @@ import { createModuleReadyPromise } from '../module-ready-promise';
 export class NoiseGeneratorFactory implements AudioModuleFactory {
   ModuleType = AudioModuleType.NoiseGenerator;
   CreateAudioModule(
-    context: IAudioContext,
+    context: AudioContext,
     graph: Map<string, ModuleImplementation>,
     defaultGain: number,
-    parameterMax: (parameter: IAudioParam) => number,
-    parameterMin: (parameter: IAudioParam) => number,
+    parameterMax: (parameter: AudioParam) => number,
+    parameterMin: (parameter: AudioParam) => number,
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
@@ -37,10 +36,10 @@ export class NoiseGeneratorFactory implements AudioModuleFactory {
       outputChannelCount: [1],
       channelInterpretation: 'speakers'
     });
-    const stepMin = noiseGeneratorNode.parameters.get('stepMin');
-    const stepMax = noiseGeneratorNode.parameters.get('stepMax');
-    const sampleHold = noiseGeneratorNode.parameters.get('sampleHold');
-    const nextValueTrigger = noiseGeneratorNode.parameters.get('nextValueTrigger');
+    const stepMin = noiseGeneratorNode.parameters['get']('stepMin');
+    const stepMax = noiseGeneratorNode.parameters['get']('stepMax');
+    const sampleHold = noiseGeneratorNode.parameters['get']('sampleHold');
+    const nextValueTrigger = noiseGeneratorNode.parameters['get']('nextValueTrigger');
     const volumeControl = context.createGain();
     volumeControl.gain.value = defaultGain;
     noiseGeneratorNode.connect(volumeControl);

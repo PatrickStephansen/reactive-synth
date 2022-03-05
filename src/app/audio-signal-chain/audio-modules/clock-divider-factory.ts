@@ -1,5 +1,4 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { IAudioContext, IAudioParam, AudioWorkletNode } from 'standardized-audio-context';
 
 import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
@@ -17,11 +16,11 @@ import { createModuleReadyPromise } from '../module-ready-promise';
 export class ClockDividerFactory implements AudioModuleFactory {
   ModuleType = AudioModuleType.ClockDivider;
   CreateAudioModule(
-    context: IAudioContext,
+    context: AudioContext,
     graph: Map<string, ModuleImplementation>,
     defaultGain: number,
-    parameterMax: (parameter: IAudioParam) => number,
-    parameterMin: (parameter: IAudioParam) => number,
+    parameterMax: (parameter: AudioParam) => number,
+    parameterMin: (parameter: AudioParam) => number,
     createModuleId: (moduleType: string, id?: string) => string,
     subscriptions: Subscription[],
     id?: string,
@@ -38,12 +37,12 @@ export class ClockDividerFactory implements AudioModuleFactory {
       outputChannelCount: [1]
     });
 
-    const clockTrigger = clockDividerNode.parameters.get('clockTrigger');
-    const resetTrigger = clockDividerNode.parameters.get('resetTrigger');
-    const attackAfterTicks = clockDividerNode.parameters.get('attackAfterTicks');
-    const releaseAfterTocks = clockDividerNode.parameters.get('releaseAfterTocks');
-    const ticksOnReset = clockDividerNode.parameters.get('ticksOnReset');
-    const tocksOnReset = clockDividerNode.parameters.get('tocksOnReset');
+    const clockTrigger = clockDividerNode.parameters['get']('clockTrigger');
+    const resetTrigger = clockDividerNode.parameters['get']('resetTrigger');
+    const attackAfterTicks = clockDividerNode.parameters['get']('attackAfterTicks');
+    const releaseAfterTocks = clockDividerNode.parameters['get']('releaseAfterTocks');
+    const ticksOnReset = clockDividerNode.parameters['get']('ticksOnReset');
+    const tocksOnReset = clockDividerNode.parameters['get']('tocksOnReset');
 
     const outputGain = context.createGain();
     outputGain.gain.value = defaultGain;
