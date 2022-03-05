@@ -10,7 +10,7 @@ module.exports = api => {
         [
           'env',
           {
-            modules: false,
+            modules: 'commonjs',
             targets: {
               node: 'current'
             }
@@ -22,7 +22,7 @@ module.exports = api => {
         test: {
           // since jest runs in node, it only understands commonjs modules
           plugins: [
-            'transform-es2015-modules-commonjs',
+            '@babel/plugin-transform-modules-commonjs',
             [
               '@babel/plugin-proposal-decorators',
               {
