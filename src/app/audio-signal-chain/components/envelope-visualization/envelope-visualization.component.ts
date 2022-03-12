@@ -4,11 +4,12 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges
 } from '@angular/core';
-import { animationFrameScheduler, filter, interval, Observable } from 'rxjs';
+import { animationFrameScheduler, filter, interval, Observable, Subscription } from 'rxjs';
 import { ChangeVisualizationActiveEvent } from '../../model/visualization/change-visualization-active-event';
 import { Visualization } from '../../model/visualization/visualization';
 
@@ -18,7 +19,7 @@ import { Visualization } from '../../model/visualization/visualization';
   styleUrls: ['./envelope-visualization.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EnvelopeVisualizationComponent implements OnInit, OnChanges {
+export class EnvelopeVisualizationComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   visualization: Visualization;
 
@@ -36,10 +37,17 @@ export class EnvelopeVisualizationComponent implements OnInit, OnChanges {
   };
   hideCanvas: boolean;
   visualizationData$: Observable<Object>;
+  subscriptions = new Array<Subscription>();
+
   constructor() {}
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
   ngOnInit(): void {
-    this.visualizationData$ = this.visualization.createVisualizationPipeline(
-      interval(0, animationFrameScheduler).pipe(filter(() => !this.hideCanvas))
+    this.subscriptions.push(
+      interval(0, animationFrameScheduler)
+        .pipe(filter(() => !this.hideCanvas))
+        .subscribe(() => this.visualization.nextFrameEventEmitter.emit())
     );
   }
 
@@ -61,25 +69,16 @@ export class EnvelopeVisualizationComponent implements OnInit, OnChanges {
       this.toggleVisualizationActive();
     }
   }
-  getEnvelopeTime({stage, parameters, stageProgress}) {
+  getEnvelopeTime({ stage, parameters, stageProgress }) {
     switch (stage) {
       case 'attack':
         return parameters.attackTime * stageProgress;
       case 'hold':
         return parameters.attackTime + parameters.holdTime * stageProgress;
       case 'decay':
-        return (
-          parameters.attackTime +
-          parameters.holdTime +
-          parameters.decayTime * stageProgress
-        );
+        return parameters.attackTime + parameters.holdTime + parameters.decayTime * stageProgress;
       case 'sustain':
-        return (
-          parameters.attackTime +
-          parameters.holdTime +
-          parameters.decayTime +
-          stageProgress
-        );
+        return parameters.attackTime + parameters.holdTime + parameters.decayTime + stageProgress;
       case 'release':
         return (
           parameters.attackTime +

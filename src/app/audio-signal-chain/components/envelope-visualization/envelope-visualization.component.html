@@ -3,7 +3,7 @@
     {{ visualization.name | titlecase }}
   </div>
 </h4>
-<div [ngClass]="{ 'is-hidden': hideCanvas }" *ngIf="visualizationData$ | async as envelopeState">
+<div [ngClass]="{ 'is-hidden': hideCanvas }" *ngIf="visualization.visualizationData$ | async as envelopeState">
   <svg:svg
     version="1.2"
     class="envelop-visualization"

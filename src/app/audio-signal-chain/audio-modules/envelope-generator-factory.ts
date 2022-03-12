@@ -1,16 +1,16 @@
-import { Injectable, EventEmitter } from '@angular/core';
-
+import { EventEmitter, Injectable } from '@angular/core';
+import { map, Subscription } from 'rxjs';
+import { frameRateLimit } from '../frame-rate-limit';
 import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
-import { AudioModuleFactory } from './audio-module-factory';
-import { ModuleImplementation } from './module-implementation';
-import { map, Subscription } from 'rxjs';
-import { observableFromMessagePort } from '../observable-from-message-port';
-import { frameRateLimit } from '../frame-rate-limit';
 import { ExtensionEvent } from '../model/extension-event';
+import { ModuleSignalStage } from '../model/module-signal-stage';
 import { TriggerExtension } from '../model/trigger-extension';
 import { createModuleReadyPromise } from '../module-ready-promise';
-import { ModuleSignalStage } from '../model/module-signal-stage';
+import { observableFromMessagePort } from '../observable-from-message-port';
+import { AudioModuleFactory } from './audio-module-factory';
+import { ModuleImplementation } from './module-implementation';
+
 
 @Injectable()
 export class EnvelopeGeneratorFactory implements AudioModuleFactory {
@@ -78,22 +78,17 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
       envelopeGeneratorNode.port.start();
 
       const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
+      const nextVisualizationFrameEventEmitter = new EventEmitter<void>();
 
-      const visualizationState = {
-        stage: 0,
-        stageProgress: 0,
-        outputValue: 0,
-        attackValue: attackValue.value,
-        attackTime: attackTime.value,
-        holdTime: holdTime.value,
-        decayTime: decayTime.value,
-        sustainValue: sustainValue.value,
-        releaseTime: releaseTime.value
-      };
-      const stateUpdates = observableFromMessagePort(envelopeGeneratorNode.port, 'state').pipe(map(message => message.state));
+      const stateUpdates = observableFromMessagePort(envelopeGeneratorNode.port, 'state').pipe(
+        map(message => message.state)
+      );
       subscriptions.push(
         manualTriggerEventEmitter.subscribe((next: ExtensionEvent) =>
           envelopeGeneratorNode.port.postMessage(next)
+        ),
+        nextVisualizationFrameEventEmitter.subscribe(() =>
+          envelopeGeneratorNode.port.postMessage({ type: 'get-state' })
         )
       );
 
@@ -225,14 +220,12 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [],
                 getVisualizationData: () => {
-                  console.error('This function should not be used: getVisualizationData() on envelope state visualizer.');
-                },
-                createVisualizationPipeline: getNextFrame$ => {
-                  getNextFrame$.subscribe(() =>
-                    envelopeGeneratorNode.port.postMessage({ type: 'get-state' })
+                  console.error(
+                    'This function should not be used: getVisualizationData() on envelope state visualizer.'
                   );
-                  return stateUpdates;
-                }
+                },
+                visualizationData$: stateUpdates,
+                nextFrameEventEmitter: nextVisualizationFrameEventEmitter
               }
             ]
           )

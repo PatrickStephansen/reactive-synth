@@ -119,12 +119,10 @@ export class AudioGraphService {
               fetch(this.locationService.prepareExternalUrl(inverseGainWasmUrl)),
               fetch(this.locationService.prepareExternalUrl(noiseGeneratorWasmUrl)),
               fetch(this.locationService.prepareExternalUrl(clockDividerWasmUrl)),
-              fetch(this.locationService.prepareExternalUrl(envelopeGeneratorWasmUrl)),
+              fetch(this.locationService.prepareExternalUrl(envelopeGeneratorWasmUrl))
             ])
           )
-          .then(wasmResponses =>
-            Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer()))
-          )
+          .then(wasmResponses => Promise.all(wasmResponses.map(wasm => wasm.arrayBuffer())))
           .then(
             ([
               bitcrusherWasmBinary,
@@ -175,8 +173,7 @@ export class AudioGraphService {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
                 isActive: true,
-                getVisualizationData: data => visualizer.getByteTimeDomainData(data),
-                createVisualizationPipeline: identity
+                getVisualizationData: data => visualizer.getByteTimeDomainData(data)
               },
               {
                 moduleId: 'Output to Speakers',
@@ -186,8 +183,7 @@ export class AudioGraphService {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [logarithmicScalingStrategy, linearScalingStrategy],
                 isActive: false,
-                getVisualizationData: data => visualizer.getByteFrequencyData(data),
-                createVisualizationPipeline: identity
+                getVisualizationData: data => visualizer.getByteFrequencyData(data)
               },
               {
                 moduleId: 'Output to Speakers',
@@ -197,8 +193,7 @@ export class AudioGraphService {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
                 isActive: false,
-                getVisualizationData: data => visualizer.getByteFrequencyData(data),
-                createVisualizationPipeline: identity
+                getVisualizationData: data => visualizer.getByteFrequencyData(data)
               }
             ],
             muted: this.context.state && this.context.state === 'suspended',
@@ -449,7 +444,10 @@ export class AudioGraphService {
           )?.selection
         })),
       // this will need revision when more visuals are added
-      visualizations: [...resetState.visualizations, ...newModules.flatMap(m => m?.visualizations).filter(identity)],
+      visualizations: [
+        ...resetState.visualizations,
+        ...newModules.flatMap(m => m?.visualizations).filter(identity)
+      ],
       activeControlSurfaceId: resetState.activeControlSurfaceId
     };
   }

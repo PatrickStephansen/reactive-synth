@@ -1,3 +1,4 @@
+import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ModuleSignalStage } from '../module-signal-stage';
 import { ScalingStrategy } from './scaling-strategy';
@@ -10,7 +11,8 @@ export interface Visualization {
   visualizationType: string;
   renderingStrategyPerAxis: ScalingStrategy[];
   isActive: boolean;
-  // move towards this - it makes more sense
-  createVisualizationPipeline(getNext: Observable<any>): Observable<any>;
+  // start using the next two props instead of getVisualizationData()
+  visualizationData$?: Observable<any>;
+  nextFrameEventEmitter?: EventEmitter<void | number>;
   getVisualizationData(data: any): void;
 }
