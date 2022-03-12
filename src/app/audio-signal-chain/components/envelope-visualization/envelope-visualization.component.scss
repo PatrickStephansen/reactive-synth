@@ -24,7 +24,9 @@
 }
 
 svg line {
-  stroke-width: 0.01;
+  shape-rendering: crispEdges;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
   stroke-linecap: round;
   &.current-envelope-time {
     stroke: green;

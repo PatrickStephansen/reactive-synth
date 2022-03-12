@@ -5,9 +5,8 @@
 </h4>
 <div [ngClass]="{ 'is-hidden': hideCanvas }" *ngIf="visualizationData$ | async as envelopeState">
   <svg:svg
-    version="1.1"
+    version="1.2"
     class="envelop-visualization"
-    #visualization_svg
     preserveAspectRatio="none meet"
     width="100%"
     height="140"
@@ -25,7 +24,6 @@
       [attr.x2]="getEnvelopeTime(envelopeState)"
       y1="0"
       y2="1"
-      stroke-width="0.01"
     ></svg:line>
     <svg:line
       [ngClass]="{ active: envelopeState.stage == 'attack', parameter: 1, attack: 1 }"
