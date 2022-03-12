@@ -4,12 +4,13 @@ import { AudioModuleType } from '../model/audio-module-type';
 import { CreateModuleResult } from '../model/create-module-result';
 import { AudioModuleFactory } from './audio-module-factory';
 import { ModuleImplementation } from './module-implementation';
-import { Subscription } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 import { observableFromMessagePort } from '../observable-from-message-port';
 import { frameRateLimit } from '../frame-rate-limit';
 import { ExtensionEvent } from '../model/extension-event';
 import { TriggerExtension } from '../model/trigger-extension';
 import { createModuleReadyPromise } from '../module-ready-promise';
+import { ModuleSignalStage } from '../model/module-signal-stage';
 
 @Injectable()
 export class EnvelopeGeneratorFactory implements AudioModuleFactory {
@@ -78,6 +79,18 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
 
       const manualTriggerEventEmitter = new EventEmitter<ExtensionEvent>();
 
+      const visualizationState = {
+        stage: 0,
+        stageProgress: 0,
+        outputValue: 0,
+        attackValue: attackValue.value,
+        attackTime: attackTime.value,
+        holdTime: holdTime.value,
+        decayTime: decayTime.value,
+        sustainValue: sustainValue.value,
+        releaseTime: releaseTime.value
+      };
+      const stateUpdates = observableFromMessagePort(envelopeGeneratorNode.port, 'state').pipe(map(message => message.state));
       subscriptions.push(
         manualTriggerEventEmitter.subscribe((next: ExtensionEvent) =>
           envelopeGeneratorNode.port.postMessage(next)
@@ -201,7 +214,27 @@ export class EnvelopeGeneratorFactory implements AudioModuleFactory {
                 canConnectSources: true
               }
             ],
-            []
+            [],
+            [
+              {
+                moduleId: id,
+                dataLength: 1,
+                isActive: false,
+                name: 'envelope state',
+                visualizationType: 'envelope',
+                visualizationStage: ModuleSignalStage.input,
+                renderingStrategyPerAxis: [],
+                getVisualizationData: () => {
+                  console.error('This function should not be used: getVisualizationData() on envelope state visualizer.');
+                },
+                createVisualizationPipeline: getNextFrame$ => {
+                  getNextFrame$.subscribe(() =>
+                    envelopeGeneratorNode.port.postMessage({ type: 'get-state' })
+                  );
+                  return stateUpdates;
+                }
+              }
+            ]
           )
       );
     } catch (error) {

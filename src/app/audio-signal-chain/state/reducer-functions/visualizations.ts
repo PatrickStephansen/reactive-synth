@@ -6,3 +6,8 @@ export const setVisualizationActive = (state: AudioSignalChainState, { change })
   );
   return { ...state, visualizations };
 };
+
+export const addVisualization = (state: AudioSignalChainState, { visualization }) => ({
+  ...state,
+  visualizations: [...state.visualizations, visualization]
+});

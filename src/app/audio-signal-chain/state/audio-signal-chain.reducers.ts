@@ -12,7 +12,7 @@ import {
 } from './reducer-functions/parameters';
 import { addOutput } from './reducer-functions/outputs';
 import { addInput } from './reducer-functions/inputs';
-import { setVisualizationActive } from './reducer-functions/visualizations';
+import { addVisualization, setVisualizationActive } from './reducer-functions/visualizations';
 import { addError, clearErrors, removeError } from './reducer-functions/errors';
 import { updateChoice, addChoice } from './reducer-functions/choices';
 import {
@@ -60,7 +60,8 @@ export const realReducer = createReducer(
   on(audioSignalActions.dismissError, removeError),
   on(audioSignalActions.toggleVisualizationActive, setVisualizationActive),
   on(audioSignalActions.setViewMode, setViewMode),
-  on(audioSignalActions.activateControlSurface, activateControlSurface)
+  on(audioSignalActions.activateControlSurface, activateControlSurface),
+  on(audioSignalActions.createVisualizationSuccess, addVisualization)
 );
 
 export function reducer(state: AudioSignalChainState, action: Action) {

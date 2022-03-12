@@ -93,8 +93,8 @@ export class AudioGraphService {
         if (typeof AudioContext !== 'function') {
           throw new Error(
             `Your browser is not supported because it does not implement the Web Audio API.
-          Try reloading the page in a newer browser.
-          If you're using iOS, none of them will work due to Apple store policy restrictions.`
+              Try reloading the page in a newer browser.
+              If you're using iOS, none of them will work due to Apple store policy restrictions.`
           );
         }
         this.context = new AudioContext();
@@ -175,7 +175,8 @@ export class AudioGraphService {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
                 isActive: true,
-                getVisualizationData: data => visualizer.getByteTimeDomainData(data)
+                getVisualizationData: data => visualizer.getByteTimeDomainData(data),
+                createVisualizationPipeline: identity
               },
               {
                 moduleId: 'Output to Speakers',
@@ -185,7 +186,8 @@ export class AudioGraphService {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [logarithmicScalingStrategy, linearScalingStrategy],
                 isActive: false,
-                getVisualizationData: data => visualizer.getByteFrequencyData(data)
+                getVisualizationData: data => visualizer.getByteFrequencyData(data),
+                createVisualizationPipeline: identity
               },
               {
                 moduleId: 'Output to Speakers',
@@ -195,7 +197,8 @@ export class AudioGraphService {
                 visualizationStage: ModuleSignalStage.input,
                 renderingStrategyPerAxis: [linearScalingStrategy, linearScalingStrategy],
                 isActive: false,
-                getVisualizationData: data => visualizer.getByteFrequencyData(data)
+                getVisualizationData: data => visualizer.getByteFrequencyData(data),
+                createVisualizationPipeline: identity
               }
             ],
             muted: this.context.state && this.context.state === 'suspended',
@@ -446,7 +449,7 @@ export class AudioGraphService {
           )?.selection
         })),
       // this will need revision when more visuals are added
-      visualizations: resetState.visualizations,
+      visualizations: [...resetState.visualizations, ...newModules.flatMap(m => m?.visualizations).filter(identity)],
       activeControlSurfaceId: resetState.activeControlSurfaceId
     };
   }

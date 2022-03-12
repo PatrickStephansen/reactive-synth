@@ -84,7 +84,9 @@ export class AudioSignalChainEffects implements OnInitEffects {
     mergeMap(({ signalChain }) =>
       from(this.graphService.loadState(signalChain)).pipe(
         mergeMap(newState => {
-          const actions = [audioSignalActions.resetSignalChainSuccess({ signalChain: newState })] as Action[];
+          const actions = [
+            audioSignalActions.resetSignalChainSuccess({ signalChain: newState })
+          ] as Action[];
           if (newState.muted) {
             actions.push(audioSignalActions.toggleSignalChainActive({ isActive: true }));
           }
@@ -111,6 +113,9 @@ export class AudioSignalChainEffects implements OnInitEffects {
             ),
             ...result.choiceParameters.map(choice =>
               audioSignalActions.createChoiceParameterSuccess({ choice })
+            ),
+            ...result.visualizations.map(visualization =>
+              audioSignalActions.createVisualizationSuccess({ visualization })
             )
           ])
         ),

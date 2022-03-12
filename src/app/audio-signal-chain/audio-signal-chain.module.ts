@@ -40,6 +40,7 @@ import { ViewSelectorShellComponent } from './containers/view-selector-shell/vie
 import { ControlsShellComponent } from './containers/controls-shell/controls-shell.component';
 import { ControlSurfaceFactory } from './audio-modules/control-surface-factory';
 import { ControlSurfaceComponent } from './components/control-surface/control-surface.component';
+import { EnvelopeVisualizationComponent } from './components/envelope-visualization/envelope-visualization.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import { ControlSurfaceComponent } from './components/control-surface/control-su
     TriggerParameterExtensionComponent,
     ViewSelectorShellComponent,
     ControlsShellComponent,
-    ControlSurfaceComponent
+    ControlSurfaceComponent,
+    EnvelopeVisualizationComponent
   ],
   imports: [
     StoreModule.forFeature('signalChain', reducer),

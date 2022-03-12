@@ -1,0 +1,38 @@
+@import '../../../../variables';
+@import '../../../../../node_modules/bulma/sass/utilities/mixins';
+
+.is-hidden {
+  display: none;
+}
+
+.hide-visual {
+  cursor: pointer;
+  position: relative;
+
+  .arrow:not(.is-closed)::after {
+    @include arrow($grey-dark);
+    right: 1.125em;
+    transform: rotate(135deg);
+    margin-top: -0.2em;
+  }
+
+  .arrow.is-closed::after {
+    @include arrow($grey-dark);
+    right: 1.125em;
+    transform: rotate(-45deg);
+  }
+}
+
+svg line {
+  stroke-width: 0.01;
+  stroke-linecap: round;
+  &.current-envelope-time {
+    stroke: green;
+  }
+  &.parameter {
+    stroke: green;
+    &.active {
+      stroke: lime;
+    }
+  }
+}

@@ -19,6 +19,7 @@ import { ActivateControlSurfaceEvent } from '../model/activate-control-surface-e
 import { ChangeParameterBoundsEvent } from '../model/change-parameter-bounds-event';
 import { ControlSurfaceValueChangeEvent } from '../model/control-surface-value-change-event';
 import { ControlSurfaceRangeChangeEvent } from '../model/control-surface-range-change-event';
+import { Visualization } from '../model/visualization/visualization';
 
 export enum AudioSignalChainActionTypes {
   ResetSignalChain = '[Audio Signal Chain] Reset Signal Chain',
@@ -48,6 +49,7 @@ export enum AudioSignalChainActionTypes {
   CreateInputSuccess = '[Audio Signal Chain] Create Input Success',
   CreateOutputSuccess = '[Audio Signal Chain] Create Output Success',
   CreateChoiceParameterSuccess = '[Audio Signal Chain] Create Choice Parameter Success',
+  CreateVisualizationSuccess = '[Audio Signal Chain] Create Visualiztion Success',
   ToggleSignalChainActive = '[Audio Signal Chain] Toggle SignalChain Output Active',
   ToggleSignalChainActiveSuccess = '[Audio Signal Chain] Toggle SignalChain Output Active Success',
   AddError = '[Audio Signal Chain] Add SignalChain Change Error',
@@ -157,6 +159,10 @@ export const audioSignalActions = {
   createChoiceParameterSuccess: createAction(
     AudioSignalChainActionTypes.CreateChoiceParameterSuccess,
     props<{ choice: ChoiceParameter }>()
+  ),
+  createVisualizationSuccess: createAction(
+    AudioSignalChainActionTypes.CreateVisualizationSuccess,
+    props<{visualization: Visualization}>()
   ),
   toggleSignalChainActive: createAction(
     AudioSignalChainActionTypes.ToggleSignalChainActive,

@@ -5,4 +5,8 @@
     [visualization]="visualization"
     (toggleActive)="toggleActive.emit($event)"
   ></app-line-graph-visualization>
+  <app-envelope-visualization *ngIf="visualization.visualizationType === 'envelope'"
+    [visualization]="visualization"
+    (toggleActive)="toggleActive.emit($event)"
+  ></app-envelope-visualization>
 </ng-container>
