@@ -41,6 +41,7 @@ import { ControlsShellComponent } from './containers/controls-shell/controls-she
 import { ControlSurfaceFactory } from './audio-modules/control-surface-factory';
 import { ControlSurfaceComponent } from './components/control-surface/control-surface.component';
 import { EnvelopeVisualizationComponent } from './components/envelope-visualization/envelope-visualization.component';
+import { MonoMidiInputFactory } from './audio-modules/mono-midi-input-factory';
 
 @NgModule({
   declarations: [
@@ -87,7 +88,8 @@ import { EnvelopeVisualizationComponent } from './components/envelope-visualizat
     { provide: AUDIO_MODULE_FACTORY, useClass: NoiseGeneratorFactory, multi: true },
     { provide: AUDIO_MODULE_FACTORY, useClass: OscillatorFactory, multi: true },
     { provide: AUDIO_MODULE_FACTORY, useClass: RectifierFactory, multi: true },
-    { provide: AUDIO_MODULE_FACTORY, useClass: ControlSurfaceFactory, multi: true }
+    { provide: AUDIO_MODULE_FACTORY, useClass: ControlSurfaceFactory, multi: true },
+    { provide: AUDIO_MODULE_FACTORY, useClass: MonoMidiInputFactory, multi: true }
   ]
 })
 export class AudioSignalChainModule {}

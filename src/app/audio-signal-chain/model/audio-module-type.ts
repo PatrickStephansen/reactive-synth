@@ -12,5 +12,6 @@ export enum AudioModuleType {
   ClockDivider = 'clock-divider',
   ConstantSource = 'constant',
   ControlSurface = 'control-surface',
-  Output = 'output'
+  Output = 'output',
+  MonoMidiInput = 'MonoMidiInput'
 }

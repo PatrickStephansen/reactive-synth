@@ -84,4 +84,7 @@ export class AudioModuleListComponent implements OnInit {
   createControlSurfaceModule() {
     this.createModule.emit(new CreateModuleEvent(AudioModuleType.ControlSurface));
   }
+  createMonoMidiInput() {
+    this.createModule.emit(new CreateModuleEvent(AudioModuleType.MonoMidiInput));
+  }
 }
